@@ -1,0 +1,97 @@
+Destination plate name,Row,Column,Well ID,Plate source,Well Source,Strain,Media Definition
+Control strain plate,A,1,Empty,Empty,Empty,Empty,None
+Control strain plate,A,2,Empty,Empty,Empty,Empty,None
+Control strain plate,A,3,Empty,Empty,Empty,Empty,None
+Control strain plate,A,4,Empty,Empty,Empty,Empty,None
+Control strain plate,A,5,Empty,Empty,Empty,Empty,None
+Control strain plate,A,6,Empty,Empty,Empty,Empty,None
+Control strain plate,A,7,Empty,Empty,Empty,Empty,None
+Control strain plate,A,8,Empty,Empty,Empty,Empty,None
+Control strain plate,A,9,Empty,Empty,Empty,Empty,None
+Control strain plate,A,10,Empty,Empty,Empty,Empty,None
+Control strain plate,A,11,Empty,Empty,Empty,Empty,None
+Control strain plate,A,12,Empty,Empty,Empty,Empty,None
+Control strain plate,B,1,Empty,Empty,Empty,Empty,None
+Control strain plate,B,2,Sample,USDA,,Lab strain,YP
+Control strain plate,B,3,Sample,USDA,,Wild strain,YP
+Control strain plate,B,4,Sample,Internal source,,Industrial strain,YP
+Control strain plate,B,5,Sample,ATCC,,Engineered strain,YP
+Control strain plate,B,6,Empty,Empty,Empty,Empty,None
+Control strain plate,B,7,Sample,USDA,,Lab strain,AFEX
+Control strain plate,B,8,Sample,USDA,,Wild strain,AFEX
+Control strain plate,B,9,Sample,Internal source,,Industrial strain,AFEX
+Control strain plate,B,10,Sample,ATCC,,Engineered strain,AFEX
+Control strain plate,B,11,Empty,Empty,Empty,Empty,None
+Control strain plate,B,12,Empty,Empty,Empty,Empty,None
+Control strain plate,C,1,Empty,Empty,Empty,Empty,None
+Control strain plate,C,2,Sample,USDA,,Lab strain,YP+0.25% glucose
+Control strain plate,C,3,Sample,USDA,,Wild strain,YP+0.25% glucose
+Control strain plate,C,4,Sample,Internal source,,Industrial strain,YP+0.25% glucose
+Control strain plate,C,5,Sample,ATCC,,Engineered strain,YP+0.25% glucose
+Control strain plate,C,6,Empty,Empty,Empty,Empty,Empty
+Control strain plate,C,7,Sample,USDA,,Lab strain,AFEX+0.25% glucose
+Control strain plate,C,8,Sample,USDA,,Wild strain,AFEX+0.25% glucose
+Control strain plate,C,9,Sample,Internal source,,Industrial strain,AFEX+0.25% glucose
+Control strain plate,C,10,Sample,ATCC,,Engineered strain,AFEX+0.25% glucose
+Control strain plate,C,11,Empty,Empty,Empty,Empty,None
+Control strain plate,C,12,Empty,Empty,Empty,Empty,None
+Control strain plate,D,1,Empty,Empty,Empty,Empty,None
+Control strain plate,D,2,Sample,USDA,,Lab strain,YP+0.5% glucose
+Control strain plate,D,3,Sample,USDA,,Wild strain,YP+0.5% glucose
+Control strain plate,D,4,Sample,Internal source,,Industrial strain,YP+0.5% glucose
+Control strain plate,D,5,Sample,ATCC,,Engineered strain,YP+0.5% glucose
+Control strain plate,D,6,Empty,Empty,Empty,Empty,Empty
+Control strain plate,D,7,Sample,USDA,,Lab strain,AFEX+0.5% glucose
+Control strain plate,D,8,Sample,USDA,,Wild strain,AFEX+0.5% glucose
+Control strain plate,D,9,Sample,Internal source,,Industrial strain,AFEX+0.5% glucose
+Control strain plate,D,10,Sample,ATCC,,Engineered strain,AFEX+0.5% glucose
+Control strain plate,D,11,Empty,Empty,Empty,Empty,None
+Control strain plate,D,12,Empty,Empty,Empty,Empty,None
+Control strain plate,E,1,Empty,Empty,Empty,Empty,None
+Control strain plate,E,2,Sample,USDA,,Lab strain,YP+1% glucose
+Control strain plate,E,3,Sample,USDA,,Wild strain,YP+1% glucose
+Control strain plate,E,4,Sample,Internal source,,Industrial strain,YP+1% glucose
+Control strain plate,E,5,Sample,ATCC,,Engineered strain,YP+1% glucose
+Control strain plate,E,6,Empty,Empty,Empty,Empty,Empty
+Control strain plate,E,7,Sample,USDA,,Lab strain,AFEX+1% glucose
+Control strain plate,E,8,Sample,USDA,,Wild strain,AFEX+1% glucose
+Control strain plate,E,9,Sample,Internal source,,Industrial strain,AFEX+1% glucose
+Control strain plate,E,10,Sample,ATCC,,Engineered strain,AFEX+1% glucose
+Control strain plate,E,11,Empty,Empty,Empty,Empty,None
+Control strain plate,E,12,Empty,Empty,Empty,Empty,None
+Control strain plate,F,1,Empty,Empty,Empty,Empty,None
+Control strain plate,F,2,Sample,USDA,,Lab strain,YP+2% glucose
+Control strain plate,F,3,Sample,USDA,,Wild strain,YP+2% glucose
+Control strain plate,F,4,Sample,Internal source,,Industrial strain,YP+2% glucose
+Control strain plate,F,5,Sample,ATCC,,Engineered strain,YP+2% glucose
+Control strain plate,F,6,Empty,Empty,Empty,Empty,Empty
+Control strain plate,F,7,Sample,USDA,,Lab strain,AFEX+2% glucose
+Control strain plate,F,8,Sample,USDA,,Wild strain,AFEX+2% glucose
+Control strain plate,F,9,Sample,Internal source,,Industrial strain,AFEX+2% glucose
+Control strain plate,F,10,Sample,ATCC,,Engineered strain,AFEX+2% glucose
+Control strain plate,F,11,Empty,Empty,Empty,Empty,None
+Control strain plate,F,12,Empty,Empty,Empty,Empty,None
+Control strain plate,G,1,Empty,Empty,Empty,Empty,None
+Control strain plate,G,2,Sample,USDA,,Lab strain,YP+5% glucose
+Control strain plate,G,3,Sample,USDA,,Wild strain,YP+5% glucose
+Control strain plate,G,4,Sample,Internal source,,Industrial strain,YP+5% glucose
+Control strain plate,G,5,Sample,ATCC,,Engineered strain,YP+5% glucose
+Control strain plate,G,6,Empty,Empty,Empty,Empty,Empty
+Control strain plate,G,7,Sample,USDA,,Lab strain,AFEX+5% glucose
+Control strain plate,G,8,Sample,USDA,,Wild strain,AFEX+5% glucose
+Control strain plate,G,9,Sample,Internal source,,Industrial strain,AFEX+5% glucose
+Control strain plate,G,10,Sample,ATCC,,Engineered strain,AFEX+5% glucose
+Control strain plate,G,11,Empty,Empty,Empty,Empty,None
+Control strain plate,G,12,Empty,Empty,Empty,Empty,None
+Control strain plate,H,1,Empty,Empty,Empty,Empty,None
+Control strain plate,H,2,Empty,Empty,Empty,Empty,None
+Control strain plate,H,3,Empty,Empty,Empty,Empty,None
+Control strain plate,H,4,Empty,Empty,Empty,Empty,None
+Control strain plate,H,5,Empty,Empty,Empty,Empty,None
+Control strain plate,H,6,Empty,Empty,Empty,Empty,None
+Control strain plate,H,7,Empty,Empty,Empty,Empty,None
+Control strain plate,H,8,Empty,Empty,Empty,Empty,None
+Control strain plate,H,9,Empty,Empty,Empty,Empty,None
+Control strain plate,H,10,Empty,Empty,Empty,Empty,None
+Control strain plate,H,11,Empty,Empty,Empty,Empty,None
+Control strain plate,H,12,Empty,Empty,Empty,Empty,None

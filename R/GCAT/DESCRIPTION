@@ -1,0 +1,17 @@
+Package: GCAT
+Title: Growth Curve Analysis Tool
+Description: Imports high-throughput growth curve data from microtiter
+  plate reads in .csv format and performs non-linear
+  regression using the Richards, Logistic, or Gompertz functions.
+  Richards is used unless the shape parameter is not significant.
+  Local polynomial regression can be performed as well.
+  GCAT estimates important growth characteristics
+  (specific growth rate, maximum growth capacity, and lag time)
+  for each well in a read.
+  The code was written by Jason Shao (no longer at GLBRC) and Nate DiPiazza.
+Version: 5.0
+Depends: pheatmap, gplots
+Maintainer: Yury Bukhman <ybukhman@glbrc.wisc.edu>
+License: LGPL-3
+Date: 2014-02-10
+Author: Jason Shao, Nate DiPiazza <ndipiazza@wisc.edu>, Minh Duc Bui, Yury V Bukhman

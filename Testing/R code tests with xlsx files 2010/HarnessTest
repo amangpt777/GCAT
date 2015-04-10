@@ -1,0 +1,142 @@
+#!/bin/bash
+echo "Starting the harness test .....\n"
+
+R --vanilla --slave  --file="xlsx_file_input_R.txt"
+
+
+#test file 0
+diff ~/harnesstest/multiPlate/test.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv  > consoleOut.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between test.xlsx_HTS.fit.csv AND Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv\n"
+	rm consoleOut.txt
+else
+	echo "There are diff between test.xlsx_HTS.fit.csv AND Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv files. Plase check consoleOut.txt for for details\n"
+fi
+
+
+echo "Testing Multiple  Plate Case .....\n\n"
+#test file 1
+diff ~/harnesstest/multiPlate/test.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/test.xlsx_HTS.fit.csv  > consoleOut1.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two test.xlsx_HTS.fit.csv files\n"
+	rm consoleOut1.txt
+else
+	echo "There are diff between two test.xlsx_HTS.fit.csv. Plase check consoleOut1.txt for details\n"
+fi
+
+
+#test file 2
+diff ~/harnesstest/multiPlate/Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv  > consoleOut2.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv files\n"
+	rm consoleOut2.txt
+else
+	echo "There are diff between two Ecoli_M9_growth_032510_fixed.xlsx_HTS.fit.csv. Plase check consoleOut2.txt for details\n"
+fi
+
+
+
+
+echo "Testing Single Plate Plate Case ....\n\n."
+#test file 3
+diff ~/harnesstest/singlePlate/YPDAFEXglucoseTests_Reps2-3_3-9-10.xlsx_HTS.fit.csv ~/harnesstest/singlePlate/original_csvfile/YPDAFEXglucoseTests_Reps2-3_3-9-10.xlsx_HTS.fit.csv > consoleOut3.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two YPDAFEXglucoseTests_Reps2-3_3-9-10.xlsx_HTS.fit.csv files\n"
+	rm consoleOut3.txt
+else
+	echo "There are diff between two YPDAFEXglucoseTests_Reps2-3_3-9-10.xlsx_HTS.fit.csv. Plase check consoleOut3.txt for details\n"
+fi
+
+
+
+#test file 4
+diff ~/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10.xlsx_HTS.fit.csv ~/harnesstest/singlePlate/original_csvfile/YPDAFEXglucoseTests_2-25-10.xlsx_HTS.fit.csv > consoleOut4.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two YPDAFEXglucoseTests_2-25-10.xlsx_HTS.fit.csv files\n"
+	rm consoleOut4.txt
+else
+	echo "There are diff between two YPDAFEXglucoseTests_2-25-10.xlsx_HTS.fit.csv. Plase check consoleOut4.txt for details\n"
+fi
+
+
+
+echo "Testing Multiple Plate log(x + 2) transformation Case .....\n\n"
+#test file 5
+diff ~/harnesstest/multiPlate/test_n2.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/test_n2.xlsx_HTS.fit.csv  > consoleOut5.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two test_n2.xlsx_HTS.fit.csv files for log(x + 2) transformation\n"
+	rm consoleOut5.txt
+else
+	echo "There are diff between two test_n2.xlsx_HTS.fit.csv files for log(x + 2) transformation. Plase check consoleOut5.txt for details\n"
+fi
+
+
+
+echo "Testing Multiple Plate  log(x + 3) transformation Case .....\n\n"
+#test file 6
+diff ~/harnesstest/multiPlate/test_n3.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/test_n3.xlsx_HTS.fit.csv  > consoleOut6.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two test_n3.xlsx_HTS.fit.csv files for log(x + 3) transformation\n"
+	rm consoleOut6.txt
+else
+	echo "There are diff between two test_n3.xlsx_HTS.fit.csv files for log(x + 3) transformation. Plase check consoleOut6.txt for details\n"
+fi
+
+
+echo "Testing Multiple Plate log(x + 0) transformation Case .....\n\n"
+#test file 7
+diff ~/harnesstest/multiPlate/test_n0.xlsx_HTS.fit.csv ~/harnesstest/multiPlate/original_csvfile/test_n0.xlsx_HTS.fit.csv  > consoleOut7.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two test_n0.xlsx_HTS.fit.csv files for log(x + 0) transformation\n"
+	rm consoleOut7.txt
+else
+	echo "There are diff between two test_n0.xlsx_HTS.fit.csv files for log(x + 0) transformation. Plase check consoleOut7.txt for details\n"
+fi
+
+
+echo "Testing Single Plate log(x + 0) transformation Case .....\n\n"
+#test file 8
+diff ~/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n0.xlsx_HTS.fit.csv ~/harnesstest/singlePlate/original_csvfile/YPDAFEXglucoseTests_2-25-10_n0.xlsx_HTS.fit.csv > consoleOut8.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two YPDAFEXglucoseTests_2-25-10_n0.xlsx_HTS.fit.csv files\n"
+	rm consoleOut8.txt
+else
+	echo "There are diff between two YPDAFEXglucoseTests_2-25-10_n0.xlsx_HTS.fit.csv. Plase check consoleOut8.txt for details\n"
+fi
+
+echo "Testing Single Plate log(x + 2) transformation Case .....\n\n"
+#test file 9
+diff ~/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n2.xlsx_HTS.fit.csv ~/harnesstest/singlePlate/original_csvfile/YPDAFEXglucoseTests_2-25-10_n2.xlsx_HTS.fit.csv > consoleOut9.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two YPDAFEXglucoseTests_2-25-10_n2.xlsx_HTS.fit.csv files\n"
+	rm consoleOut9.txt
+else
+	echo "There are diff between two YPDAFEXglucoseTests_2-25-10_n2.xlsx_HTS.fit.csv. Plase check consoleOut9.txt for details\n"
+fi
+
+
+echo "Testing Single Plate log(x + 3) transformation Case .....\n\n"
+#test file 10
+diff ~/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n3.xlsx_HTS.fit.csv ~/harnesstest/singlePlate/original_csvfile/YPDAFEXglucoseTests_2-25-10_n3.xlsx_HTS.fit.csv > consoleOut10.txt
+if [ $? == 0 ]
+then
+	echo "NO diff between two YPDAFEXglucoseTests_2-25-10_n3.xlsx_HTS.fit.csv files\n"
+	rm consoleOut10.txt
+else
+	echo "There are diff between two YPDAFEXglucoseTests_2-25-10_n3.xlsx_HTS.fit.csv. Plase check consoleOut10.txt for details\n"
+fi
+
+
+
+
+echo "The End of The Harness Test ....."

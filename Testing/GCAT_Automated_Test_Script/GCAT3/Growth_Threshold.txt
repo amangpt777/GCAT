@@ -1,0 +1,129 @@
+"row"	"plate"	"well"	"media"	"strain"	"model"	"spec.growth"	"tot.growth"	"lag.time"	"inoc.OD"	"good.fit"	"empty"	"asymp"	"tank"	"reach"	"other"	"pdf.file"	"page.no"	"Destination.plate.name"	"Well.ID"	"Plate.source"	"Well.Source"
+1	"YPDAFEXglucoseTests_2-25-10"	"A01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	2	"Control strain plate"	"Empty"	"Empty"	"Empty"
+2	"YPDAFEXglucoseTests_2-25-10"	"B01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	3	"Control strain plate"	"Empty"	"Empty"	"Empty"
+3	"YPDAFEXglucoseTests_2-25-10"	"C01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	4	"Control strain plate"	"Empty"	"Empty"	"Empty"
+4	"YPDAFEXglucoseTests_2-25-10"	"D01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	5	"Control strain plate"	"Empty"	"Empty"	"Empty"
+5	"YPDAFEXglucoseTests_2-25-10"	"E01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	6	"Control strain plate"	"Empty"	"Empty"	"Empty"
+6	"YPDAFEXglucoseTests_2-25-10"	"F01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	7	"Control strain plate"	"Empty"	"Empty"	"Empty"
+7	"YPDAFEXglucoseTests_2-25-10"	"G01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	8	"Control strain plate"	"Empty"	"Empty"	"Empty"
+8	"YPDAFEXglucoseTests_2-25-10"	"H01"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	9	"Control strain plate"	"Empty"	"Empty"	"Empty"
+9	"YPDAFEXglucoseTests_2-25-10"	"A02"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	10	"Control strain plate"	"Empty"	"Empty"	"Empty"
+10	"YPDAFEXglucoseTests_2-25-10"	"B02"	"YP"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	11	"Control strain plate"	"Sample"	"USDA"	""
+11	"YPDAFEXglucoseTests_2-25-10"	"C02"	"YP+0.25% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	12	"Control strain plate"	"Sample"	"USDA"	""
+12	"YPDAFEXglucoseTests_2-25-10"	"D02"	"YP+0.5% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	13	"Control strain plate"	"Sample"	"USDA"	""
+13	"YPDAFEXglucoseTests_2-25-10"	"E02"	"YP+1% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	14	"Control strain plate"	"Sample"	"USDA"	""
+14	"YPDAFEXglucoseTests_2-25-10"	"F02"	"YP+2% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	15	"Control strain plate"	"Sample"	"USDA"	""
+15	"YPDAFEXglucoseTests_2-25-10"	"G02"	"YP+5% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	16	"Control strain plate"	"Sample"	"USDA"	""
+16	"YPDAFEXglucoseTests_2-25-10"	"H02"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	17	"Control strain plate"	"Empty"	"Empty"	"Empty"
+17	"YPDAFEXglucoseTests_2-25-10"	"A03"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	18	"Control strain plate"	"Empty"	"Empty"	"Empty"
+18	"YPDAFEXglucoseTests_2-25-10"	"B03"	"YP"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	19	"Control strain plate"	"Sample"	"USDA"	""
+19	"YPDAFEXglucoseTests_2-25-10"	"C03"	"YP+0.25% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	20	"Control strain plate"	"Sample"	"USDA"	""
+20	"YPDAFEXglucoseTests_2-25-10"	"D03"	"YP+0.5% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	21	"Control strain plate"	"Sample"	"USDA"	""
+21	"YPDAFEXglucoseTests_2-25-10"	"E03"	"YP+1% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	22	"Control strain plate"	"Sample"	"USDA"	""
+22	"YPDAFEXglucoseTests_2-25-10"	"F03"	"YP+2% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	23	"Control strain plate"	"Sample"	"USDA"	""
+23	"YPDAFEXglucoseTests_2-25-10"	"G03"	"YP+5% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	24	"Control strain plate"	"Sample"	"USDA"	""
+24	"YPDAFEXglucoseTests_2-25-10"	"H03"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	25	"Control strain plate"	"Empty"	"Empty"	"Empty"
+25	"YPDAFEXglucoseTests_2-25-10"	"A04"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	26	"Control strain plate"	"Empty"	"Empty"	"Empty"
+26	"YPDAFEXglucoseTests_2-25-10"	"B04"	"YP"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	27	"Control strain plate"	"Sample"	"Internal source"	""
+27	"YPDAFEXglucoseTests_2-25-10"	"C04"	"YP+0.25% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	28	"Control strain plate"	"Sample"	"Internal source"	""
+28	"YPDAFEXglucoseTests_2-25-10"	"D04"	"YP+0.5% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	29	"Control strain plate"	"Sample"	"Internal source"	""
+29	"YPDAFEXglucoseTests_2-25-10"	"E04"	"YP+1% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	30	"Control strain plate"	"Sample"	"Internal source"	""
+30	"YPDAFEXglucoseTests_2-25-10"	"F04"	"YP+2% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	31	"Control strain plate"	"Sample"	"Internal source"	""
+31	"YPDAFEXglucoseTests_2-25-10"	"G04"	"YP+5% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	32	"Control strain plate"	"Sample"	"Internal source"	""
+32	"YPDAFEXglucoseTests_2-25-10"	"H04"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	33	"Control strain plate"	"Empty"	"Empty"	"Empty"
+33	"YPDAFEXglucoseTests_2-25-10"	"A05"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	34	"Control strain plate"	"Empty"	"Empty"	"Empty"
+34	"YPDAFEXglucoseTests_2-25-10"	"B05"	"YP"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	35	"Control strain plate"	"Sample"	"ATCC"	""
+35	"YPDAFEXglucoseTests_2-25-10"	"C05"	"YP+0.25% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	36	"Control strain plate"	"Sample"	"ATCC"	""
+36	"YPDAFEXglucoseTests_2-25-10"	"D05"	"YP+0.5% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	37	"Control strain plate"	"Sample"	"ATCC"	""
+37	"YPDAFEXglucoseTests_2-25-10"	"E05"	"YP+1% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	38	"Control strain plate"	"Sample"	"ATCC"	""
+38	"YPDAFEXglucoseTests_2-25-10"	"F05"	"YP+2% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	39	"Control strain plate"	"Sample"	"ATCC"	""
+39	"YPDAFEXglucoseTests_2-25-10"	"G05"	"YP+5% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	40	"Control strain plate"	"Sample"	"ATCC"	""
+40	"YPDAFEXglucoseTests_2-25-10"	"H05"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	41	"Control strain plate"	"Empty"	"Empty"	"Empty"
+41	"YPDAFEXglucoseTests_2-25-10"	"A06"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	42	"Control strain plate"	"Empty"	"Empty"	"Empty"
+42	"YPDAFEXglucoseTests_2-25-10"	"B06"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	43	"Control strain plate"	"Empty"	"Empty"	"Empty"
+43	"YPDAFEXglucoseTests_2-25-10"	"C06"	"Empty"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	44	"Control strain plate"	"Empty"	"Empty"	"Empty"
+44	"YPDAFEXglucoseTests_2-25-10"	"D06"	"Empty"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	45	"Control strain plate"	"Empty"	"Empty"	"Empty"
+45	"YPDAFEXglucoseTests_2-25-10"	"E06"	"Empty"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	46	"Control strain plate"	"Empty"	"Empty"	"Empty"
+46	"YPDAFEXglucoseTests_2-25-10"	"F06"	"Empty"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	47	"Control strain plate"	"Empty"	"Empty"	"Empty"
+47	"YPDAFEXglucoseTests_2-25-10"	"G06"	"Empty"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	48	"Control strain plate"	"Empty"	"Empty"	"Empty"
+48	"YPDAFEXglucoseTests_2-25-10"	"H06"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	49	"Control strain plate"	"Empty"	"Empty"	"Empty"
+49	"YPDAFEXglucoseTests_2-25-10"	"A07"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	50	"Control strain plate"	"Empty"	"Empty"	"Empty"
+50	"YPDAFEXglucoseTests_2-25-10"	"B07"	"AFEX"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	51	"Control strain plate"	"Sample"	"USDA"	""
+51	"YPDAFEXglucoseTests_2-25-10"	"C07"	"AFEX+0.25% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	52	"Control strain plate"	"Sample"	"USDA"	""
+52	"YPDAFEXglucoseTests_2-25-10"	"D07"	"AFEX+0.5% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	53	"Control strain plate"	"Sample"	"USDA"	""
+53	"YPDAFEXglucoseTests_2-25-10"	"E07"	"AFEX+1% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	54	"Control strain plate"	"Sample"	"USDA"	""
+54	"YPDAFEXglucoseTests_2-25-10"	"F07"	"AFEX+2% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	55	"Control strain plate"	"Sample"	"USDA"	""
+55	"YPDAFEXglucoseTests_2-25-10"	"G07"	"AFEX+5% glucose"	"Lab strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	56	"Control strain plate"	"Sample"	"USDA"	""
+56	"YPDAFEXglucoseTests_2-25-10"	"H07"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	57	"Control strain plate"	"Empty"	"Empty"	"Empty"
+57	"YPDAFEXglucoseTests_2-25-10"	"A08"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	58	"Control strain plate"	"Empty"	"Empty"	"Empty"
+58	"YPDAFEXglucoseTests_2-25-10"	"B08"	"AFEX"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	59	"Control strain plate"	"Sample"	"USDA"	""
+59	"YPDAFEXglucoseTests_2-25-10"	"C08"	"AFEX+0.25% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	60	"Control strain plate"	"Sample"	"USDA"	""
+60	"YPDAFEXglucoseTests_2-25-10"	"D08"	"AFEX+0.5% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	61	"Control strain plate"	"Sample"	"USDA"	""
+61	"YPDAFEXglucoseTests_2-25-10"	"E08"	"AFEX+1% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	62	"Control strain plate"	"Sample"	"USDA"	""
+62	"YPDAFEXglucoseTests_2-25-10"	"F08"	"AFEX+2% glucose"	"Wild strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	63	"Control strain plate"	"Sample"	"USDA"	""
+63	"YPDAFEXglucoseTests_2-25-10"	"G08"	"AFEX+5% glucose"	"Wild strain"	"richards 5-par."	0.104909957772007	1.38120323294419	3.5400282340856	0.0841025860310471	3.54895808838236	"I "	"-"	"-"	99.9341701264792	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	64	"Control strain plate"	"Sample"	"USDA"	""
+64	"YPDAFEXglucoseTests_2-25-10"	"H08"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	65	"Control strain plate"	"Empty"	"Empty"	"Empty"
+65	"YPDAFEXglucoseTests_2-25-10"	"A09"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	66	"Control strain plate"	"Empty"	"Empty"	"Empty"
+66	"YPDAFEXglucoseTests_2-25-10"	"B09"	"AFEX"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	67	"Control strain plate"	"Sample"	"Internal source"	""
+67	"YPDAFEXglucoseTests_2-25-10"	"C09"	"AFEX+0.25% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	68	"Control strain plate"	"Sample"	"Internal source"	""
+68	"YPDAFEXglucoseTests_2-25-10"	"D09"	"AFEX+0.5% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	69	"Control strain plate"	"Sample"	"Internal source"	""
+69	"YPDAFEXglucoseTests_2-25-10"	"E09"	"AFEX+1% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	70	"Control strain plate"	"Sample"	"Internal source"	""
+70	"YPDAFEXglucoseTests_2-25-10"	"F09"	"AFEX+2% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	71	"Control strain plate"	"Sample"	"Internal source"	""
+71	"YPDAFEXglucoseTests_2-25-10"	"G09"	"AFEX+5% glucose"	"Industrial strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	72	"Control strain plate"	"Sample"	"Internal source"	""
+72	"YPDAFEXglucoseTests_2-25-10"	"H09"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	73	"Control strain plate"	"Empty"	"Empty"	"Empty"
+73	"YPDAFEXglucoseTests_2-25-10"	"A10"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	74	"Control strain plate"	"Empty"	"Empty"	"Empty"
+74	"YPDAFEXglucoseTests_2-25-10"	"B10"	"AFEX"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	75	"Control strain plate"	"Sample"	"ATCC"	""
+75	"YPDAFEXglucoseTests_2-25-10"	"C10"	"AFEX+0.25% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	76	"Control strain plate"	"Sample"	"ATCC"	""
+76	"YPDAFEXglucoseTests_2-25-10"	"D10"	"AFEX+0.5% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	77	"Control strain plate"	"Sample"	"ATCC"	""
+77	"YPDAFEXglucoseTests_2-25-10"	"E10"	"AFEX+1% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	78	"Control strain plate"	"Sample"	"ATCC"	""
+78	"YPDAFEXglucoseTests_2-25-10"	"F10"	"AFEX+2% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	79	"Control strain plate"	"Sample"	"ATCC"	""
+79	"YPDAFEXglucoseTests_2-25-10"	"G10"	"AFEX+5% glucose"	"Engineered strain"	"<NA>: skipped"	NA	NA	NA	NA	NA	"! "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	80	"Control strain plate"	"Sample"	"ATCC"	""
+80	"YPDAFEXglucoseTests_2-25-10"	"H10"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	81	"Control strain plate"	"Empty"	"Empty"	"Empty"
+81	"YPDAFEXglucoseTests_2-25-10"	"A11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	82	"Control strain plate"	"Empty"	"Empty"	"Empty"
+82	"YPDAFEXglucoseTests_2-25-10"	"B11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	83	"Control strain plate"	"Empty"	"Empty"	"Empty"
+83	"YPDAFEXglucoseTests_2-25-10"	"C11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	84	"Control strain plate"	"Empty"	"Empty"	"Empty"
+84	"YPDAFEXglucoseTests_2-25-10"	"D11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	85	"Control strain plate"	"Empty"	"Empty"	"Empty"
+85	"YPDAFEXglucoseTests_2-25-10"	"E11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	86	"Control strain plate"	"Empty"	"Empty"	"Empty"
+86	"YPDAFEXglucoseTests_2-25-10"	"F11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	87	"Control strain plate"	"Empty"	"Empty"	"Empty"
+87	"YPDAFEXglucoseTests_2-25-10"	"G11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	88	"Control strain plate"	"Empty"	"Empty"	"Empty"
+88	"YPDAFEXglucoseTests_2-25-10"	"H11"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	89	"Control strain plate"	"Empty"	"Empty"	"Empty"
+89	"YPDAFEXglucoseTests_2-25-10"	"A12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	90	"Control strain plate"	"Empty"	"Empty"	"Empty"
+90	"YPDAFEXglucoseTests_2-25-10"	"B12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	91	"Control strain plate"	"Empty"	"Empty"	"Empty"
+91	"YPDAFEXglucoseTests_2-25-10"	"C12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	92	"Control strain plate"	"Empty"	"Empty"	"Empty"
+92	"YPDAFEXglucoseTests_2-25-10"	"D12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	93	"Control strain plate"	"Empty"	"Empty"	"Empty"
+93	"YPDAFEXglucoseTests_2-25-10"	"E12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	94	"Control strain plate"	"Empty"	"Empty"	"Empty"
+94	"YPDAFEXglucoseTests_2-25-10"	"F12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	95	"Control strain plate"	"Empty"	"Empty"	"Empty"
+95	"YPDAFEXglucoseTests_2-25-10"	"G12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	96	"Control strain plate"	"Empty"	"Empty"	"Empty"
+96	"YPDAFEXglucoseTests_2-25-10"	"H12"	"None"	"Empty"	"<NA>: skipped"	NA	NA	NA	NA	NA	"E "	"-"	"-"	NA	""	"YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.58.22.pdf"	97	"Control strain plate"	"Empty"	"Empty"	"Empty"
+
+# -- Explanation of columns -- 
+#    - model: Name of the model the well was successfully fit with (if any) 
+#    - spec.growth: (Specific growth rate) The largest exponential growth rate achieved by the culture in the course of the experiment 
+#    - tot.growth: (Total extrapolated growth) The estimated growth plateau from the fitted model in optical density units. May be higher than the actual highest OD reached. 
+#    - lag.time: (Lag time) The exponential trend from <spec.growth> is extrapolated to the baseline OD at inoculation and subtracted from the time at inoculation to yield lag time. 
+#    - inoc.OD: (OD at inoculation) The adjusted optical density at the user-specified starting timepoint. 
+#    - good.fit: (Goodness of fit) A metric based on root mean square deviations (RMSD). 
+#              - higher values ( > 3.0) indicate a very good fit while lower values (< 2.0) indicate generally unacceptable fits. 
+#    - empty: (Well indicator) 
+#              - an 'E' indicates that the well was empty and no growth was detected.  
+#              - an 'I' indicates that the well was inoculated and growth was detected above the threshold.  
+#              - an 'E*' indicates that the well was empty and growth was detected (possible contamination).  
+#              - an '!' indicates that the well was inoculated and no growth was detected.  
+#    - tank: (Tanking indicator) If a number is present then the growth trend was determined to tank at that timepoint index. 
+#    - reach: (Final growth percentage): The percentage of <tot.growth> reached by the culture in the course of the experiment. 
+#    - other: Other information includes output from jump detection algorithm and additional columns from the Plate Layout. 
+#    - pdf.file and page.no: location of the figure for this well in the output .pdf files.
+#
+# -- Source file information-- 
+#  YPDAFEXglucoseTests_2-25-10.csv 
+#  analyzed using GCAT v 0.01 
+#  request sent:  2013-11-26 11:58:22 
+#  completed:  2013-11-26 11:58:30 
+#
+# -- Parameters used in current analysis -- 
+#    - Constant added to log(OD + n) transformation: 1 
+#    - Blank OD value:  First timepoint in well 
+#    - Index of inoculation timepoint 2 
+#    - Minimum growth threshold: 1.37 
+#    - Removed points:  
+#    - Jump detection: FALSE

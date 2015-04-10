@@ -1,0 +1,52 @@
+library(MadHTS)
+file = "/home/GLBRC/exie/harnesstest/multiPlate/test.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test = default.screen.fit(file,  out.dir, out.dir, addOne = 1)
+
+
+file = "/home/GLBRC/exie/harnesstest/multiPlate/Ecoli_M9_growth_032510_fixed.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test = default.screen.fit(file,  out.dir, out.dir, addOne = 1)
+
+
+
+file = "/home/GLBRC/exie/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test_new = single.screen.fit(file, out.dir, out.dir, addOne = 1)
+
+
+
+file = "/home/GLBRC/exie/harnesstest/singlePlate/YPDAFEXglucoseTests_Reps2-3_3-9-10.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test_new = single.screen.fit(file, out.dir, out.dir, addOne = 1)
+
+
+file = "/home/GLBRC/exie/harnesstest/multiPlate/test_n0.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test = default.screen.fit(file,  out.dir, out.dir, addOne = 0)
+
+
+file = "/home/GLBRC/exie/harnesstest/multiPlate/test_n2.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test = default.screen.fit(file,  out.dir, out.dir, addOne = 2)
+
+
+
+file = "/home/GLBRC/exie/harnesstest/multiPlate/test_n3.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test = default.screen.fit(file,  out.dir, out.dir, addOne = 3)
+
+
+file = "/home/GLBRC/exie/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n0.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test_new = single.screen.fit(file, out.dir, out.dir, addOne = 0)
+
+
+file = "/home/GLBRC/exie/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n2.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test_new = single.screen.fit(file, out.dir, out.dir, addOne = 2)
+
+
+file = "/home/GLBRC/exie/harnesstest/singlePlate/YPDAFEXglucoseTests_2-25-10_n3.xlsx"
+out.dir = "/home/GLBRC/exie/outdir_test"
+test_new = single.screen.fit(file, out.dir, out.dir, addOne = 3)

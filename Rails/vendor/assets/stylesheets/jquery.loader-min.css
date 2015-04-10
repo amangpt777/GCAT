@@ -1,0 +1,26 @@
+/*
+ * Copyright 2012 The Board of Regents of the University of Wisconsin System.
+ * Contributors: Jason Shao, James McCurdy, Enhai Xie, Adam G.W. Halstead,
+ * Michael H. Whitney, Nathan DiPiazza, Trey K. Sato and Yury V. Bukhman
+ *
+ * This file is part of GCAT.
+ *
+ * GCAT is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GCAT is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@CHARSET "UTF-8";
+#jquery-loader{border:1px grey solid;padding-top:10px;background-color:white;text-align:center;background-image:url(ajax-loader.gif);background-position:center center;background-repeat:no-repeat;}
+#jquery-loader-background{background-color:silver;}
+#jquery-loader.blue-with-image{border:2px #008587 solid;padding-top:10px;background-color:white;text-align:center;background-image:url(ajax-loader.gif);background-position:center center;background-repeat:no-repeat;}
+#jquery-loader.blue-with-image-2{border:none;padding-top:10px;background-color:transparent;text-align:center;background-image:url(ajax-loader.gif);background-position:center center;background-repeat:no-repeat;}

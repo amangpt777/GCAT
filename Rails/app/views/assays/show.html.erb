@@ -1,0 +1,42 @@
+<div id="results-container">
+  <% if flash[:notice] %>
+    <div class="alert alert-success alert-dismissible" role="alert" style="width:668px;">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+  <% if flash[:alert] %>
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <%= flash[:alert] %>
+    </div>
+  <% end %>
+  <h1>Analysis Results</h1>
+  <p>
+    Uploaded file: <%=h @result[:inputfile].to_s %>
+    <br>
+    <% if @result[:layout_file] %>
+      Layout file: <%=h @result[:layout_file].to_s %>
+    <% end %>
+  </p>
+  <%= link_to 'New Assay', new_assay_path%>
+  <p>
+    <% @result[:overviewFiles].each do | overview_file | %>
+      <%= link_to image_tag(relative_path(overview_file),
+                  :alt => "Your Submission",
+                  :style => "vertical-align:middle;"),
+                  relative_path(@result[:zipfile])%>
+    <% end %>
+  </p>
+  <br>
+  <h3><i>Analysis Results DataTable</i></h3>
+  <table class="table table-bordered table-striped table-condensed">
+    <% @table.each do |row| %>
+      <% i = 0 %>
+      <tr>
+        <% row.each do |cell| %>
+          <!-- don't round row # -->
+          <td><%= cell %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
+</div>

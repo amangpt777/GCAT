@@ -1,0 +1,102 @@
+/*
+ * Copyright 2012 The Board of Regents of the University of Wisconsin System.
+ * Contributors: Jason Shao, James McCurdy, Enhai Xie, Adam G.W. Halstead,
+ * Michael H. Whitney, Nathan DiPiazza, Trey K. Sato and Yury V. Bukhman
+ *
+ * This file is part of GCAT.
+ *
+ * GCAT is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GCAT is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*.yui-skin-sam .yui-dt-liner { white-space:nowrap; font-size: 8pt;}
+.twoColLiqLtHdr #mainContent { margin:0;min-height:500px; } //Not used anymore NWD// */
+
+body {
+  background: url("bkg-body.png") repeat-x scroll left top #FFFFFF;
+  background-color: #FFFFFF;
+}
+
+a:visited { color: #428bca !important;}
+
+#nav-bar{
+  background:#B0C5D4;
+  border-bottom:1px solid #B0C5D4;
+  text-align:center;
+  h1{
+    font: 42px impact, sans-serif;
+  }
+}
+
+/*#copyright-stmt {
+  padding: 5px 25px;
+  width: 88%;
+  margin: 20px auto 0;
+  text-align: right;
+}*/
+
+#header h1 {
+  font-size: 32px;
+  color: #4F4F4F;
+}
+
+#results-container {    
+  background-color: #FFFFFF;
+  border: 1px solid black;
+  margin: 20px auto 0;
+  padding: 120px;
+  width: 4000px;        
+}
+
+#form-container {    
+  background-color: #FFFFFF;
+  border: 1px solid black;
+  margin: 20px auto 0;
+  width: 1600px;
+  padding-left: 50px;      
+}
+
+#contents {
+  padding: 5px 25px;
+}
+
+/*#mainContent{
+  margin:0;
+  min-height:500px;
+}*/
+
+/*#header {
+  background: #fffff; 
+  font: 14px arial;
+  color: black; 
+  height:50px;
+  text-align:left;
+  padding: 0px 10px;
+  border-bottom:1px solid #69B03F;
+  width: 1600px;
+}*/
+
+/*#flash_notice, #flash_error, #flash_alert, .notice, .error, .alert {
+  padding: 5px 8px;
+  margin: 10px 0;
+}
+
+#flash_notice, .notice {
+  background-color: #CFC;
+  border: solid 1px #6C6;
+}
+
+#flash_error, #flash_alert, .error, .alert {
+  background-color: #FCC;
+  border: solid 1px #C66;
+}*/

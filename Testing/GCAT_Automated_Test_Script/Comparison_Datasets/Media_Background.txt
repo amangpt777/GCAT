@@ -1,0 +1,110 @@
+Command:
+Rscript compare_gcat_outputs.R ./GCAT2/Media_Background.txt ./GCAT3/Media_Background.txt Media_Background
+
+Summary: 
+
+   Mode    TRUE    NA's 
+logical      96       0 
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+
+
+GCAT2: 
+
+  row                       plate well media strain         model spec.growth
+1   1 YPDAFEXglucoseTests_2-25-10  A01  None  Empty <NA>: skipped          NA
+2   2 YPDAFEXglucoseTests_2-25-10  B01  None  Empty <NA>: skipped          NA
+3   3 YPDAFEXglucoseTests_2-25-10  C01  None  Empty <NA>: skipped          NA
+4   4 YPDAFEXglucoseTests_2-25-10  D01  None  Empty <NA>: skipped          NA
+5   5 YPDAFEXglucoseTests_2-25-10  E01  None  Empty <NA>: skipped          NA
+6   6 YPDAFEXglucoseTests_2-25-10  F01  None  Empty <NA>: skipped          NA
+  tot.growth lag.time inoc.OD good.fit empty asymp tank reach other
+1         NA       NA      NA       NA    E      -    -    NA    NA
+2         NA       NA      NA       NA    E      -    -    NA    NA
+3         NA       NA      NA       NA    E      -    -    NA    NA
+4         NA       NA      NA       NA    E      -    -    NA    NA
+5         NA       NA      NA       NA    E      -    -    NA    NA
+6         NA       NA      NA       NA    E      -    -    NA    NA
+                                                   pdf.file page.no
+1 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       2
+2 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       3
+3 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       4
+4 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       5
+5 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       6
+6 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.49.pdf       7
+  Destination.plate.name Well.ID Plate.source Well.Source
+1   Control strain plate   Empty        Empty       Empty
+2   Control strain plate   Empty        Empty       Empty
+3   Control strain plate   Empty        Empty       Empty
+4   Control strain plate   Empty        Empty       Empty
+5   Control strain plate   Empty        Empty       Empty
+6   Control strain plate   Empty        Empty       Empty
+
+
+GCAT3: 
+
+  row                       plate well media strain         model spec.growth
+1   1 YPDAFEXglucoseTests_2-25-10  A01  None  Empty <NA>: skipped          NA
+2   2 YPDAFEXglucoseTests_2-25-10  B01  None  Empty <NA>: skipped          NA
+3   3 YPDAFEXglucoseTests_2-25-10  C01  None  Empty <NA>: skipped          NA
+4   4 YPDAFEXglucoseTests_2-25-10  D01  None  Empty <NA>: skipped          NA
+5   5 YPDAFEXglucoseTests_2-25-10  E01  None  Empty <NA>: skipped          NA
+6   6 YPDAFEXglucoseTests_2-25-10  F01  None  Empty <NA>: skipped          NA
+  tot.growth lag.time inoc.OD good.fit empty asymp tank reach other
+1         NA       NA      NA       NA    E      -    -    NA    NA
+2         NA       NA      NA       NA    E      -    -    NA    NA
+3         NA       NA      NA       NA    E      -    -    NA    NA
+4         NA       NA      NA       NA    E      -    -    NA    NA
+5         NA       NA      NA       NA    E      -    -    NA    NA
+6         NA       NA      NA       NA    E      -    -    NA    NA
+                                                   pdf.file page.no
+1 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       2
+2 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       3
+3 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       4
+4 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       5
+5 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       6
+6 YPDAFEXglucoseTests_2-25-10_plots_2013-11-26_11.41.59.pdf       7
+  Destination.plate.name Well.ID Plate.source Well.Source Media.Definition
+1   Control strain plate   Empty        Empty       Empty             None
+2   Control strain plate   Empty        Empty       Empty             None
+3   Control strain plate   Empty        Empty       Empty             None
+4   Control strain plate   Empty        Empty       Empty             None
+5   Control strain plate   Empty        Empty       Empty             None
+6   Control strain plate   Empty        Empty       Empty             None
+
+
+Specific Growth Comparison Summary: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+      1       1       1       1       1       1      50 
+
+
+Total Growth Comparison Summary: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+      1       1       1       1       1       1      50 
+
+
+Lag Time Comparison Summary: 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+      1       1       1       1       1       1      50 
+null device 
+          1 
+ [1] row                    plate                  well                  
+ [4] media                  strain                 model                 
+ [7] spec.growth            tot.growth             lag.time              
+[10] inoc.OD                good.fit               empty                 
+[13] asymp                  tank                   reach                 
+[16] other                  pdf.file               page.no               
+[19] Destination.plate.name Well.ID                Plate.source          
+[22] Well.Source           
+<0 rows> (or 0-length row.names)
+ [1] row                    plate                  well                  
+ [4] media                  strain                 model                 
+ [7] spec.growth            tot.growth             lag.time              
+[10] inoc.OD                good.fit               empty                 
+[13] asymp                  tank                   reach                 
+[16] other                  pdf.file               page.no               
+[19] Destination.plate.name Well.ID                Plate.source          
+[22] Well.Source            Media.Definition      
+<0 rows> (or 0-length row.names)
