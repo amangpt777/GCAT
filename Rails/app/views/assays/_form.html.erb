@@ -45,16 +45,17 @@
           </div>
         </li>
         <li>
-          <h3><span data-tooltip="OD value for blank well read. As the default option <NULL>, GCAT will automatically take the first OD reading of each well to be the blank.">Media background</span></h3>
-          <%= f.radio_button(:blank_value, "zero", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_zero, "0" ) %> <br/>
-          <%= f.radio_button(:blank_value, "default", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br>
+          <h3><span data-tooltip="OD value for blank well read">Media background</span></h3>
           <%= f.radio_button(:blank_value, "user", {:checked => true, :class => "user_enter3 user_enter3_yes"}) %>
           <%= f.label(:blank_value_user, "User Input.") %>
           <div class="field optional_input3" style="display:none">
             <%= f.text_field :blank_value_input, :placeholder => 'Enter your OD blank value here' %>
           </div>
+          <br>
+          <%= f.radio_button(:blank_value, "default", {:class => "user_enter3 user_enter3_no"}) %>
+          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br>
+          <%= f.radio_button(:blank_value, "zero", {:class => "user_enter3 user_enter3_no"}) %>
+          <%= f.label(:blank_value_zero, "Set to 0" ) %>
         </li>
         <li>
           <h3><span data-tooltip="GCAT transforms optical density (OD) to log(x+δ). x = OD – Media background. Specify a value for n or choose from the defaults. Note: 0 is not recommended unless all wells contain many repeated measurements for initial density that can be used to accurately estimate the baseline density. See the user manual for more details.">OD Transform</span></h3>
@@ -84,8 +85,8 @@
           <h3><span data-tooltip="Enter the index of the timepoint at which the wells were inoculated with the culture. 
             " >Inoculation timepoint</span></h3>
           <div class="field">
-              <%= f.label :start_index, "Enter the timepoint index (positive integer only).  The default value is 2. "  %><br />
-              <%= f.text_field(:start_index, :type => 'number', :min =>'1', :size => '3', :value => '2') %>
+              <%= f.label :start_index, "Enter the timepoint index (positive integer only).  The default value is 1. "  %><br />
+              <%= f.text_field(:start_index, :type => 'number', :min =>'1', :size => '3', :value => '1') %>
           </div>
         </li>
         <li>

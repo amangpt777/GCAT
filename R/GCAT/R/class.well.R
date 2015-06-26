@@ -306,6 +306,7 @@ setMethod("show", "well",
 #' @param  well.number the number of the well in an array of wells
 #' @param  ... additional arguments passed to the generic plot function
 #' 
+#' @export
 setMethod("plot",
           signature(x = "well", y="missing"),
           function (x, y, constant.added = 1.0, xlim = NULL, ylim = NULL,

@@ -90,7 +90,7 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param use.loess Whether to use LOESS model or not?
 #' @param smooth.param Smoothing parameter for LOESS model.
 #' @param add.constant A numeric constant that will be added to each curve before the log transform (defaults to 1) 
-#' @param blank.value User can enter a blank OD measurement for uninoculated wells. if NULL, defaults to the value of the first OD measurement of each well. 
+#' @param blank.value User can enter a blank OD measurement for uninoculated wells. if NULL, assumes the first OD measurement of each well to be blank. 
 #' @param start.index Which timepoint should be used as the first one after inoculation (defaults to the 2th one)
 #' @param growth.cutoff Minimum threshold for curve growth. 
 #' @param points.to.remove A list of numbers referring to troublesome points that should be removed across all wells.
@@ -115,7 +115,7 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @export
 gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,   
   out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
-  add.constant = 0, blank.value = NULL, start.index = 2, growth.cutoff = 0.05,
+  add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
   lagRange = NA, totalRange = NA, specRange = NA,
   points.to.remove = 0, remove.jumps = F, time.input = NA,
@@ -126,6 +126,11 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
+  
+  #  Check blank value and start index
+  if (is.null(blank.value) && start.index==1) {
+    exception("", "If inoculation time point is 1, the user must specify a blank value")
+  }
 
     # MB: Not the best solution.
     if (is.na(time.input)) {

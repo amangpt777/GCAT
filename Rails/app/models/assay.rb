@@ -139,7 +139,7 @@ class Assay
     # (4) start index (A Positive Integer Number)
     if 
       start_index == ''
-      self.start_index = 2
+      self.start_index = 1
     else  
       self.start_index.gsub(/\s+/, "")  # remove white spaces
       self.start_index = self.start_index.to_i
@@ -276,6 +276,7 @@ class Assay
     # (2) transformation. N value (A Real Number)
     R.assign "add.constant", self.transformation
     # R.assign "add.constant", 0
+
     # (3) blank value (A Real Number)
     if (self.blank_value == nil)
       R.eval "blank.value <- NULL"
@@ -284,8 +285,14 @@ class Assay
     else
       R.assign "blank.value", self.blank_value
     end
-    # (4) start index (A Positive Integer Number)
-    R.assign "start.index", self.start_index
+
+    # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is nil.
+    if(self.blank_value == nil && self.start_index == 1)
+      return {:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => inputfile}
+    else 
+      R.assign "start.index", self.start_index
+    end
+    
     # (5) remove points [a space-separated list of points. Example: 2,3,4,5 (Positive Integer Number)]
     R.assign "points.to.remove", self.remove_points
     
