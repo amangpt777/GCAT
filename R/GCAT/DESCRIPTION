@@ -9,9 +9,10 @@ Description: Imports high-throughput growth curve data from microtiter
   (specific growth rate, maximum growth capacity, and lag time)
   for each well in a read.
   The code was written by Jason Shao (no longer at GLBRC) and Nate DiPiazza.
-Version: 5.0
-Depends: pheatmap, gplots
+Version: 5.0.2
+Depends: pheatmap, gplots, methods
 Maintainer: Yury Bukhman <ybukhman@glbrc.wisc.edu>
 License: LGPL-3
-Date: 2014-02-10
+Date: 2015-04-21
 Author: Jason Shao, Nate DiPiazza <ndipiazza@wisc.edu>, Minh Duc Bui, Yury V Bukhman
+Suggests: testthat

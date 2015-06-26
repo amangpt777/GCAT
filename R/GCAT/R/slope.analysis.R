@@ -18,14 +18,13 @@
 #along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
 
 ########################################################################
-#                                                                      #
-#    Estimate the growth curve slope at each timepoint of a well       #
-#                                                                      #
 ########################################################################
-#
+#    Estimate the growth curve slope at each timepoint of a well
+#    
+#    @details
 #   uses the functions <data.from> and <well.name> (see well.class.R) 
 #   adds estimated slopes as a new column to the "screen.data" slot
-
+#
 calculate.slopes = function(input.well, silent = T){
   # Get the growth curve data (excluding removed points, but not excluding points marked as tanking)
 	growth.data = data.from(input.well, remove = T, remove.tanking = F)
@@ -54,34 +53,28 @@ calculate.slopes = function(input.well, silent = T){
   
   
 ########################################################################
-#                                                                      #
-#  Use slope estimates to check growth curves for tanking and OD jumps #
-#                                                                      #
 ########################################################################
-#
-#   uses the functions <data.from> and <well.name> (see well.class.R) 
-#   Arguments: 
-#  ----- stringency parameters ----
-#     remove.jumps - should the program remove OD jumps? default F (just report them) - 
-#                   should be set to T if data contains distinct jumps in OD that need to be eliminated 
-#                   otherwise, this might be too stringent and will result in loss of data.  
-#     check.start - which timepoint should checking for jumps and tanking start at? this is included because early timepoints can be unstable.
-#     fall.cutoff - what downward slope should constitute a fall in OD? 
-#     jump.cutoffs - multipliers to determine whether a curve jumps up or down (see methods 1 and 2, below)
-#     tank.limit - how many timepoints in a row can have falling slopes until the curve is marked as tanking?
-#     tank.cutoff - what proportion of the maximum OD can the curve go below until it is considered tanking?
-
-#  ---- input/output ----
-#     silent - output to R console?
-#     draw - plot growth curve with curve checking details? 
-#
-#   Fills the "curve.par" slot in the well with the starting index of tanking (NA if none is found)
-#     
-
-#check.slopes = function(input.well, check.start = 8, fall.cutoff = -.0025, remove.jumps = F,
-#			jump.multipliers = -c(15, 500, 10), tank.cutoff = 1.0, tank.limit = 3, silent = T, draw = T){
-
-#changed default values to parameters to account for settling
+#'  Use slope estimates to check growth curves for tanking and OD jumps #
+#'
+#' @details
+#'  Uses the functions <data.from> and <well.name> (see well.class.R) 
+#'   
+#'  Fills the "curve.par" slot in the well with the starting index of tanking (NA if none is found)
+#'  
+#'  Changed default values to parameters to account for settling
+#' 
+#'  @param input.well object of class \code{well} to check the slopes for 
+#'  @param remove.jumps should the program remove OD jumps? default F (just report them) - 
+#'                   should be set to T if data contains distinct jumps in OD that need to be eliminated 
+#'                   otherwise, this might be too stringent and will result in loss of data.  
+#'  @param check.start which timepoint should checking for jumps and tanking start at? this is included because early timepoints can be unstable.
+#'  @param fall.cutoff what downward slope should constitute a fall in OD? 
+#'  @param jump.multipliers multipliers of fall.cutoff that determine whether a curve jumps up or down (see methods 1 and 2, below)
+#'  @param tank.limit how many timepoints in a row can have falling slopes until the curve is marked as tanking?
+#'  @param tank.cutoff what proportion of the maximum OD can the curve go below until it is considered tanking?
+#'  @param silent output to R console?
+#'  @param draw plot growth curve with curve checking details? 
+#'
 check.slopes = function(input.well, check.start = 22, fall.cutoff = -.0025, remove.jumps = F,
 			jump.multipliers = -c(15, 500, 10), tank.cutoff = 1.0, tank.limit = 6, silent = T, draw = T){
 
@@ -380,19 +373,32 @@ check.slopes = function(input.well, check.start = 22, fall.cutoff = -.0025, remo
 	}
 	
 ########################################################################
-#                                                                      #
-#    Check wells for growth, remove from analysis if OD is too low     #                   
-#                                                                      #
 ########################################################################
+#    Check wells for growth, remove from analysis if OD is too low                 
 #
+#  @details
 #   The well will be tagged with no.growth = T in the slot "curve.par" if raw OD values (except for <points.to.remove>)
 #   do not increase beyond <growth.cutoff> above the specified time of inoculation for that well (<start.index>) 
-
+#
 check.growth = function(input.well, growth.cutoff, start.index = 2){
+  
+  #  Debug
+  #if (all(getPosition(input.well) == c("022510b.GLBRC200DH.2","D","5"))) browser()
 
   # Get raw ODs (not including <points.to.remove>) and slope estimates from the well 
   # as well as OD at inoculation timepoint <start.index>
+  well.pos = getPosition(input.well)
+  
+  # Debug 
+  #if (well.pos[[2]] == "A" && well.pos[[3]] == 1)
+  #  browser()
+  
 	raw.ODs = raw.data(input.well)[,2]
+  
+  # Check for missing point.
+  if (any(is.na(raw.ODs)))
+    exception("Warning: ", "Missing data point detected. Please check the file and try again.")
+  
   start.OD = raw.ODs[start.index]
   
   raw.ODs[input.well@screen.data$Remove] = NA

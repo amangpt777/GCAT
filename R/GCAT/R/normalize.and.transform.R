@@ -18,27 +18,33 @@
 #along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
 
 ########################################################################
-#                                                                      #
-#         Normalize OD readings for an entire array of well objects    #
-#                                                                      #
 ########################################################################
-#
-#  Note: This function does not write any new OD values to the well objects in the array - it only 
-#   fills the "norm" slot of each well object in the array with a value that will be subtracted 
-#   from all OD measurements when returning data from the wells using the function <data.from> (see well.class.R) 
-#
-#  These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
-#
-#  well.array: an array of well objects. note this is the only normalization function that acts on an entire array instead of an individual well.
-#  normalize.method: 
-#     - (default): subtracts the blank OD (either specified by <blank.value> or taken from the first timepoint as default) of each well from all timepoints in that well
-#     - average.blank: subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate
-#     - average.first: takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
-#                     and subtracts this value from all timepoints in all wells on that plate
-#     - anything else: do nothing
-#  blank.value - user can enter a blank OD measurement for uninoculated wells. if NULL, defaults to the value of the first OD measurement of each well. 
-#  start.index - which timepoint should be used as the first one after inoculation (defaults to the 2th one)
-#  add.constant: add a numeric constant to all timepoints in all wells. 
+#' Normalize OD readings for an entire array of well objects
+#'
+#' @details
+#'  Note: This function does not write any new OD values to the well objects in the array - it only 
+#'   fills the "norm" slot of each well object in the array with a value that will be subtracted 
+#'   from all OD measurements when returning data from the wells using the function <data.from> (see well.class.R) 
+#'
+#'  These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
+#'  
+#'  note this is the only normalization function that acts on an entire array instead of an individual well.
+#'  
+#'  normalize.method settings: 
+#'  \describe{
+#'  \item{default}{subtracts the blank OD (either specified by <blank.value> or taken from the first timepoint as default)  
+#'  of each well from all timepoints in that well}
+#'  \item{average.blank}{subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate}
+#'  \item{average.first}{takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
+#'                     and subtracts this value from all timepoints in all wells on that plate}
+#'  \item{anything else}{do nothing}
+#'  }
+#'  
+#' @param  normalize.method see Details 
+#' @param  well.array an array of well objects. 
+#' @param  blank.value user can enter a blank OD measurement for uninoculated wells. if NULL, defaults to the value of the first OD measurement of each well. 
+#' @param  start.index which timepoint should be used as the first one after inoculation (defaults to the 2th one)
+#' @param  add.constant add a numeric constant to all timepoints in all wells. 
 normalize.ODs = function(well.array, normalize.method = "default", blank.value = NULL, start.index = 2, add.constant = 1){
   
   if (normalize.method == "default"){
@@ -87,18 +93,17 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 	}
 
 ########################################################################
-#                                                                      #
-#      Log-transform OD readings for a single well object              #
-#                                                                      #
 ########################################################################
 
 # Must include this so that the checking process will not complain about
 # inconsistency S3 generic/method. Though I don't know why.
+# S3 generic
+# @seealso \code{\link{transform.ODs}}
 transform <- function(input.well, ...) {
   UseMethod("transform")
 }
 
-#' Transform.Ods 
+#' Log-transform OD readings for a single well object 
 #'  
 #' This function adds a "log.OD" column to the "screen.data" slot of a well object with log-transformed data.  
 #' The raw data is kept intact.  
@@ -109,7 +114,9 @@ transform <- function(input.well, ...) {
 #'              or raw normalized data is returned using the function \code{data.from}.    
 #' @param blank.value user can enter a blank OD measurement for uninoculated wells. if NULL, defaults to the value of the first OD measurement of each well.  
 #' @param start.index which timepoint should be used as the first one after inoculation (defaults to the 2th one) 
-#' @param negative.OD.cutoff if any ODs below the specified blank value are detected before this index timepoint, the entire well is discarded.  
+#' @param negative.OD.cutoff if any ODs below the specified blank value are detected before this index timepoint, the entire well is discarded.
+#' @param constant.added similar to added.constant.
+#' @param ... Additional arguments for this function.
 transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.index = 2, negative.OD.cutoff = 10, constant.added = 1.0, ...){
  
   # The default value for the log-transformed ODs will be NA. Valid values will be filled in. 
@@ -148,22 +155,23 @@ transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.inde
 	}
 
 ########################################################################
-#                                                                      #
-#    Remove timepoints from the analysis but not from the raw data     #
-#                                                                      #
 ########################################################################
-# 
+#    Remove timepoints from the analysis but not from the raw data     #
+#
+# @details 
 #   Removes timepoints from further analysis. Does not remove them from the raw data;
 #   instead, this function creates or updates the Remove column in slot "screen.data" of the well which dictates whether 
 #   individual timepoints are returned using the <load.data> function. 
 #
-#   <points> can be a vector containing:
-#   - any combination of positive and negative integers 
+#   parameter \emph{points} can be a vector containing:
+#   \itemize{
+#   \item{any combination of positive and negative integers 
 #      the timepoints at indices corresponding to positive integers will be set to be removed.
-#      the timepoints at indices corresponding to negative integers will be be re-added if they were previously set to be removed.
-#   - a single zero, which resets all timepoints (nothing will be removed)
-#   - a logical vector to replace the Remove column and which will be cycled along the length of the timepoints. 
-
+#      the timepoints at indices corresponding to negative integers will be be re-added if they were previously set to be removed.}
+#   \item{a single zero, which resets all timepoints (nothing will be removed)}
+#   \item{a logical vector to replace the Remove column and which will be cycled along the length of the timepoints.}
+#   }
+#
 remove.points = function(input.well, points){
   # Copy the Remove column or create a new one if it doesn't yet exist
 	if (is.null(input.well@screen.data$Remove))
@@ -192,7 +200,21 @@ remove.points = function(input.well, points){
 	input.well
 	}
 
-
+#   Add a column y = OD - blank.value for each well@screen.data
+#   switch Remove flag to TRUE if y < 0.
+subtract.blank = function(well.array, blank.value = NULL) {
+  well.array = aapply(well.array, function(well, blank.value){
+    if (is.null(blank.value))
+      blank.value = well@screen.data$OD[1]
+    
+    well@screen.data$y = well@screen.data$OD - blank.value
+    well = remove.points(well, well@screen.data$y < 0)
+    #newOD = well@screen.data$y
+    #oldOD = well@screen.data$OD
+    #well@screen.data$OD = newOD
+    #well@screen.data$y = oldOD
+    return(well)}, blank.value)   
+}
 
 
 

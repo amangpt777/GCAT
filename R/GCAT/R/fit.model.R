@@ -39,9 +39,9 @@
 #' @param backup.growth.model If \code{gowth.mode} fails, this model will be used. 
 #' @param fit.if.no.growth should the function attempt to fit a well even if there was no growth detected? default is F 
 #' @param silent output back to R console? 
-#' @param use.linear.param: Should an additional linear parameter (c) be used when fitting the data to the model? 
-#' @param use.loess: Should Local Polynomial Regression Fitting (loess function) be used instead of nls? 
-#' @param smooth.param: If loess is used, an optional smoothing parameter. Default is .6 
+#' @param use.linear.param Should an additional linear parameter (c) be used when fitting the data to the model? 
+#' @param use.loess Should Local Polynomial Regression Fitting (loess function) be used instead of nls? 
+#' @param smooth.param If loess is used, an optional smoothing parameter. Default is .6 
 fit.model = function(input.well, growth.model, backup.growth.model = NULL, fit.if.no.growth = F, 
                      use.linear.param=F, use.loess=F, smooth.param, silent = T){
  
@@ -138,11 +138,11 @@ fit.model = function(input.well, growth.model, backup.growth.model = NULL, fit.i
   if(use.loess){
     number.of.points = nrow(input.well@screen.data)
     if (smooth.param <= 1/number.of.points)
-      exception("Invalid input", "Smoothing parameter is out of range.")
+      exception("", "Invalid input: Smoothing parameter is out of range.")
    
     fit = try(loess(y~Time, data=input.data, span=smooth.param), silent=TRUE)
     input.well@loess = fit
-    if (class(fit) != "loess") stop("loess fit failed on well", paste(input.well@position,collapse=" "))
+    if (class(fit) != "loess") stop("Loess fit failed on well", paste(input.well@position,collapse=" "))
     input.well@fit.info = "Loess model fit successfully."
     input.well@model.name = loess.model@name
     input.well@equation = loess.model@expression
@@ -224,10 +224,10 @@ fit.model = function(input.well, growth.model, backup.growth.model = NULL, fit.i
     return(input.well)
 }
 
-#  Fit nls model to a well using a specified model
-#  Arguments:
-#  input.well: object of class well
-#  model: object of class model, e.g. richards, gompertz or logistic
+#'  Fit nls model to a well using a specified model
+#'
+#' @param input.well object of class well
+#' @param  model object of class model, e.g. richards, gompertz or logistic
 fit.nls.model <- function (input.well, model) {
   # Get OD vs. time data from well
   input.data = data.from(input.well, na.rm = T)

@@ -28,14 +28,14 @@ require(gplots)
 ########################################################################
 
 # S3 Generic.
-plot <- function(input.well, ...) {
-  UseMethod("plot")
-}
+#plot <- function(input.well, ...) {
+#  UseMethod("plot")
+#}
 
 ########################################################################
 #        Basic function plots time vs. OD from a well object           #
 ########################################################################
-#' plot.data
+#' plot_data
 #'
 #' Basic function plots time vs. OD from a well object
 #'
@@ -46,7 +46,10 @@ plot <- function(input.well, ...) {
 #' @param scale determines the font scale for the entire graph. all cex values are calculated from this.
 #' @param draw.symbols - should <check.slopes> be called on the well and markings drawn on the graph?
 #' @param ... additional arguments passed to plot()
-plot.data = function(input.well, view.raw.data = F, unlog = F, scale = 1, 
+#' @param main ...
+#' @param constant.added Similar to added.constant.
+#' @param ylim ...
+plot_data = function(input.well, view.raw.data = F, unlog = F, scale = 1, 
    main = paste(plate.name(input.well), well.name(input.well)), number.points = T, 
     draw.symbols = F, constant.added, ylim, ...){
   
@@ -58,7 +61,8 @@ plot.data = function(input.well, view.raw.data = F, unlog = F, scale = 1,
   # Draw the axes and all text labels first.
 	par(mar = c(5, 4, 4, 5)+0.1)
 	plot(input.data, main = main, xlab = "Time(hours)", ylab = "log(OD - blank + const)",
-     mex = scale, cex.main = 1.5*scale, cex.axis = 1.2*scale, cex.lab = 1.2*scale, type ="n",...)
+     mex = scale, cex.main = 1.5*scale, cex.axis = 1.2*scale, cex.lab = 1.2*scale, 
+     type ="n", ylim=ylim, ...)
      
 	# Draw a second vertical axis, showing unlogged OD scale
 	#  - Determine the range of the labels: from min.OD to max.OD
@@ -94,12 +98,13 @@ plot.data = function(input.well, view.raw.data = F, unlog = F, scale = 1,
 	}
 	
 ########################################################################
-#    Plots the fitted model curve from a well object if it exists      #
 ########################################################################
+#    Plot the fitted model curve from a well object if it exists      
 #
-#   time: specify which points (in units of time) to plot fitted OD values for. if not specifies, plot all timepoints in range of well. 
-
-plot.model = function(input.well, col = 1, scale = 1, lty = 1, time = NULL, unlog = F, constant.added=1, ...){
+# @details
+#   \strong{time:} specify which points (in units of time) to plot fitted OD values for. if not specifies, plot all timepoints in range of well. 
+#
+plot_model = function(input.well, col = 1, scale = 1, lty = 1, time = NULL, unlog = F, constant.added=1, ...){
 	 
   #input.data = data.from(input.well)
 	#growth = input.data[,2]
@@ -121,8 +126,8 @@ plot.model = function(input.well, col = 1, scale = 1, lty = 1, time = NULL, unlo
 }
 	
 ########################################################################
-#   Put various parameters and info in text form on the graphs         #
 ########################################################################
+#   Put various parameters and info in text form on the graphs         #
 #			
 draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0,...){
 
@@ -185,11 +190,12 @@ draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0,...){
 	}	
 
 ########################################################################
-#        Draw lines on graph denoting calculated parameters            #
 ########################################################################
-#	
-# <show.num> - should curve parameters be labeled? 
-		
+#        Draw lines on graph denoting calculated parameters          
+#
+#  @details	
+# \strong{show.num} - should curve parameters be labeled? 
+#		
 draw.calc.par = function(input.well, scale = 0.5, unlog = F, constant.added, show.num = T){
 
   # Don't do anything if well was not fit. 
@@ -262,10 +268,10 @@ draw.calc.par = function(input.well, scale = 0.5, unlog = F, constant.added, sho
   }
 	
 ########################################################################
-#  Draw residuals from the nonlinear fit with option for lowess line   #
 ########################################################################
+#  Draw residuals from the nonlinear fit with option for lowess line   #
 #		
-plot.residuals = function(input.well, xlim = NULL, lowess = T, ...){
+plot_residuals = function(input.well, xlim = NULL, lowess = T, ...){
   well = input.well
 	data = data.from(well, remove = F, remove.tanking = F)
 
@@ -282,17 +288,22 @@ plot.residuals = function(input.well, xlim = NULL, lowess = T, ...){
 	}
 
 ##############################################################################
-# This function is used to create a heatmap using: 
-# specific growth, total growth, and lag time
-# for each well on a plate.
-#
-# @params
-#   fitted.well.array: matrix containing well array object data
-#   attribute: the data type we should use to create a heatmap
-# @returns
-#   path of heatmap pdf file
 ##############################################################################
-create.heatmap = function(fitted.well.array, attribute, unlog=NULL){
+#' Create a heat map of a plate
+#' 
+#' @details
+#' This function is used to create a heatmap using 
+#' specific growth, total growth, or lag time
+#' for each well on a plate.
+#'
+#' @param fitted.well.array matrix containing well array object data
+#' @param attribute the data type we should use to create a heatmap
+#' @param unlog transform values to linear scale
+#' @param MinMax The specific range for the heatmap. 
+#'   
+#' @return path of heatmap pdf file
+#' 
+create.heatmap = function(fitted.well.array, attribute, MinMax = NA, unlog=NULL){
   attr.name <- deparse(substitute(attribute))
   pdf.name <- ""
   if(class(fitted.well.array) == "matrix"){
@@ -322,9 +333,17 @@ create.heatmap = function(fitted.well.array, attribute, unlog=NULL){
     pdf(pdf.name)
     #heatmap(heat, Rowv=NA, Colv=NA, revC=T, scale="none", na.rm=T, main=plate.ID, col=rainbow(100), margins=c(6,6))
     #mtext(paste("Max:", round(max(spec.growth, na.rm=T), digits=4),"Min:", round(min(spec.growth, na.rm=T), digits=4), "Avg:", round(mean(spec.growth, na.rm=T), digits=4)), side=1, line=3)
-    pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
-             border_color="black", cell_width=2, cell_height=3,
-             cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
+    if (length(MinMax) == 2){
+      Mean = mean(MinMax)
+      bk = unique(c(seq(MinMax[1], Mean, length=50), seq(Mean, MinMax[2], length = 50)))
+      pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"), breaks = bk,
+               border_color="black", cell_width=2, cell_height=3,
+               cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
+    } else {
+      pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
+               border_color="black", cell_width=2, cell_height=3,
+               cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
+    }
     dev.off()
   }
   else {
@@ -334,11 +353,13 @@ create.heatmap = function(fitted.well.array, attribute, unlog=NULL){
 }
 
 ########################################################################
+########################################################################
+# Plate overview graphic
+# 
+# @details
 #  Draw grids of 96 points as a visual representation of fit status,   #
 #  and other info for an array of fitted well objects, plate by plate  #
-########################################################################
 #
-	
 plate.overview = function(fitted.well.array, scale = 1, plate.ncol = 12, plate.nrow = 8){
  
   
@@ -452,11 +473,13 @@ plate.overview = function(fitted.well.array, scale = 1, plate.ncol = 12, plate.n
 	}
 
 ########################################################################
+########################################################################
+#  Draw individual fitted wells
+#  
+#  @details
 #  Draw each well in an array of fitted well objects in succession.    #
 #  Include options for adding notations, text info and fit parameters. #
-########################################################################
 #
-
 view.fit = function(fitted.data, indices = 1:length(fitted.data), 
       unlog = F, constant.added, xlim = NULL, ylim = NULL, display.legend = T, 
 		  show.text = T, show.calc = T, draw.guess = NULL, draw.symbols = F, number.points = T, 
@@ -513,7 +536,7 @@ view.fit = function(fitted.data, indices = 1:length(fitted.data),
       if (show.residuals & is.numeric(model.residuals(fitted.well))){
         if(user.advance)
           if (toupper(readline("<Enter> for residuals >>")) == "Q") break
-        plot.residuals(fitted.well)
+        plot_residuals(fitted.well)
         }
         
       # Allow user to advance the currently shown well if specified. 
@@ -534,7 +557,7 @@ view.fit = function(fitted.data, indices = 1:length(fitted.data),
 		}		
 	}	
 
-
+#  Draw legend on a well plot
 well.fit.legend = function(xlim, ylim, scale = 1, constant.added){
   par(mar = c(5, 4, 4, 5)+0.1)
   plot(0,0, main = "[Index] <Plate Name> <Well Position>\n<Strain Name>; <Media Definition>",
@@ -588,8 +611,10 @@ well.fit.legend = function(xlim, ylim, scale = 1, constant.added){
            x.intersp=1, xjust = 1, y.intersp=1.5)
 }
 
+#  Generate pdf files
 pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL, 
-  out.dir = getwd(), unlog = F, constant.added, silent = T, overview.jpgs = T, plate.ncol = 12, plate.nrow = 8,...){
+  out.dir = getwd(), unlog = F, constant.added, silent = T, overview.jpgs = T, plate.ncol = 12, plate.nrow = 8,
+  lagRange = NA, specRange = NA, totalRange = NA, ...){
  
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
@@ -620,13 +645,13 @@ pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL,
       if(num.wells > 1){
         #Heatmap block##########################################################
         #alongside the jpgs file create 3 heatmaps for each plate. NWD
-        spec.heat.file = create.heatmap(fitted.data[,,i], max.spec.growth.rate)
+        spec.heat.file = create.heatmap(fitted.data[,,i], max.spec.growth.rate, MinMax = specRange)
         if(spec.heat.file == "Error")
           stop("Error in <create.heatmap> for specific growth")
-        lag.heat.file = create.heatmap(fitted.data[,,i], lag.time)
+        lag.heat.file = create.heatmap(fitted.data[,,i], lag.time, MinMax = lagRange)
         if(lag.heat.file == "Error")
           stop("Error in <create.heatmap> for lag time")
-        total.heat.file = create.heatmap(fitted.data[,,i], achieved.growth)
+        total.heat.file = create.heatmap(fitted.data[,,i], achieved.growth, MinMax = totalRange)
         if(total.heat.file == "Error")
           stop("Error in <create.heatmap> for total growth")
         #  Add name of file if successfully written to file list output. Including heatmap files NWD

@@ -1,6 +1,21 @@
 <div id="form-container">
-	<h1>Error</h1>
-	<p>Please resubmit your file.</p>
-  <%= link_to 'New Assay', new_assay_path%>
+    <h1>Error</h1>
+    <%= @error_msg %>
+	</br></br>
+    <button type="button" id ="show">Full console message</button>
+    <div id="console" style="display:none;">
+    	<code><%= @console_msg %></code>
+    </div>
+    <script>
+    	$(function() {
+    		$('button#show').click(function(event){
+    			event.preventDefault();
+    			$('div#console').toggle();
+    		});
+    	});
+    </script>
+	</br>
+	<h5>Please resubmit your file.</h5>
+    <%= link_to 'New Assay', new_assay_path%>
   <br><br><br>
 </div>

@@ -23,7 +23,7 @@
 #                                                                      #
 ########################################################################
 
-# S3 generic
+# S3 generic for lag
 lag <- function(fitted.well, ...)
 {
   UseMethod("lag")
@@ -36,18 +36,13 @@ lag <- function(fitted.well, ...)
 #   constant.added - for returning values on the linear scale, what was the constant added before the log transform?
 #   digits - passed to the <round> function, default is no rounding (infinity digits)
 
+# Transform values back to OD scale
 unlog = function(x, constant.added) {
-  ########################################################################
-  #   Transform values back to OD scale                                  #
-  ########################################################################
-exp(x) - constant.added
+  exp(x) - constant.added
 }
 
+# Evaluate estimated OD at any timepoints using the fitted model
 well.eval = function(fitted.well, Time = NULL){
-  ########################################################################
-  #   Evaluate estimated OD at any timepoints using the fitted model     #
-  ########################################################################
-
   # If no timepoints are provided, use the ones collected in the experiment itself.
 	if(!is.numeric(Time))
 		Time = data.from(fitted.well)$Time
@@ -73,10 +68,8 @@ well.eval = function(fitted.well, Time = NULL){
 	}
 }
 
+# Evaluate model residuals using the measured vs. fitted log.OD values
 model.residuals = function(fitted.well, unlog = F){
-  ########################################################################
-  #   Evaluate model residuals using the measured vs. fitted log.OD values   #
-  ########################################################################
 	measured.OD = data.from(fitted.well)[,2]
 
 	# Use <well.eval> with no Time argument to get fitted OD values at measured timepoints.
@@ -89,10 +82,8 @@ model.residuals = function(fitted.well, unlog = F){
     return(measured.OD - predicted.OD)
 	}
 
+# Evaluate deviations of log.OD values from the mean
 dev.from.mean = function(fitted.well){
-  ########################################################################
-  #   Evaluate deviations of log.OD values from the mean                 #
-  ########################################################################
   measured.ODs = data.from(fitted.well,remove=T,na.rm=T)[,2]
   
   # Get the mean values of these measured ODs.
@@ -104,21 +95,16 @@ dev.from.mean = function(fitted.well){
     return (measured.ODs - mean.ODs)
 }
 
+# Get the residual sum of square.
 rss = function(fitted.well){
-  #######################################################################
-  #  Get the residual sum of square.                                    #
-  #######################################################################
   if (length(fitted.well@rss) == 0)
     return (NA)
   else
     return (fitted.well@rss)
 }
 
+# Calculate a metric for fit accuracy using squared residuals
 model.good.fit = function(fitted.well, digits = Inf){
-  ########################################################################
-  #   Calculate a metric for fit accuracy using squared residuals        #
-  ########################################################################
-
   # Sum of squared residuals
 	RSS = rss(fitted.well)
   
@@ -129,11 +115,8 @@ model.good.fit = function(fitted.well, digits = Inf){
   return (1 - RSS/tot)
 	}
 
+# Output a string with values of fitted parameters
 parameter.text = function(fitted.well){
-  ########################################################################
-  #           Output a string with values of fitted parameters           #
-  ########################################################################
-  
   # Get a list of fitted parameters
   fit.par = fitted.well@fit.par
   
@@ -177,21 +160,16 @@ parameter.text = function(fitted.well){
   	}
 	}
 
+# Calculate maximum specific growth rate
 max.spec.growth.rate = function(fitted.well, digits = Inf, ...){
-  ########################################################################
-  #        Calculate maximum specific growth rate                       #
-  ########################################################################
   if(length(fitted.well@fit.par) == 0)
     return(NA)
   
   round(fitted.well@fit.par$u,digits)
 }
 
-
+# Calculate plateau log.OD from fitted parameters
 plateau = function(fitted.well, digits = Inf){
-  ########################################################################
-  #        Calculate plateau log.OD from fitted parameters               #
-  ########################################################################
   if(length(fitted.well@fit.par) == 0)
     return(NA)
   
@@ -205,10 +183,8 @@ plateau = function(fitted.well, digits = Inf){
 	return(plat)
 }
 
+# Calculate baseline log.OD from fitted parameters
 baseline = function(fitted.well, digits = Inf){
-  ########################################################################
-  #        Calculate baseline log.OD from fitted parameters              #
-  ########################################################################
   if(length(fitted.well@fit.par) == 0)
     return(NA)
 
@@ -226,11 +202,8 @@ baseline = function(fitted.well, digits = Inf){
 	return(base)
 	}
 
+# Calculate log.OD at inoculation from fitted parameters
 inoc.log.OD = function(fitted.well, digits = Inf){
-  ########################################################################
-  #        Calculate log.OD at inoculation from fitted parameters        #
-  ########################################################################
-
   # Evaluated the fitted model at the inoculation timepoint (should be zero from using <start.times> from table2wells.R)
 	if (is.null(well.eval(fitted.well)))
 		return(NA)
@@ -242,11 +215,8 @@ inoc.log.OD = function(fitted.well, digits = Inf){
     }
 	}
 
+# Calculate max log.OD from model fit
 max.log.OD = function(fitted.well, digits = Inf, ...){
-  ########################################################################
-  #        Calculate max log.OD from model fit                           #
-  ########################################################################
-
   # Evaluated the fitted model at the final timepoint (just the last valid timepoint in the experiment)
 	if (is.null(well.eval(fitted.well)))
 		return(NA)
@@ -255,43 +225,31 @@ max.log.OD = function(fitted.well, digits = Inf, ...){
   }
 }
 
-
+# Calculate projected growth: plateau minus the inoculated log.OD
 projected.growth = function(fitted.well,digits=Inf) {
-  ########################################################################
-  #   Calculate projected growth: plateau minus the inoculated log.OD    #
-  ########################################################################
 	plateau(fitted.well,digits) - inoc.log.OD(fitted.well,digits)
 }
 
+
+#   Calculate projected growth: plateau minus the inoculated log.OD    
 projected.growth.OD = function(fitted.well,constant.added,digits=Inf) {
-  ########################################################################
-  #   Calculate projected growth: plateau minus the inoculated log.OD    #
-  ########################################################################
   value = unlog(plateau(fitted.well),constant.added) - unlog(inoc.log.OD(fitted.well),constant.added)
   round(value,digits)
 }
 
-
+#   Calculate achieved growth: max.log.OD minus the inoculated log.OD
 achieved.growth = function(fitted.well,digits=Inf) {
-  ########################################################################
-  #   Calculate achieved growth: max.log.OD minus the inoculated log.OD  #
-  ########################################################################
   max.log.OD(fitted.well,digits) - inoc.log.OD(fitted.well,digits)
 }
 
+#   Calculate projected growth: plateau minus the inoculated log.OD    
 achieved.growth.OD = function(fitted.well,constant.added,digits=Inf) {
-  ########################################################################
-  #   Calculate projected growth: plateau minus the inoculated log.OD    #
-  ########################################################################
   value = unlog(max.log.OD(fitted.well),constant.added) - unlog(inoc.log.OD(fitted.well),constant.added)
   round(value,digits)
 }
 
+# Did the curve come close to the plateau OD during the experiment?
 reach.plateau = function(fitted.well, cutoff = 0.75){
-  ########################################################################
-  # Did the curve come close to the plateau OD during the experiment?    #
-  ########################################################################
-
   plat = plateau(fitted.well)
   inoc = inoc.log.OD(fitted.well)
   final = max.log.OD(fitted.well)
@@ -310,11 +268,8 @@ reach.plateau = function(fitted.well, cutoff = 0.75){
 		# If no final OD was calculated (if curve was not fit properly) just return T.
 	}
 
-
+#  Calculate the lag time from the fitted OD
 lag.time = function(fitted.well, digits = Inf, ...){
-  ########################################################################
-  #              Calculate the lag time from the fitted OD               #
-  ########################################################################
   if(length(fitted.well@fit.par) == 0)
     return(NA)
   
@@ -322,7 +277,7 @@ lag.time = function(fitted.well, digits = Inf, ...){
 }
 
 # new params for GCAT 4.0
-
+#  Get amplitude
 amplitude = function(fitted.well){
   if(length(fitted.well@fit.par) == 0)
     return(NA)
@@ -330,43 +285,49 @@ amplitude = function(fitted.well){
   return(fitted.well@fit.par$A)
 }
 
+# Get shape parameter
 shape.par = function(fitted.well){
     if(length(fitted.well@fit.par) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.par$v), NA, fitted.well@fit.par$v)
 }
 
+#  Get standard error of the maximum specific growth rate value
 max.spec.growth.rate.SE = function(fitted.well, ...){
   if(length(fitted.well@fit.std.err) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.std.err$u), NA, fitted.well@fit.std.err$u)
 }
 
+#  Get standard error of the lag time value
 lag.time.SE = function(fitted.well, ...){
   if(length(fitted.well@fit.std.err) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.std.err$lam), NA, fitted.well@fit.std.err$lam)
 }
 
+#  Get standard error of the shape parameter
 shape.par.SE = function(fitted.well){
   if(length(fitted.well@fit.std.err) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.std.err$v), NA, fitted.well@fit.std.err$v)
 }
 
+# Get standard error of the amplitude
 amplitude.SE = function(fitted.well){
   if(length(fitted.well@fit.std.err) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.std.err$A), NA, fitted.well@fit.std.err$A)
 }
 
+# Get standard error of the baseline value
 baseline.SE = function(fitted.well){
   if(length(fitted.well@fit.std.err) == 0)
     return(NA)
   ifelse(is.null(fitted.well@fit.std.err$b), NA, fitted.well@fit.std.err$b)
 }
 
-# used to calulate the inflection.time value
+# Calulate the inflection time value
 inflection.time = function(well){
   if (length(well@loess) == 0 && length(well@nls) == 0) return(NA) # can' compute inflection time in the absence of a fit
   data = data.from(well)

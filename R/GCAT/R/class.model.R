@@ -22,6 +22,7 @@
 #  and other information for parameterized growth curve models.        #
 #                                                                      #
 ########################################################################
+# Class to represent growth curve model objects
 setClass("model", representation(name = "character",
                                  expression = "expression",
                                  formula = "formula",
@@ -35,32 +36,26 @@ setClass("model", representation(name = "character",
 # --------------------------------------------------------------------
 ###################### BEGIN PROTOTYPING ACCESSOR METHODS##############
 
-# Minh: Let this code fragment be F1.
-if (!isGeneric("getName")){
-  if (is.function("getName"))
-    fun <- getName
-  else
-    fun <- function(object) standardGeneric("getName")
-    setGeneric("getName", fun)
-}
-# End of F1
-setMethod("getName", "model", function(object) object@name)
+# Get an object's @@name slot
+setGeneric("getName", function(object) standardGeneric("getName"))
+setMethod("getName", "model", function(object){return(object@name)})
 
-# Minh: Let this line be F2.
+# Get an object's @@expression slot
 setGeneric("getExpression", function(object){standardGeneric("getExpression")})
-# Question: How is F1 different from F2?
 
 setMethod("getExpression", "model",
           function(object){
             return(object@expression)
           })
 
+# Get an object's @@formula slot
 setGeneric("getFormula", function(object){standeardGeneric("getFormula")})
 setMethod("getFormula", "model", 
           function(object){
             return(object@formula)
           })
 
+# Get an object's @@guess slot
 setGeneric("getGuess", function(object){standeardGeneric("getGuess")})
 setMethod("getGuess", "model", 
           function(object){
@@ -81,6 +76,7 @@ model = function(name, expression, formula, guess){
   new("model", name = name, expression = expression, formula = formula, guess = guess)
 }
 
+# Initial guess of growth curve parameters using a loess model
 loess.g =  function(well,smooth.param=0.75){
   #data = data.from(well)
   #growth = data[,2]

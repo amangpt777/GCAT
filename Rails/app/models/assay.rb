@@ -32,8 +32,10 @@ class Assay
   include ActiveModel::Validations
   include ActiveModel::Conversion
   extend ActiveModel::Naming
-  attr_accessor :input_file, :transformation, :transformation_input, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
-  :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input
+  attr_accessor :input_file, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
+  :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input, :console_out, :specg_min,
+  :specg_max, :totg_min, :totg_max, :lagT_min, :lagT_max,:transformation, :transformation_input
+  
 
   # (1) Validation of input data file
   validates_presence_of :input_file, :message => '- No input file was specified.'
@@ -117,7 +119,7 @@ class Assay
     if self.transformation == '-1'
       self.transformation =  Float(self.transformation_input)
     else
-      self.transformation = self.transformation.to_i
+      self.transformation = self.transformation.to_f
     end
 
     # Soothing parameter for growth curve model. Applied for Loess model only.
@@ -128,6 +130,8 @@ class Assay
     # (3) blank value (A Real Number)
     if self.blank_value == 'default'
       self.blank_value = nil
+    elsif self.blank_value == 'zero'
+      self.blank_value = 0
     else
       self.blank_value = Float(self.blank_value_input)
     end
@@ -154,6 +158,20 @@ class Assay
       self.remove_jumps = true
     else
       self.remove_jumps = false
+    end
+
+    ## (7) Heatmap values
+    if (self.specg_min != '' && self.specg_max != '')
+      self.specg_max = Float(self.specg_max)
+      self.specg_min = Float(self.specg_min)
+    end
+    if (self.totg_min != '' && self.totg_max != '')
+      self.totg_min = Float(self.totg_min)
+      self.totg_max = Float(self.totg_max)
+    end
+    if (self.lagT_min != '' && self.lagT_max != '')
+      self.lagT_max = Float(self.lagT_max)
+      self.lagT_min = Float(self.lagT_min)
     end
 
 
@@ -201,7 +219,11 @@ class Assay
     if(File.size(inputfile) > MAX_FILE_SIZE)
       return {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE/(10**6)} MB.", :path => inputfile}
     end
- 
+    
+    # Try to override stdout to redirect the console output.
+    $stdout = File.new(out_dir_path + '/console.out', 'w')
+    $stdout.sync = true 
+
     # use web interface parsed parameters to call R function/library via Rinruby  
     R.eval ('library(GCAT)')
     R.assign "out.dir", out_dir_path
@@ -253,9 +275,12 @@ class Assay
 
     # (2) transformation. N value (A Real Number)
     R.assign "add.constant", self.transformation
+    # R.assign "add.constant", 0
     # (3) blank value (A Real Number)
     if (self.blank_value == nil)
       R.eval "blank.value <- NULL"
+    elsif (self.blank_value == 0)
+      R.eval "blank.value <- 0"
     else
       R.assign "blank.value", self.blank_value
     end
@@ -303,16 +328,40 @@ class Assay
       R.assign 'use.linear.param', 'F'
       R.assign 'smooth.param', 0.1 # default value
     end
+
+    ## Heatmap values
+    if (self.specg_max != '' && self.specg_min != '')
+      R.assign 'specMin', self.specg_min
+      R.assign 'specMax', self.specg_max
+      R.eval "specRange <- c(specMin, specMax)"
+    else
+      R.eval 'specRange <- NA'
+    end
+    if (self.totg_min != '' && self.totg_max != '')
+      R.assign 'totMin', self.totg_min
+      R.assign 'totMax', self.totg_max
+      R.eval "totalRange <- c(totMin, totMax)"
+    else
+      R.eval 'totalRange <- NA'
+    end
+    if (self.lagT_min != '' && self.lagT_max != '')
+      R.assign 'lagT_min', self.lagT_min
+      R.assign 'lagT_max', self.lagT_max
+      R.eval "lagRange <- c(lagT_min, lagT_max)"
+    else
+      R.eval 'lagRange <- NA'
+    end
     
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
     R.eval ('R_file_return_value <- gcat.analysis.main(file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
-                                    start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
-                                    points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
-                                    multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
+                                    start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, lagRange = lagRange, 
+                                    totalRange = totalRange, specRange = specRange, points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
+                                    plate.ncol = 12, input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
                                     layout.sheet.headers = c("Strain", "Media Definition"), silent = T, verbose = F, return.fit = F, overview.jpgs = T)')
    
     # good file returns a list of file path(length is more than 1), bad file returns error message string(array length = 1)
     print R.R_file_return_value
+    
     R.eval ('R_array_return_length <- length(R_file_return_value)')
     unless  R.R_array_return_length == 1
       puts R.R_file_return_value, "\n"
@@ -323,16 +372,23 @@ class Assay
       if(error_message.include? "Error in <remove.points>")
         num_data_points = error_message.split("data has ").last.gsub("\n\n", "")
         error_message = "Invalid 'Points to ignore'. Please select a value in the range (1-#{num_data_points})."
+      else
+        # debugger
+        console_message = error_message
+        split_s = error_message.split(":")
+        print split_s
+        split_s.each {|x| error_message = x}
       end
-      return {:error_message => error_message, :path => inputfile}
+      return {:error_message => error_message, :path => inputfile, :console_msg => console_message}
     end
-
+    
     # process generated files
     raise "no files generated" if files.empty?
     #search for "_overview.jpg files" from Array of files
     overviewFiles = ""
     pdfFile = ""
     txtFile = ""
+    consoleOut = ""
     files_Array_Size = files.size - 1
 
     for i in 0..files_Array_Size
@@ -368,6 +424,7 @@ class Assay
 
     # build array named overviewFiles that contains "_overview.jpg files"
     overviewFiles = overviewFiles.split("\n")
+   
     raise "no overview files generated" if overviewFiles.empty?
 
     if self.plate_type == 'm'
@@ -375,18 +432,20 @@ class Assay
     else
       zipfile = out_dir_path + "/singlePlateAnalysis.zip"
     end
-    
+    consoleOut = out_dir_path + "/console.out"
+    self.console_out = consoleOut
     # create Zip files at current directory
     Zip::File.open(zipfile, Zip::File::CREATE) { |zf|
       files.each{|file| zf.add(File.basename(file), file)}
       #files.each{|file| zf.add(file.sub(out_dir_path + "/", ""), file))}
+      #zf.add(File.basename(consoleOut), consoleOut)
     }
-
     #return results unless error
     #zip files, jpg of overviews, txt file for datagrid, pdf file
     
     
-    {:status => status, :overviewFiles => overviewFiles, :zipfile => zipfile, :txtFile => txtFile, :pdfFile => pdfFile, :inputfile => inputfile, :layout_file => layout_file, :model => self.model}
+    {:status => status, :overviewFiles => overviewFiles, :zipfile => zipfile, :txtFile => txtFile, :pdfFile => pdfFile, :inputfile => inputfile, :layout_file => layout_file, :model => self.model,
+     :consoleout => consoleOut}
   end # end of r_calculation method
 
   

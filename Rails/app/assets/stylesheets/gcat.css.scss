@@ -63,11 +63,26 @@ a:visited { color: #428bca !important;}
   border: 1px solid black;
   margin: 20px auto 0;
   width: 1600px;
-  padding-left: 50px;      
+  padding-left: 50px;
+  overflow: hidden;  /* MB: added so that float left stuffs won't collapse. */
 }
 
 #contents {
   padding: 5px 25px;
+}
+
+/* MB: Options in GCAT. For unordered list */
+#options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* MB: 1 option in GCAT. */
+#options li {
+  float: left;
+  width: 33%;
+  padding: 0 100px 0 0;
 }
 
 /*#mainContent{

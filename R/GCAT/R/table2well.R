@@ -38,11 +38,10 @@
 #' @param input.data A list of tables representing input files read with \code{read.table}. Used to save time in cases
 #' of running multiple analyses on the same dataset. If used, the function will ignore \code{file.name} entirely.
 #' @param load.type .csv by default. 
-#' @param plate.laout Specifies the layout of the given plate.
+#' @param plate.layout Specifies the layout of the given plate.
 #' @param single.plate.ID specifies a plate name for a single-plate read.  If NULL, this is derived from the file name. 
 #' @param blank.value Blank OD measurement for uninoculated wells. By default(NULL), the value of the first OD
 #'        measurement in each well is used.
-#' @param add.constant A value for r in the log(OD + r) transformation.
 #' @param plate.nrow The number of rows in the input files.
 #' @param plate.ncol The number of columns in the input files.
 #' @param input.skip.lines specifies a plate name for a single-plate read.  If NULL, this is derived from the file name. 
@@ -50,7 +49,8 @@
 #' @param single.column.headers The headers of the column when analyzing a single plate.
 #' @param layout.sheet.headers The headers of the layout file.
 #' @param silent Surpress all messages.
-#' @param verbose Display all messages when analyzing each well.
+#' @param start.index Which timepoint should be used as the first one after inoculation?
+#' @param single.plate Is the plate single type?
 #' 
 #' @return A list of well objects.
 gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL, single.plate.ID = NULL, 
@@ -64,8 +64,30 @@ gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL
   ########################################################################
   
 	if(is.null(input.data)){
+    # Check for bad encoding.
+    file.name.cmd = paste("'", file.name, sep = "")
+    file.name.cmd = paste(file.name.cmd, "'", sep = "")
+    cmd = paste("enca -L none", file.name.cmd)
+    sys.msg = system(cmd, intern = TRUE)
+    if (length(attributes(sys.msg)) == 1) {
+      if (attributes(sys.msg)[1] == 1)
+        exception("", "Unrecognized encoding for input file. The file should be in UTF-8.")
+    }
+    
 		# Either read from .csv.
+    
+    # Skipping temperature column.
+    colclasses = c(rep("integer", 1), rep("NULL", 1), rep("integer", 96))
+    
+		# input.data = read.csv(file.name, colClasses = colclasses, stringsAsFactors=F, skip = input.skip.lines, fileEncoding='UTF-8')
 		input.data = read.csv(file.name, stringsAsFactors=F, skip = input.skip.lines, fileEncoding='UTF-8')
+    
+    # Checking for temperature column.
+    # Reread the file if temp column is there.
+    # MB: Not the best solution.
+    if (length(input.data) == 98)
+      exception("", "The number of columns in the file is not 97 columns format. Please resubmit a valid file.")
+    
 
 		# Determine single plate name if not specified. 
     if (is.null(single.plate.ID)){
@@ -192,7 +214,7 @@ gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL
         
         # Error if either no rows or more than one row matches the well
         if (length(layout.row.number) != 1)
-          stop("incorrectly formatted plate layout! check names of columns, rows, and plates (if applicable).")
+          stop("Incorrectly formatted plate layout! check names of columns, rows, and plates (if applicable).")
         
         # Add any additional columns to the well's "well.info" slot
         well.info = plate.layout[layout.row.number,!(names(plate.layout) %in% c("Row","Column","Plate.ID",layout.sheet.headers))]
@@ -234,12 +256,13 @@ gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL
 #  Reorganize data from single-plate input format before reading       #
 #                                                                      #
 ########################################################################
+#  Reorganize data from single-plate input format before reading       #
 #
 # This function reorganizes the data frame from a single-plate format file. 
-#   input.data - data frame read straight from a single-plate format data file. 
-#   single.plate.ID - specifies a plate name for a single-plate read, since none is given in the single-plate format
+# @param   input.data - data frame read straight from a single-plate format data file. 
+# @param   single.plate.ID - specifies a plate name for a single-plate read, since none is given in the single-plate format.
 #                       The plate will be named Plate_1 unless otherwise specified. 
-
+#                       
 gcat.reorganize.single.plate.data = function(input.data, blank.value = NULL, single.column.headers, single.plate.ID = "Plate_1", 
                                              plate.nrow = 8, plate.ncol = 12, silent=T){
  
@@ -252,12 +275,12 @@ gcat.reorganize.single.plate.data = function(input.data, blank.value = NULL, sin
   
 	header.row = min(which(input.data[,1] == single.column.headers[1])) 
   if (length(header.row) != 1 | is.infinite(header.row))
-    stop("could not locate header row in input file!")
+    stop("Could not locate header row in input file!")
     
   # The last row: where column 2 starts to be blank, or the total number of rows, whichever is smaller 
   extra.rows.start = min(which(input.data[-(1:header.row),2] == ""), which(is.na(input.data[-(1:header.row),2])), nrow(input.data[-(1:header.row),]))
   if (length(extra.rows.start) != 1 & is.infinite(extra.rows.start))  
-    stop("could not locate last row in input file!")
+    stop("Could not locate last row in input file!")
 
   # Use header row to rename the columns, then cut off extra rows (including the ones above header)
 	names(input.data) = as.character(unlist(input.data[header.row,]))
@@ -332,9 +355,12 @@ gcat.reorganize.single.plate.data = function(input.data, blank.value = NULL, sin
 #                                                                      #
 ########################################################################
 # ----------------------------------------------------------
-# This function can append together arrays created using <load.data> 
-# Arguments: any number of array objects as long as they are all output straight from <load.data> 
-
+#'    Function to combine two well array datasets by plate
+#'    
+#' This function can append together arrays created using <load.data> 
+#' 
+#' @param ... any number of array objects as long as they are all output straight from <load.data> 
+#'
 gcat.append.arrays = function(...){
 
   # Transfer arrays to a list
@@ -385,14 +411,16 @@ gcat.append.arrays = function(...){
 #     Convert timestamps to hours from start and sort timepoints       #
 #                                                                      #
 ########################################################################
+#'     Convert timestamps to hours from start and sort timepoints
 #
-# This function acts on a single well and modifies the raw data stored in slot "screen.data"
-# 
-#   input.well - an object of class well
-#   time.format - specifies the time format. allowed values are "%S", for seconds, "%d", for days, or anything complying with ISO C / POSIX standards; see <strptime>
-#      note: reading directly from excel to R results in timestamps being converted to days.
-#   start.index - which timepoint should be used as the starting time at inoculation?
-
+#' This function acts on a single well and modifies the raw data stored in slot "screen.data"
+#' 
+#' @param input.well an object of class well
+#' @param time.input specifies time format in the input. allowed values are "%S", for seconds, "%d", for days, or anything complying with 
+#' ISO C / POSIX standards; see <strptime>.
+#' @param start.index which timepoint should be used as the starting time at inoculation?
+#'
+#' @details note: reading directly from excel to R results in timestamps being converted to days.
 gcat.start.times = function(input.well, time.input, start.index = 2) {  
  
   if(start.index > length(input.well))

@@ -1,0 +1,6 @@
+           File name                                Problem       
+133 Well H1-H3 M200.csv                     Unrecognized encoding   
+133 Well H1-H3 M200 UTF-8 fixed.csv         Temperature column exist
+133 Well H1-H3 M200 UTF-8 fixed noT.csv     Missing data point at A6 time 
+                                            point 14
+

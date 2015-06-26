@@ -1,6 +1,6 @@
 #Copyright 2012 The Board of Regents of the University of Wisconsin System.
 #Contributors: Jason Shao, James McCurdy, Enhai Xie, Adam G.W. Halstead, 
-#Michael H. Whitney, Nathan DiPiazza, Trey K. Sato and Yury V. Bukhman
+#Michael H. Whitney, Nathan DiPiazza, Minh Bui, Trey K. Sato and Yury V. Bukhman
 #
 #This file is part of GCAT.
 #
@@ -17,13 +17,30 @@
 #You should have received a copy of the GNU Lesser General Public License  
 #along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
 
-# GCAT version 5.00
-# Notes by Jason
-# 08/18/2011
+########################################################################
+#                                                                      #
+#               Package-level documentation and imports                #
+#                                                                      #
+########################################################################
+#'  GCAT: Growth Curve Analysis Tool
+#'  
+#'  Mathematical modeling and parameter estimation of high volume microbial growth data.
+#'  
+#'  @details
+#'  GCAT input is in .csv format.  GCAT analysis is accessed using \code{\link{gcat.analysis.main}}
+#'  
+#'  GCAT utilizes the \code{\link[stats]{nls}} function in the R stats package to fit logistic, Gompertz and Richards models to growth curve 
+#'  data. Best model is selected automatically.  Alternatively, the user may choose LOESS local regression fits, implemented using
+#'  \code{\link[stats]{loess}} function in the R stats package  
+#'  
+#'  Internally, the data are stored in an array of \linkS4class{well} objects
+#'  
+#'  @import pheatmap gplots methods
+#'  @docType package
+#'  @name GCAT
+NULL
 
 # Initialization
-
-
 PLATE.LETTERS = paste(rep(c("", LETTERS), each = 26), rep(LETTERS, 26), sep="")
 global.version.number = packageDescription(pkg="GCAT")$Version 
 
@@ -88,31 +105,45 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param silent Shoulde messages be returned to the console?
 #' @param verbose Should sub-functions return messages to console? (when I say verbose, I mean it!)
 #' @param overview.jpgs Should GCAT enable an overview image?
+#' @param return.fit Whether should a fit well object is returned or not.
+#' @param lagRange The heatmap specific range for lag time.
+#' @param totalRange The heatmap specific range for the achieved growth.
+#' @param specRange The heatmap specific range for spec growth rate.
 #' 
-#' @return A list of the output files.
+#' @return Depending on return.fit setting, an array of fitted well objects or a list of output files
+#' 
+#' @export
 gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,   
   out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
-  add.constant = 0.1, blank.value = NULL, start.index = 2, growth.cutoff = 0.05,
+  add.constant = 0, blank.value = NULL, start.index = 2, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
+  lagRange = NA, totalRange = NA, specRange = NA,
   points.to.remove = 0, remove.jumps = F, time.input = NA,
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
   layout.sheet.headers = c("Strain", "Media Definition"),
   silent = T, verbose = F, return.fit = F, overview.jpgs = T){
+  
+  #  Capture the starting environment for debugging
+  main.envir = c(as.list(environment()))
 
-    # MB: Prototyping system unwanted argument guarding. Proper function 
-    # will be added in the future.
-    # Not the best solution.
+    # MB: Not the best solution.
     if (is.na(time.input)) {
       if (single.plate)
         time.input = 1/3600
       else
-        exception("Error: ", "time.input is NA.")
+        exception("", "time.input is NA.")
     }
-    
-    if (add.constant < 0)
-      exception("Error: ", "The constant r should not be negative.")
+  
+    # MB: Now add.constant will always be 0.
+    # No need to check.
+    #if (add.constant < 0)
+    #  exception("", "The constant r should not be negative.")
     # End prototyping temporary solution.
+    
+    #  YB: seem to need this to avoid spurious discarding of some wells in example multiplate dataset: Trac ticket 1780.
+    #  however, this causes an error in Rails
+    if(length(points.to.remove)==0) points.to.remove = 0
     
     upload.timestamp = strftime(Sys.time(), format="%Y-%m-%d %H:%M:%S") # Get a timestamp for the time of upload.  
     fitted.well.array.master = list()
@@ -148,9 +179,10 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
           source.file.list = source.file.list, upload.timestamp = upload.timestamp,   
           growth.cutoff = growth.cutoff, add.constant = add.constant, blank.value = blank.value, start.index = start.index, 
           points.to.remove = points.to.remove, remove.jumps = remove.jumps, 
+          lagRange = lagRange, specRange = specRange, totalRange = totalRange,
           out.dir = out.dir, graphic.dir = graphic.dir, overview.jpgs=overview.jpgs,
           use.linear.param=use.linear.param, use.loess=use.loess, plate.ncol = plate.ncol, plate.nrow = plate.nrow,
-          silent = silent), silent = T)
+          silent = silent, main.envir = main.envir), silent = T)
     
     # Return file list or error message otherwise return "successful analysis" message (?)
 
@@ -209,7 +241,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
 #' @param input.skip.lines If specified, this number of lines shall be skipped from the top when reading the input file with read.csv 
 #' @param multi.column.headers The headers of the column when analyzing multiple plates.
 #' @param single.column.headers The headers of the column when analyzing a single plate.
-#' @param layour.sheet.headers The headers of the layout file.
+#' @param layout.sheet.headers The headers of the layout file.
 #' @param growth.model What growth model should be used?
 #' @param backup.growth.model If the main growth model fails, the back up model will be used.
 #' @param silent Surpress all messages.
@@ -246,7 +278,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   #     "first": subtracts the first OD, assumed to be the blank, from all ODs
   #     "none": does nothing, assumes no blank. highly recommend log(OD+1) transform in this case.
   #     "average.first": forces all filled wells on each plate to match the average value at <start.index> (after subtracting the first OD) 
-  #  add.constant - a numeric constant that will be added to each curve before the log transform (defaults to 1)
+  #  add.constant - a numeric constant that will be added to each curve before the log transform (default is 0)
   #  use.log - should a log transform be applied to the data after normalization? 
   #  points.to.remove - a list of numbers referring to troublesome points that should be removed across all wells.
   
@@ -326,6 +358,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
       # Return an error if there is a problem with normalization
       if (class(well.array) == "try-error")
       	stop("Error in <normalize.ODs>: ", well.array)
+  #well.array = try(subtract.blank(well.array, blank.value), silent = silent)
   
   # Transform ODs on the logarithmic scale, regardless of whether <use.log> is true 
   #   an extra column of log-transformed values is added to the "well.array" slot of each well 
@@ -432,17 +465,26 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
 #' @param overview.jpgs should jpgs be generated for each plate with the overview graphic? 
 #' This is for backwards compatibility with the old web server.  
 #' @param silent should messages be returned to the console?
-#' @param unlog should exported graphics be transformed back to the OD scale?
-#' @param constant.added (should be the same value as add.constant above) - 
-#' used to readjust for the constant added during the log transform when plotting ODs. 
+#' @param unlog should exported graphics be transformed back to the OD scale? 
+#' @param source.file.list A list of the source files' names.
+#' @param upload.timestamp The time format indicated by the user.
+#' @param add.constant used to readjust for the constant added during the log transform when plotting ODs.
+#' @param use.linear.param linear parameter is used or not?
+#' @param use.loess Is LOESS model going to be used?
+#' @param plate.nrow The number of rows for a plate.
+#' @param plate.ncol The number of columns for a plate
+#' @param lagRange The heatmap specific range for lag time.
+#' @param totalRange The heatmap specific range for the achieved growth.
+#' @param specRange The heatmap specific range for spec growth rate.
+#' @param main.envir starting environment of gcat.analysis.main(), captured as a list, printed out for debugging
+#' 
 #' @return A list of output files if success.
-
 gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list, upload.timestamp = NULL,   
   add.constant, blank.value, start.index, growth.cutoff, points.to.remove, remove.jumps, 
   out.dir = getwd(), graphic.dir = paste(out.dir,"/pics",sep = ""), overview.jpgs = T,
-  use.linear.param=F, use.loess=F, plate.nrow = 8, plate.ncol = 12,
-  unlog = F, silent = T){     
-  
+  use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, specRange = NA,
+  plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir){     
+
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
     	
@@ -510,7 +552,8 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
 	# Use function <pdf.by.plate> to write fit graphics to file. 
   
 	graphic.files = try(pdf.by.plate(fitted.well.array, out.prefix=out.prefix, upload.timestamp = upload.timestamp, 
-    unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, plate.ncol = plate.ncol, plate.nrow = plate.nrow),silent=silent)
+    unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, lagRange = lagRange, specRange = specRange, totalRange = totalRange,
+    plate.ncol = plate.ncol, plate.nrow = plate.nrow),silent=silent)
   
   if (class(graphic.files) == "try-error")
 		stop("Error in <pdf.by.plate>: ", graphic.files)
@@ -550,7 +593,7 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
       "\n#              - an 'I' indicates that the well was inoculated and growth was detected above the threshold. ",
       "\n#              - an 'E*' indicates that the well was empty and growth was detected (possible contamination). ",
       "\n#              - an '!' indicates that the well was inoculated and no growth was detected. ",
-      "\n#    - asymp.not.reached: shows “L” if the bottom asymptote (baseline) was not reached and “U” if the upper asymptote (plateau) was not reached.",
+      "\n#    - asymp.not.reached: shows \"L\" if the bottom asymptote (baseline) was not reached and \"U\" if the upper asymptote (plateau) was not reached.",
       "\n#    - tank: (Tanking indicator) If a number is present then the growth trend was determined to tank at that timepoint index.", 
       "\n#    - other: Additional flag column.  Displays information about whether jumps in OD were detected and what was done about them.",
       "\n#    - pdf.file and page.no: location of the figure for this well in the output .pdf files."
@@ -569,7 +612,14 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
       "\n#    - Index of inoculation timepoint", start.index,
       "\n#    - Minimum growth threshold:", growth.cutoff, 
       "\n#    - Removed points:", paste(points.to.remove, collapse = " "),
-      "\n#    - Jump detection:", remove.jumps) 
+      "\n#    - Jump detection:", remove.jumps
+   )
+  
+  # gcat.analysis.main() starting environment
+  cat("\n#\n# -- gcat.analysis.main() starting environment --\n#")
+  print(main.envir)
+  
+  #  Done with text file output
   sink()
   
   ########################################################################

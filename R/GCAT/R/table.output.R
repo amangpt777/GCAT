@@ -18,17 +18,18 @@
 #along with GCAT.  If not, see <http://www.gnu.org/licenses/>.
 
 ########################################################################
-#                                                                      #
-# Populate an output table with parameters and other useful info for   #
-#   each well in a fitted dataset.                                     #
-#                                                                      #
 ########################################################################
-#
-# unlog - Should OD values be returned on the linear scale instead of log-transformed scale? 
-# constant.added - For returning values on linear scale, what constant was added to ODs before the log transform? 
-# reach.cutoff - what proportion of the plateau OD must tbe reached by the last valid timepoint for the curve to be marked as reaching its plateau OD?
-#
-
+#' Populate an output table with parameters and other useful info for each well in a fitted dataset.
+#'
+#' @param fitted.data.set array of fitted well objects
+#' @param unlog - Should OD values be returned on the linear scale instead of log-transformed scale? 
+#' @param constant.added - For returning values on linear scale, what constant was added to ODs before the log transform? 
+#' @param reach.cutoff - what proportion of the plateau OD must tbe reached by the last valid timepoint for the curve to be marked as reaching 
+#' its plateau OD?
+#' @param filename.timestamp timestamp for addition to output file names (for file references in last column of the output)
+#' @param use.linear.param did the model formula contain a linear parameter?  Should normally be FALSE, as the linear parameter is deprecated
+#' @param use.loess was LOESS used to fit the data (instead of unsing a growth curve model formula)?
+#'
 table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 0.90, filename.timestamp = NULL,use.linear.param=F, use.loess=F){
   
   # The idea is basically to use <unlist> and <aapply> on the fitted data array in order 

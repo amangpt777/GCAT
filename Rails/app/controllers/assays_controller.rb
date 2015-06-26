@@ -55,7 +55,11 @@ class AssaysController < ApplicationController
         flash.now[:error] = @result[:error_message] #.join("\n")
         #do not allow bad guys to fill disc space with invalid files
         FileUtils.rm @result[:path]
-        render :action => 'inputfile_error_message' 
+        # render :action => 'inputfile_error_message'
+        @error_msg = @result[:error_message]
+        @console_msg = @result[:console_msg]
+        render :action => 'inputfile_error_message'
+        
       else
         # parse the output text file into a hash in order to create a table in Assays#show
         @table = output_table(@result, !@result[:layout_file].nil?)
