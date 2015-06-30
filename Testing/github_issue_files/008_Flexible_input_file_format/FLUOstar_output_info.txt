@@ -1,0 +1,6 @@
+#Column A from Row 4 to the end: 1 - 1 0 h #Means Plate 1 - Measure 1 Time 0 (in hours)
+#Column B from Row 4 to the end: time in hours
+#Column C 	Row 1: Plate row names: A-H #For 96 well plates
+		Row 2: Column position in the 96 well plates
+		Row 3: Sample name
+	  from Row 4 to the end: OD values
