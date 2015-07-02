@@ -9,8 +9,8 @@ gcat.output.main(fitted.well.array, out.prefix = "", source.file.list,
   growth.cutoff, points.to.remove, remove.jumps, out.dir = getwd(),
   graphic.dir = paste(out.dir, "/pics", sep = ""), overview.jpgs = T,
   use.linear.param = F, use.loess = F, lagRange = NA, totalRange = NA,
-  specRange = NA, plate.nrow = 8, plate.ncol = 12, unlog = F,
-  silent = T, main.envir)
+  totalODRange = NA, specRange = NA, plate.nrow = 8, plate.ncol = 12,
+  unlog = F, silent = T, main.envir)
 }
 \arguments{
 \item{fitted.well.array}{A list of fitted well objects.}
@@ -49,6 +49,8 @@ This is for backwards compatibility with the old web server.}
 \item{lagRange}{The heatmap specific range for lag time.}
 
 \item{totalRange}{The heatmap specific range for the achieved growth.}
+
+\item{totalODRange}{The heatmap specific range for the achieved growth on linear (OD) scale.}
 
 \item{specRange}{The heatmap specific range for spec growth rate.}
 

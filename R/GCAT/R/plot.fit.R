@@ -298,12 +298,13 @@ plot_residuals = function(input.well, xlim = NULL, lowess = T, ...){
 #'
 #' @param fitted.well.array matrix containing well array object data
 #' @param attribute the data type we should use to create a heatmap
-#' @param unlog transform values to linear scale
 #' @param MinMax The specific range for the heatmap. 
+#' @param constant.added the numeric constant that was added to each curve before the log transform: 
+#' same as \code{add.constant} in \link{gcat.analysis.main}
 #'   
 #' @return path of heatmap pdf file
 #' 
-create.heatmap = function(fitted.well.array, attribute, MinMax = NA, unlog=NULL){
+create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.added){
   # debug
   #browser()
   
@@ -312,13 +313,14 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, unlog=NULL)
   if(class(fitted.well.array) == "matrix"){
     #We may want to sub() out periods from plate.ID if it causes problems
     plate.ID = unique(unlist(aapply(fitted.well.array,plate.name)))[1]
-    if(is.null(unlog)) {
+    if (attr.name == "achieved.growth.OD") {
+      #  Need to pass constant.added to the attribute computation function
+      spec.growth = unlist(aapply(fitted.well.array, attribute, constant.added = constant.added))
+    } else {
+      #  The attribute computation function does not have a constant.added argument
       spec.growth = unlist(aapply(fitted.well.array, attribute))
     }
-    # currently only total growth needs to be unlogged if unlog == T
-    else {
-      spec.growth = unlist(aapply(fitted.well.array, attribute))
-    }
+    
     num.dig = 3 #how many digits should be put on pdf?
     max = round(max(spec.growth, na.rm=T), digits=num.dig)
     min = round(min(spec.growth, na.rm=T), digits=num.dig)
@@ -614,7 +616,7 @@ well.fit.legend = function(xlim, ylim, scale = 1, constant.added){
 #  Generate pdf files
 pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL, 
   out.dir = getwd(), unlog = F, constant.added, silent = T, overview.jpgs = T, plate.ncol = 12, plate.nrow = 8,
-  lagRange = NA, specRange = NA, totalRange = NA, ...){
+  lagRange = NA, specRange = NA, totalRange = NA, totalODRange = NA, ...){
  
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
@@ -645,17 +647,20 @@ pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL,
       if(num.wells > 1){
         #Heatmap block##########################################################
         #alongside the jpgs file create 3 heatmaps for each plate. NWD
-        spec.heat.file = create.heatmap(fitted.data[,,i], max.spec.growth.rate, MinMax = specRange)
+        spec.heat.file = create.heatmap(fitted.data[,,i], max.spec.growth.rate, MinMax = specRange, constant.added)
         if(spec.heat.file == "Error")
           stop("Error in <create.heatmap> for specific growth")
-        lag.heat.file = create.heatmap(fitted.data[,,i], lag.time, MinMax = lagRange)
+        lag.heat.file = create.heatmap(fitted.data[,,i], lag.time, MinMax = lagRange, constant.added)
         if(lag.heat.file == "Error")
           stop("Error in <create.heatmap> for lag time")
-        total.heat.file = create.heatmap(fitted.data[,,i], achieved.growth, MinMax = totalRange)
+        total.heat.file = create.heatmap(fitted.data[,,i], achieved.growth, MinMax = totalRange, constant.added)
         if(total.heat.file == "Error")
           stop("Error in <create.heatmap> for total growth")
+        total.OD.heat.file = create.heatmap(fitted.data[,,i], achieved.growth.OD, MinMax = totalODRange, constant.added)
+        if(total.OD.heat.file == "Error")
+          stop("Error in <create.heatmap> for total growth")
         #  Add name of file if successfully written to file list output. Including heatmap files NWD
-        file.list.out = c(file.list.out, spec.heat.file, lag.heat.file, total.heat.file)
+        file.list.out = c(file.list.out, spec.heat.file, lag.heat.file, total.heat.file, total.OD.heat.file)
         ########################################################################
       }
       jpg.name = paste(out.dir, "/", plate.ID, "_overview", ".jpg", sep="")

@@ -8,12 +8,13 @@ gcat.analysis.main(file.list, single.plate, layout.file = NULL,
   out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""),
   add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param = 0.1,
-  lagRange = NA, totalRange = NA, specRange = NA, points.to.remove = 0,
-  remove.jumps = F, time.input = NA, plate.nrow = 8, plate.ncol = 12,
-  input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD",
-  "Time"), single.column.headers = c("", "A1"),
-  layout.sheet.headers = c("Strain", "Media Definition"), silent = T,
-  verbose = F, return.fit = F, overview.jpgs = T)
+  lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
+  points.to.remove = 0, remove.jumps = F, time.input = NA,
+  plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
+  multi.column.headers = c("Plate.ID", "Well", "OD", "Time"),
+  single.column.headers = c("", "A1"), layout.sheet.headers = c("Strain",
+  "Media Definition"), silent = T, verbose = F, return.fit = F,
+  overview.jpgs = T)
 }
 \arguments{
 \item{file.list}{A list of full paths to .csv files. all files must be in the same format (see <single.plate>)}
@@ -42,7 +43,9 @@ gcat.analysis.main(file.list, single.plate, layout.file = NULL,
 
 \item{lagRange}{The heatmap specific range for lag time.}
 
-\item{totalRange}{The heatmap specific range for the achieved growth.}
+\item{totalRange}{The heatmap specific range for the achieved growth on log scale.}
+
+\item{totalODRange}{The heatmap specific range for the achieved growth on linear (OD) scale.}
 
 \item{specRange}{The heatmap specific range for spec growth rate.}
 

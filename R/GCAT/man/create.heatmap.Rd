@@ -4,7 +4,7 @@
 \alias{create.heatmap}
 \title{Create a heat map of a plate}
 \usage{
-create.heatmap(fitted.well.array, attribute, MinMax = NA, unlog = NULL)
+create.heatmap(fitted.well.array, attribute, MinMax = NA, constant.added)
 }
 \arguments{
 \item{fitted.well.array}{matrix containing well array object data}
@@ -13,7 +13,8 @@ create.heatmap(fitted.well.array, attribute, MinMax = NA, unlog = NULL)
 
 \item{MinMax}{The specific range for the heatmap.}
 
-\item{unlog}{transform values to linear scale}
+\item{constant.added}{the numeric constant that was added to each curve before the log transform:
+same as \code{add.constant} in \link{gcat.analysis.main}}
 }
 \value{
 path of heatmap pdf file

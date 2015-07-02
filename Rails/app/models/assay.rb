@@ -34,7 +34,7 @@ class Assay
   extend ActiveModel::Naming
   attr_accessor :input_file, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
   :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input, :console_out, :specg_min,
-  :specg_max, :totg_min, :totg_max, :lagT_min, :lagT_max,:transformation, :transformation_input
+  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input
   
 
   # (1) Validation of input data file
@@ -168,6 +168,10 @@ class Assay
     if (self.totg_min != '' && self.totg_max != '')
       self.totg_min = Float(self.totg_min)
       self.totg_max = Float(self.totg_max)
+    end
+    if (self.totg_OD_min != '' && self.totg_OD_max != '')
+      self.totg_OD_min = Float(self.totg_OD_min)
+      self.totg_OD_max = Float(self.totg_OD_max)
     end
     if (self.lagT_min != '' && self.lagT_max != '')
       self.lagT_max = Float(self.lagT_max)
@@ -351,6 +355,13 @@ class Assay
     else
       R.eval 'totalRange <- NA'
     end
+    if (self.totg_OD_min != '' && self.totg_OD_max != '')
+      R.assign 'totODMin', self.totg_OD_min
+      R.assign 'totODMax', self.totg_OD_max
+      R.eval "totalODRange <- c(totODMin, totODMax)"
+    else
+      R.eval 'totalODRange <- NA'
+    end
     if (self.lagT_min != '' && self.lagT_max != '')
       R.assign 'lagT_min', self.lagT_min
       R.assign 'lagT_max', self.lagT_max
@@ -361,8 +372,9 @@ class Assay
     
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
     R.eval ('R_file_return_value <- gcat.analysis.main(file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
-                                    start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, lagRange = lagRange, 
-                                    totalRange = totalRange, specRange = specRange, points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
+                                    start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
+				    lagRange = lagRange, totalRange = totalRange, totalODRange = totalODRange, specRange = specRange, 
+				    points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
                                     plate.ncol = 12, input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
                                     layout.sheet.headers = c("Strain", "Media Definition"), silent = T, verbose = F, return.fit = F, overview.jpgs = T)')
    

@@ -128,15 +128,21 @@
     </div>
   </li>
   <li>
-    <h3><span data-tooltip="Select the range for the heatmaps for easier comparison.">Heatmap options</span></h3>
+    <h3><span data-tooltip="Select value ranges for the heatmaps for easier comparison between experiments.">Heatmap options</span></h3>
     <div class="field">
-    <%= f.label "Enter the range for the total growth." %><br />
+    <%= f.label "Enter the range for the achieved growth on log scale." %><br />
     <%= f.text_field(:totg_min, :type => 'number', :min => '0', :size => '2') %>
     <%= f.label "-" %>
     <%= f.text_field(:totg_max, :type => 'number', :min => '1', :size => '2') %>
     </div>
     <div class="field">
-      <%= f.label "Enter the range for the specific growth." %><br />
+    <%= f.label "Enter the range for the achieved growth on linear scale." %><br />
+    <%= f.text_field(:totg_OD_min, :type => 'number', :min => '0', :size => '2') %>
+    <%= f.label "-" %>
+    <%= f.text_field(:totg_OD_max, :type => 'number', :min => '1', :size => '2') %>
+    </div>
+    <div class="field">
+      <%= f.label "Enter the range for the max specific growth rate." %><br />
       <%= f.text_field(:specg_min, :type => 'number', :min => '0', :size => '2') %>
       <%= f.label "-" %>
       <%= f.text_field(:specg_max, :type => 'number', :min => '1', :size => '2') %>

@@ -107,7 +107,8 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param overview.jpgs Should GCAT enable an overview image?
 #' @param return.fit Whether should a fit well object is returned or not.
 #' @param lagRange The heatmap specific range for lag time.
-#' @param totalRange The heatmap specific range for the achieved growth.
+#' @param totalRange The heatmap specific range for the achieved growth on log scale.
+#' @param totalODRange The heatmap specific range for the achieved growth on linear (OD) scale.
 #' @param specRange The heatmap specific range for spec growth rate.
 #' 
 #' @return Depending on return.fit setting, an array of fitted well objects or a list of output files
@@ -117,7 +118,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
   add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
-  lagRange = NA, totalRange = NA, specRange = NA,
+  lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
   points.to.remove = 0, remove.jumps = F, time.input = NA,
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
@@ -184,7 +185,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
           source.file.list = source.file.list, upload.timestamp = upload.timestamp,   
           growth.cutoff = growth.cutoff, add.constant = add.constant, blank.value = blank.value, start.index = start.index, 
           points.to.remove = points.to.remove, remove.jumps = remove.jumps, 
-          lagRange = lagRange, specRange = specRange, totalRange = totalRange,
+          lagRange = lagRange, specRange = specRange, totalRange = totalRange, totalODRange = totalODRange,
           out.dir = out.dir, graphic.dir = graphic.dir, overview.jpgs=overview.jpgs,
           use.linear.param=use.linear.param, use.loess=use.loess, plate.ncol = plate.ncol, plate.nrow = plate.nrow,
           silent = silent, main.envir = main.envir), silent = T)
@@ -480,6 +481,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
 #' @param plate.ncol The number of columns for a plate
 #' @param lagRange The heatmap specific range for lag time.
 #' @param totalRange The heatmap specific range for the achieved growth.
+#' @param totalODRange The heatmap specific range for the achieved growth on linear (OD) scale.
 #' @param specRange The heatmap specific range for spec growth rate.
 #' @param main.envir starting environment of gcat.analysis.main(), captured as a list, printed out for debugging
 #' 
@@ -487,7 +489,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
 gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list, upload.timestamp = NULL,   
   add.constant, blank.value, start.index, growth.cutoff, points.to.remove, remove.jumps, 
   out.dir = getwd(), graphic.dir = paste(out.dir,"/pics",sep = ""), overview.jpgs = T,
-  use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, specRange = NA,
+  use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
   plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir){     
 
   # Prepare timestamp for addition to output file names. 
@@ -558,7 +560,7 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
   
 	graphic.files = try(pdf.by.plate(fitted.well.array, out.prefix=out.prefix, upload.timestamp = upload.timestamp, 
     unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, lagRange = lagRange, specRange = specRange, totalRange = totalRange,
-    plate.ncol = plate.ncol, plate.nrow = plate.nrow),silent=silent)
+    totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow),silent=silent)
   
   if (class(graphic.files) == "try-error")
 		stop("Error in <pdf.by.plate>: ", graphic.files)
