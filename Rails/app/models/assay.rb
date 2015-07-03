@@ -97,10 +97,21 @@ class Assay
   #validates :plate_dimensions_column, :numericality => { :only_integer => true, :greater_than => 0}
   #validates :plate_dimensions_row, :numericality => { :only_integer => true, :greater_than => 0 }
   
-  #validate inoculation timepoint
+  # (7) validate inoculation timepoint
   validates :start_index, :numericality => { :only_integer => true, :greater_than => 0}
   
-  
+  # (8) validate heatmap ranges
+#validates_numericality_of :blank_value_input,:if => :user_input?,  :message => '- Invalid OD blank value. Please Enter A Real Number.'
+  validates_numericality_of :totg_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :totg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :totg_OD_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :totg_OD_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :specg_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :specg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+
+
   def initialize(attributes = {})
     attributes.each do |name, value|
       send("#{name}=", value)
