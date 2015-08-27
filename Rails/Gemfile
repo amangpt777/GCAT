@@ -17,7 +17,7 @@ group :assets do
   gem 'uglifier'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'therubyracer'
+  gem 'therubyracer', :platform => :ruby
 
 end
 
@@ -30,7 +30,8 @@ gem 'jquery-rails'
 # gem 'capistrano'
 
 # To use debugger
-gem 'debugger'
+# gem 'debugger'
+gem 'pry'
 
 group :test do
   # Pretty printed test output
