@@ -41,7 +41,8 @@ unlog = function(x, constant.added) {
   exp(x) - constant.added
 }
 
-# Evaluate estimated OD at any timepoints using the fitted model
+#' Evaluate estimated OD at any timepoints using the fitted model
+#' @export
 well.eval = function(fitted.well, Time = NULL){
   # If no timepoints are provided, use the ones collected in the experiment itself.
 	if(!is.numeric(Time))
@@ -202,7 +203,8 @@ baseline = function(fitted.well, digits = Inf){
 	return(base)
 	}
 
-# Calculate log.OD at inoculation from fitted parameters
+#' Calculate log.OD at inoculation from fitted parameters
+#' @export
 inoc.log.OD = function(fitted.well, digits = Inf){
   # Evaluated the fitted model at the inoculation timepoint (should be zero from using <start.times> from table2wells.R)
 	if (is.null(well.eval(fitted.well)))
@@ -351,4 +353,37 @@ inflection.time = function(well){
   dydt = diff(y)/delta.t
   infl.index = which.max(dydt)
   t[infl.index]
+}
+
+#'  Compute Area Under The Curve (AUC)
+#'  
+#'   @param fitted.well object of class \linkS4class{well} with fitted model info
+#'   @param start starting time for AUC calculation
+#'   @param end end time for AUC calculation
+#'   @param digits number of significant digits to output
+#'   
+#'   @export
+auc = function(fitted.well, start=NULL, end=NULL, digits=3) {
+  #  Check inputs
+  stopifnot(class(fitted.well)=="well")
+  stopifnot(is.null(start) || is.numeric(start)) 
+  stopifnot(is.null(end) || is.numeric(end))
+  stopifnot(is.numeric(digits), digits == round(digits))
+  
+  #  Set start and end times, if not supplied by the user
+  if (is.null(start)) {
+    start = getScreenData(fitted.well)$Time[getStartIndex(fitted.well)]
+  }
+  if (is.null(end)) {
+    end = getScreenData(fitted.well)$Time[nrow(getScreenData(fitted.well))]
+  }
+  
+  #  Verify that the end time is after the start time
+  stopifnot(end > start)
+  
+  #  Compute the AUC
+  int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
+  
+  #  All done
+  return(int1$value)
 }

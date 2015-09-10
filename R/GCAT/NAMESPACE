@@ -2,7 +2,10 @@
 
 export(achieved.growth)
 export(achieved.growth.OD)
+export(auc)
 export(gcat.analysis.main)
+export(inoc.log.OD)
+export(well.eval)
 exportClasses(well)
 exportMethods(getAddInfo)
 exportMethods(getCurPar)
