@@ -19,5 +19,3 @@ test_that("auc is in the right range", {
   expect_more_than(auc, upper.bound/2)
   expect_more_than(auc.OD, upper.bound.OD/2)
 })
-
-#test
