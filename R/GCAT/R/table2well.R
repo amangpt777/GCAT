@@ -65,8 +65,8 @@ gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL
   
 	if(is.null(input.data)){
     # Check for bad encoding.
-    file.name.cmd = paste("'", file.name, sep = "")
-    file.name.cmd = paste(file.name.cmd, "'", sep = "")
+    file.name.cmd = paste('"', file.name, sep = "")
+    file.name.cmd = paste(file.name.cmd, '"', sep = "")
     cmd = paste("enca -L none", file.name.cmd)
     sys.msg = system(cmd, intern = TRUE)
     if (length(attributes(sys.msg)) == 1) {
