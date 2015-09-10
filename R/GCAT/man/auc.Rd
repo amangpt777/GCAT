@@ -15,6 +15,10 @@ auc(fitted.well, start = NULL, end = NULL, digits = 3)
 
 \item{digits}{number of significant digits to output}
 }
+\value{
+Returns numeric AUC value computed using the well's nls or loess model.
+  Returns NA if neither nls nor loess model is defined for the well.
+}
 \description{
 Compute Area Under The Curve (AUC)
 }

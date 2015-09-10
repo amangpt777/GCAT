@@ -362,6 +362,10 @@ inflection.time = function(well){
 #'   @param end end time for AUC calculation
 #'   @param digits number of significant digits to output
 #'   
+#'   @return 
+#'   Returns numeric AUC value computed using the well's nls or loess model.  
+#'   Returns NA if neither nls nor loess model is defined for the well.
+#'   
 #'   @export
 auc = function(fitted.well, start=NULL, end=NULL, digits=3) {
   #  Check inputs
@@ -382,8 +386,13 @@ auc = function(fitted.well, start=NULL, end=NULL, digits=3) {
   stopifnot(end > start)
   
   #  Compute the AUC
-  int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
-  
+  if (length(fitted.well@nls)>0 || length(fitted.well@loess)>0) {
+    int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
+    result = int1$value
+  } else {
+    result = NA
+  }
+
   #  All done
-  return(int1$value)
+  return(result)
 }
