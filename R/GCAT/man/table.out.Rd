@@ -5,7 +5,8 @@
 \title{Populate an output table with parameters and other useful info for each well in a fitted dataset.}
 \usage{
 table.out(fitted.data.set, unlog = F, constant.added, reach.cutoff = 0.9,
-  filename.timestamp = NULL, use.linear.param = F, use.loess = F)
+  filename.timestamp = NULL, use.linear.param = F, use.loess = F,
+  auc.start = NULL, auc.end = NULL)
 }
 \arguments{
 \item{fitted.data.set}{array of fitted well objects}
@@ -22,6 +23,10 @@ its plateau OD?}
 \item{use.linear.param}{did the model formula contain a linear parameter?  Should normally be FALSE, as the linear parameter is deprecated}
 
 \item{use.loess}{was LOESS used to fit the data (instead of unsing a growth curve model formula)?}
+
+\item{auc.start}{Start time for AUC computation}
+
+\item{auc.end}{End time for AUC computation}
 }
 \description{
 Populate an output table with parameters and other useful info for each well in a fitted dataset.

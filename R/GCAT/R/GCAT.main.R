@@ -110,6 +110,8 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param totalRange The heatmap specific range for the achieved growth on log scale.
 #' @param totalODRange The heatmap specific range for the achieved growth on linear (OD) scale.
 #' @param specRange The heatmap specific range for spec growth rate.
+#' @param auc.start Start time for AUC computation
+#' @param auc.end End time for AUC computation
 #' 
 #' @return Depending on return.fit setting, an array of fitted well objects or a list of output files
 #' 
@@ -123,7 +125,8 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
   layout.sheet.headers = c("Strain", "Media Definition"),
-  silent = T, verbose = F, return.fit = F, overview.jpgs = T){
+  silent = T, verbose = F, return.fit = F, overview.jpgs = T,
+  auc.start = NULL, auc.end = NULL){
   
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
@@ -158,8 +161,8 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     #  exception("", "The constant r should not be negative.")
     # End prototyping temporary solution.
     
-    #  YB: seem to need this to avoid spurious discarding of some wells in example multiplate dataset: Trac ticket 1780.
-    #  however, this causes an error in Rails
+    #  YB: seem to need this to avoid spurious discarding of some wells in example multiplate dataset: 
+    #  Trac ticket 1780. 
     if(length(points.to.remove)==0) points.to.remove = 0
     
     upload.timestamp = strftime(Sys.time(), format="%Y-%m-%d %H:%M:%S") # Get a timestamp for the time of upload.  
@@ -199,7 +202,8 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
           lagRange = lagRange, specRange = specRange, totalRange = totalRange, totalODRange = totalODRange,
           out.dir = out.dir, graphic.dir = graphic.dir, overview.jpgs=overview.jpgs,
           use.linear.param=use.linear.param, use.loess=use.loess, plate.ncol = plate.ncol, plate.nrow = plate.nrow,
-          silent = silent, main.envir = main.envir), silent = T)
+          silent = silent, main.envir = main.envir, auc.start = auc.start, auc.end = auc.end), 
+          silent = T)
     
     # Return file list or error message otherwise return "successful analysis" message (?)
 
@@ -495,13 +499,15 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
 #' @param totalODRange The heatmap specific range for the achieved growth on linear (OD) scale.
 #' @param specRange The heatmap specific range for spec growth rate.
 #' @param main.envir starting environment of gcat.analysis.main(), captured as a list, printed out for debugging
+#' @param auc.start Start time for AUC computation
+#' @param auc.end End time for AUC computation
 #' 
 #' @return A list of output files if success.
 gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list, upload.timestamp = NULL,   
   add.constant, blank.value, start.index, growth.cutoff, points.to.remove, remove.jumps, 
   out.dir = getwd(), graphic.dir = paste(out.dir,"/pics",sep = ""), overview.jpgs = T,
   use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
-  plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir){     
+  plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir, auc.start = NULL, auc.end = NULL){     
 
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
@@ -537,7 +543,9 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
   # Creates a table with a row for each well and a column for each of various identifiers and fitted and calculated parameters. 
   
   if(!silent) cat("\nPopulating data table...")
-  table.fit = try(table.out(fitted.well.array, filename.timestamp=filename.timestamp,use.linear.param=use.linear.param, use.loess=use.loess, constant.added=add.constant))
+  table.fit = try(table.out(fitted.well.array, filename.timestamp=filename.timestamp,
+                            use.linear.param=use.linear.param, use.loess=use.loess, 
+                            constant.added=add.constant, auc.start = auc.start, auc.end = auc.end))
   
       # Return an error if there is a problem with returning the table
       if (class(fitted.well.array) == "try-error")
@@ -603,6 +611,7 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
       "\n#    - max.log.OD: maximal log.OD value reached during the experiment.  Estimated value from the fitted model is used rather than the actual measurement",
       "\n#    - projected.growth: maximal projected growth over inoculation value.  Global sigmoid model: projected.growth = plateau - inoc.log.OD. LOESS: not reported",
       "\n#    - achieved.growth: maximal growth over inoculation value actually achieved during the experiment.  achieved.growth = max.log.OD - inoc.log.OD",
+      "\n#    - AUC: area under the curve on log scale; AUC.OD: area under the curve on linear OD scale",
       "\n#    - shape.par: shape parameter of the Richard equation",
       "\n#    - R.squared: goodness of fit metric.  Also known as coefficient of determination.  R.squared is usually between 0 and 1.  A value close to 1 indicates good fit.",
       "\n#    - RSS: residual sum of squares.  Another goodness of fit metric.  Smaller values indicate better fits.",

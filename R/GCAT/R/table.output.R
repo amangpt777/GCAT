@@ -29,8 +29,12 @@
 #' @param filename.timestamp timestamp for addition to output file names (for file references in last column of the output)
 #' @param use.linear.param did the model formula contain a linear parameter?  Should normally be FALSE, as the linear parameter is deprecated
 #' @param use.loess was LOESS used to fit the data (instead of unsing a growth curve model formula)?
+#' @param auc.start Start time for AUC computation
+#' @param auc.end End time for AUC computation
 #'
-table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 0.90, filename.timestamp = NULL,use.linear.param=F, use.loess=F){
+table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 0.90, 
+                     filename.timestamp = NULL, use.linear.param=F, use.loess=F,
+                     auc.start = NULL, auc.end = NULL){
   
   # The idea is basically to use <unlist> and <aapply> on the fitted data array in order 
   # to get one vector for each column of the output table.  
@@ -61,6 +65,8 @@ table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 
   projected.growth.OD = unlist(aapply(fitted.data.set, projected.growth.OD, constant.added))
   achieved.growth = unlist(aapply(fitted.data.set, achieved.growth))
   achieved.growth.OD = unlist(aapply(fitted.data.set, achieved.growth.OD, constant.added))
+  auc = unlist(aapply(fitted.data.set, auc))
+  auc.OD = unlist(aapply(fitted.data.set, auc.OD, constant.added))
   lag.time = unlist(aapply(fitted.data.set, lag.time))
   shape.par = unlist(aapply(fitted.data.set, shape.par))
   RSS = unlist(aapply(fitted.data.set, rss))
@@ -164,19 +170,20 @@ table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 
   if(use.loess){
     output.core = data.frame(row = row.number, plate = plate.ID, well = well.ID, media = media.ID, strain = strain.ID, 
                              model = model.used, lag.time, inflection.time, max.spec.growth.rate, 
-                             baseline, amplitude, plateau, inoc.log.OD, max.log.OD, achieved.growth,
+                             baseline, amplitude, plateau, inoc.log.OD, max.log.OD, achieved.growth, AUC=auc,
                              baseline.OD = unlog(baseline,constant.added), amplitude.OD = unlog(amplitude,constant.added), 
                              plateau.OD = unlog(plateau,constant.added), inoc.OD = unlog(inoc.log.OD,constant.added), 
-                             max.OD = unlog(max.log.OD,constant.added), achieved.growth.OD = achieved.growth.OD,
+                             max.OD = unlog(max.log.OD,constant.added), achieved.growth.OD = achieved.growth.OD, 
+                             AUC.OD = auc.OD,
                              R.squared = good.fit, RSS = RSS, empty = flag1, asymp.not.reached = flag2, tank = tanking, other = flag3, pdf.file = pdf.file, page.no = page.no)
   } else {
     output.core = data.frame(row = row.number, plate = plate.ID, well = well.ID, media = media.ID, strain = strain.ID, 
                              model = model.used, lag.time = lag.time, lag.time.SE, inflection.time, max.spec.growth.rate, max.spec.growth.rate.SE, 
-                             baseline, baseline.SE, amplitude, amplitude.SE, plateau, inoc.log.OD, max.log.OD, projected.growth, achieved.growth,
+                             baseline, baseline.SE, amplitude, amplitude.SE, plateau, inoc.log.OD, max.log.OD, projected.growth, achieved.growth, AUC=auc,
                              baseline.OD = unlog(baseline,constant.added), amplitude.OD = unlog(amplitude,constant.added), 
                              plateau.OD = unlog(plateau,constant.added), inoc.OD = unlog(inoc.log.OD,constant.added), 
                              max.OD = unlog(max.log.OD,constant.added), projected.growth.OD = projected.growth.OD, achieved.growth.OD = achieved.growth.OD,
-                             shape.par = shape.par, shape.par.SE,
+                             AUC.OD = auc.OD, shape.par = shape.par, shape.par.SE,
                              R.squared = good.fit, RSS = RSS, empty = flag1, asymp.not.reached = flag2, tank = tanking, other = flag3, pdf.file = pdf.file, page.no = page.no)
   }
   
@@ -184,7 +191,7 @@ table.out = function(fitted.data.set, unlog = F, constant.added, reach.cutoff = 
   names2 = names(output.core)
   names2[grep("time",names2)] = sub("$",", hrs", names2[grep("time",names2)])
   names2[grep("rate",names2)] = sub("$",", log.OD/hr", names2[grep("rate",names2)])
-  log.OD.fields = c("baseline", "baseline.SE", "amplitude", "amplitude.SE", "plateau", "projected.growth", "achieved.growth")
+  log.OD.fields = c("baseline", "baseline.SE", "amplitude", "amplitude.SE", "plateau", "projected.growth", "achieved.growth", "AUC")
   names2[names2 %in% log.OD.fields] = sub("$", ", log.OD", names2[names2 %in% log.OD.fields])
   names(output.core) = names2
     

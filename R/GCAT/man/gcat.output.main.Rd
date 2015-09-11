@@ -10,7 +10,7 @@ gcat.output.main(fitted.well.array, out.prefix = "", source.file.list,
   graphic.dir = paste(out.dir, "/pics", sep = ""), overview.jpgs = T,
   use.linear.param = F, use.loess = F, lagRange = NA, totalRange = NA,
   totalODRange = NA, specRange = NA, plate.nrow = 8, plate.ncol = 12,
-  unlog = F, silent = T, main.envir)
+  unlog = F, silent = T, main.envir, auc.start = NULL, auc.end = NULL)
 }
 \arguments{
 \item{fitted.well.array}{A list of fitted well objects.}
@@ -63,6 +63,10 @@ This is for backwards compatibility with the old web server.}
 \item{silent}{should messages be returned to the console?}
 
 \item{main.envir}{starting environment of gcat.analysis.main(), captured as a list, printed out for debugging}
+
+\item{auc.start}{Start time for AUC computation}
+
+\item{auc.end}{End time for AUC computation}
 }
 \value{
 A list of output files if success.

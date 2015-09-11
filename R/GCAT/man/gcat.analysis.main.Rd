@@ -14,7 +14,7 @@ gcat.analysis.main(file.list, single.plate, layout.file = NULL,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"),
   single.column.headers = c("", "A1"), layout.sheet.headers = c("Strain",
   "Media Definition"), silent = T, verbose = F, return.fit = F,
-  overview.jpgs = T)
+  overview.jpgs = T, auc.start = NULL, auc.end = NULL)
 }
 \arguments{
 \item{file.list}{A list of full paths to .csv files. all files must be in the same format (see <single.plate>)}
@@ -74,6 +74,10 @@ gcat.analysis.main(file.list, single.plate, layout.file = NULL,
 \item{return.fit}{Whether should a fit well object is returned or not.}
 
 \item{overview.jpgs}{Should GCAT enable an overview image?}
+
+\item{auc.start}{Start time for AUC computation}
+
+\item{auc.end}{End time for AUC computation}
 }
 \value{
 Depending on return.fit setting, an array of fitted well objects or a list of output files
