@@ -3,6 +3,7 @@
 export(achieved.growth)
 export(achieved.growth.OD)
 export(auc)
+export(auc.OD)
 export(gcat.analysis.main)
 export(inoc.log.OD)
 export(well.eval)

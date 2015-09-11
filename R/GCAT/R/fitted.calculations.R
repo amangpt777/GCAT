@@ -361,13 +361,17 @@ inflection.time = function(well){
 #'   @param start starting time for AUC calculation
 #'   @param end end time for AUC calculation
 #'   @param digits number of significant digits to output
+#'   @param unlog logic, if TRUE, compute AUC on linear OD scale
+#'   @param constant.added constant added in the \emph{log.OD = log(OD - blank + const)} transformation
 #'   
 #'   @return 
-#'   Returns numeric AUC value computed using the well's nls or loess model.  
-#'   Returns NA if neither nls nor loess model is defined for the well.
+#'   Returns numeric AUC value computed using the well's \emph{nls} or \emph{loess} model.  
+#'   Returns NA if neither \emph{nls} nor \emph{loess} model is defined for the well.
+#'   
+#'   @seealso \linkS4class{well}
 #'   
 #'   @export
-auc = function(fitted.well, start=NULL, end=NULL, digits=3) {
+auc = function(fitted.well, start=NULL, end=NULL, digits=3, unlog=FALSE, constant.added=0) {
   #  Check inputs
   stopifnot(class(fitted.well)=="well")
   stopifnot(is.null(start) || is.numeric(start)) 
@@ -387,12 +391,27 @@ auc = function(fitted.well, start=NULL, end=NULL, digits=3) {
   
   #  Compute the AUC
   if (length(fitted.well@nls)>0 || length(fitted.well@loess)>0) {
-    int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
-    result = int1$value
+    if (unlog) {
+      # compute on OD scale
+      int1 = integrate(function(x) {
+          unlog(well.eval(fitted.well,x),constant.added) - unlog(inoc.log.OD(fitted.well),constant.added)
+        },  
+                       start, end) 
+    } else {
+      # compute on log scale
+      int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
+    } 
+    result = signif(int1$value,digits)
   } else {
     result = NA
   }
 
   #  All done
   return(result)
+}
+
+#' @describeIn auc Compute Area Under The Curve (AUC) on linear OD scale
+#' @export
+auc.OD = function(fitted.well, start=NULL, end=NULL, digits=3, constant.added=0) {
+  auc(fitted.well, start, end, digits, unlog=TRUE, constant.added)
 }
