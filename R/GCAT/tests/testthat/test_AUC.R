@@ -19,3 +19,13 @@ test_that("auc is in the right range", {
   expect_more_than(auc, upper.bound/2)
   expect_more_than(auc.OD, upper.bound.OD/2)
 })
+
+#  Compute the AUC in a range and check that it's correct
+auc = auc(well,start=10,end=15)
+auc.approx = achieved.growth(well)*5
+auc.OD = auc.OD(well,start=10,end=15,constant.added=constant.added)
+auc.OD.approx = achieved.growth.OD(well,constant.added)*5
+test_that("auc computed on an interval is correct", {
+  expect_equal(auc,auc.approx,tolerance=0.1)
+  expect_equal(auc.OD,auc.OD.approx,tolerance=0.1)
+})
