@@ -1,3 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
+Rails/public/generatedFiles/
+Rails/public/uploadedFiles/
+Thumbs.db
