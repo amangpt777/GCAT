@@ -97,6 +97,17 @@
           </div>
         </li>
         <li>
+          <h3><span data-tooltip="Enter start and end time points for AUC computation, in hours. If no values are entered, GCAT will compute the AUC for the entire time course." >Area Under the Curve (AUC)</span></h3>
+          <div class="field">
+              <%= f.label :area_start_hour, "Start time. Defaults to 0."  %><br />
+              <%= f.text_field(:area_start_hour, :type => 'number', :min =>'0', :size => '3', :value => 0, :step => "0.5") %>
+          </div>
+          <div class="field">
+              <%= f.label :area_end_hour, "End time. If no value entered, defaults to end of time course."  %><br />
+              <%= f.text_field(:area_end_hour, :type => 'number', :min =>'0', :size => '3', :value => nil, :step => "0.5") %>
+          </div>
+        </li>
+        <li>
           <h3><span data-tooltip="Enter indices (as a comma-separated list) of any erroneous reads that should be removed across the entire experiment. " >Points to ignore</span></h3>
           <div class="field">
               <%= f.label :remove_points,"Enter a comma-separated list of points. Example: 2,3,4,5 (positive integers only). The default is an empty list." %><br />

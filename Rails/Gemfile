@@ -41,3 +41,9 @@ end
 gem 'rinruby'
 
 gem 'rubyzip'
+
+
+group :development do
+  gem 'thin'
+  gem 'quiet_assets'
+end
