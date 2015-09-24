@@ -110,8 +110,49 @@ class Assay
   validates_numericality_of :specg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+
   validates_numericality_of :area_start_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number that is greater than the start.'
+  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validate :area_under_curve
+
+  # Validates the area under curve start and end as they are mutually dependent.
+  # Valid conditions:
+  #     area_start_hour = nil, area_end_hour == nil
+  #     area_start_hour >=0, area_end_hour == nil
+  #     area_start_hour < area_end_hour, >=0, area_end_hour > 0
+  # Invalid conditions:
+  #     area_start_hour >= area_end_hour
+  #     area_start_hour > 0, area_end_hour = nil
+  # Note that negativity of these numbers is tested above in 'validates_numericality_of' statements.
+  def area_under_curve
+    test_area_start_hour = area_start_hour != '' ? Float(area_start_hour) : nil
+    test_area_end_hour = area_end_hour != '' ? Float(area_end_hour) : nil
+
+    if test_area_end_hour
+      if test_area_end_hour <= 0
+        errors.add(:area_end_hour, "must be greater than 0.")
+      end
+      if test_area_start_hour and test_area_start_hour >= test_area_end_hour
+        errors.add(:area_end_hour, "must be greater than start hour.")
+        errors.add(:area_start_hour, "must be less than end hour.")
+      end
+    elsif test_area_start_hour and test_area_start_hour < 0
+      errors.add(:area_start_hour, "must be greater than 0.")
+    end
+
+
+    # if not test_area_start_hour and not test_area_end_hour
+    #   return
+    # end
+    # if not test_area_end_hour and test_area_start_hour >=0
+    #   return
+    # end
+    # if not test_area_start_hour and test_area_end_hour > 0
+    #   return
+    # end
+
+
+  end
 
 
   def initialize(attributes = {})
