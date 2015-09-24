@@ -49,7 +49,7 @@ class AssaysController < ApplicationController
       unless @result[:pdfFiles].nil?
        @result[:pdfFiles] = @result[:pdfFile].split('pdf')
        @result[:pdfFiles].collect{|element| element + 'pdf'}
-       end
+      end
       
       if  ( @result.has_key? :error_message )  #h.has_key?("a") # @result.has_key? :error_message
         flash.now[:error] = @result[:error_message] #.join("\n")

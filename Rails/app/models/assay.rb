@@ -34,7 +34,7 @@ class Assay
   extend ActiveModel::Naming
   attr_accessor :input_file, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
   :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input, :console_out, :specg_min,
-  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input
+  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input, :area_start_hour, :area_end_hour
   
 
   # (1) Validation of input data file
@@ -75,7 +75,7 @@ class Assay
   
   # (4) Validation of start_index
   # if user does not enter anything, the system uses the default value start_index = 2
-  validates_format_of :start_index,:with => /^[0-9 \s]*$/i, :unless => :default_value?,:message => '- Invalid value for start index. Please Enter A Positive Integer Number'
+  validates_format_of :start_index,:with => /^[0-9\s]*$/i, :unless => :default_value?,:message => '- Invalid value for start index. Please Enter A Positive Integer Number'
   def default_value?
     start_index == '' 
   end
@@ -110,6 +110,49 @@ class Assay
   validates_numericality_of :specg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+
+  validates_numericality_of :area_start_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validate :area_under_curve
+
+  # Validates the area under curve start and end as they are mutually dependent.
+  # Valid conditions:
+  #     area_start_hour = nil, area_end_hour == nil
+  #     area_start_hour >=0, area_end_hour == nil
+  #     area_start_hour < area_end_hour, >=0, area_end_hour > 0
+  # Invalid conditions:
+  #     area_start_hour >= area_end_hour
+  #     area_start_hour > 0, area_end_hour = nil
+  # Note that negativity of these numbers is tested above in 'validates_numericality_of' statements.
+  def area_under_curve
+    test_area_start_hour = area_start_hour != '' ? Float(area_start_hour) : nil
+    test_area_end_hour = area_end_hour != '' ? Float(area_end_hour) : nil
+
+    if test_area_end_hour
+      if test_area_end_hour <= 0
+        errors.add(:area_end_hour, "must be greater than 0.")
+      end
+      if test_area_start_hour and test_area_start_hour >= test_area_end_hour
+        errors.add(:area_end_hour, "must be greater than start hour.")
+        errors.add(:area_start_hour, "must be less than end hour.")
+      end
+    elsif test_area_start_hour and test_area_start_hour < 0
+      errors.add(:area_start_hour, "must be greater than 0.")
+    end
+
+
+    # if not test_area_start_hour and not test_area_end_hour
+    #   return
+    # end
+    # if not test_area_end_hour and test_area_start_hour >=0
+    #   return
+    # end
+    # if not test_area_start_hour and test_area_end_hour > 0
+    #   return
+    # end
+
+
+  end
 
 
   def initialize(attributes = {})
@@ -189,6 +232,9 @@ class Assay
       self.lagT_min = Float(self.lagT_min)
     end
 
+    # Area under curve
+    self.area_start_hour = self.area_start_hour != '' ? Float(self.area_start_hour) : nil
+    self.area_end_hour = self.area_end_hour != '' ? Float(self.area_end_hour) : nil
 
 ############################################################################################
 
@@ -380,15 +426,27 @@ class Assay
     else
       R.eval 'lagRange <- NA'
     end
-    
+    # Area under curve
+    if self.area_start_hour != nil
+      R.assign 'auc.start', self.area_start_hour
+    else
+      R.eval 'auc.start <- NULL'
+    end
+    if self.area_end_hour != nil
+      R.assign 'auc.end', self.area_end_hour
+    else
+      R.eval 'auc.end <- NULL'
+    end
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
-    R.eval ('R_file_return_value <- gcat.analysis.main(file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
-                                    start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
-				    lagRange = lagRange, totalRange = totalRange, totalODRange = totalODRange, specRange = specRange, 
-				    points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
-                                    plate.ncol = 12, input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
-                                    layout.sheet.headers = c("Strain", "Media Definition"), silent = T, verbose = F, return.fit = F, overview.jpgs = T)')
-   
+    R.eval 'R_file_return_value <- gcat.analysis.main(
+                        file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
+                        start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
+                        lagRange = lagRange, totalRange = totalRange, totalODRange = totalODRange, specRange = specRange, 
+                        points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
+                        plate.ncol = 12, input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
+                        layout.sheet.headers = c("Strain", "Media Definition"), silent = T, verbose = F, return.fit = F, overview.jpgs = T,
+                        auc.start=auc.start, auc.end=auc.end
+            )'
     # good file returns a list of file path(length is more than 1), bad file returns error message string(array length = 1)
     print R.R_file_return_value
     

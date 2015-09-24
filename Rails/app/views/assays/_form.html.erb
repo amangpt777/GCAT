@@ -1,4 +1,4 @@
-<%= form_for @assay do |f| %>
+<%= form_for @assay, :html => {:class => 'form'} do |f| %>
 <% if @assay.errors.any? %>
 <div id="error_explanation">
     <h2><%= pluralize(@assay.errors.count, "error") %> prohibited this assay from being saved:</h2>
@@ -14,37 +14,38 @@
     <%= link_to "GCAT Release Notes","/resources/Release_Notes.pdf" %>
 </div>
 <section>
-    <ul id="options">
-        <li>
-            <h3>Plate Type</h3>
-            <%= f.radio_button(:plate_type, 's', :checked => true) %>
-            <%= f.label(:plate_type_single, "Single-plate") %><br />
-            <%= f.radio_button(:plate_type, 'm', :checked => false) %>
-            <%= f.label(:plate_type_single, "Multiple-plate") %><br />
-        </li>
-        <li>
-            <h3>Input Data File</h3>
-            Please specify a  plate results file to upload for analysis:<br>
-            <div class="field">
-                <%= f.file_field :input_file %>  
-            </div>
-            <div class="actions" style="margin-top:30px;">
-              <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br>
-              <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br>
-            </div>
-        </li>
-        <li>
-          <h3><span data-tooltip="Optionally upload a companion .csv file containing identifying information for all wells in the experiments(s) to be analyzed, including strain identifiers and growth media (or growth environment) definitions, which are used for graphic output.">Plate Layout File</span></h3>
-        Optionally upload a plate layout file:<br>
-          <div class="field">
-            <%= f.file_field :layout_file %>  
-          </div>
-          <div class="actions" style="margin-top:30px;">
-            <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br>
-            <%= link_to "Multi-Plate Layout Example File","/resources/MultiPlateLayout_plateID.csv" %>
-          </div>
-        </li>
-        <li>
+  <div class="row">
+    <div class="col-lg-4 form-group">
+      <h3>Plate Type</h3>
+      <%= f.radio_button(:plate_type, 's', :checked => true) %>
+      <%= f.label(:plate_type_single, "Single-plate") %><br />
+      <%= f.radio_button(:plate_type, 'm', :checked => false) %>
+      <%= f.label(:plate_type_single, "Multiple-plate") %><br />
+    </div>
+    <div class="form-group col-lg-4">
+      <h3>Input Data File</h3>
+      Please specify a  plate results file to upload for analysis:<br>
+      <div class="field">
+        <%= f.file_field :input_file, :class=>'control-label' %>  
+      </div>
+      <div class="actions" style="margin-top:30px;">
+        <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br>
+        <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br>
+      </div>
+    </div>
+    <div class="form-group col-lg-4">
+      <h3><span data-tooltip="Optionally upload a companion .csv file containing identifying information for all wells in the experiments(s) to be analyzed, including strain identifiers and growth media (or growth environment) definitions, which are used for graphic output.">Plate Layout File</span></h3>
+      Optionally upload a plate layout file:<br>
+      <div class="field">
+        <%= f.file_field :layout_file %>  
+      </div>
+      <div class="actions" style="margin-top:30px;">
+        <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br>
+        <%= link_to "Multi-Plate Layout Example File","/resources/MultiPlateLayout_plateID.csv" %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="OD value for blank well read">Media background</span></h3>
           <%= f.radio_button(:blank_value, "user", {:checked => true, :class => "user_enter3 user_enter3_yes"}) %>
           <%= f.label(:blank_value_user, "User Input.") %>
@@ -56,8 +57,8 @@
           <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br>
           <%= f.radio_button(:blank_value, "zero", {:class => "user_enter3 user_enter3_no"}) %>
           <%= f.label(:blank_value_zero, "Set to 0" ) %>
-        </li>
-        <li>
+      </div>
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="GCAT transforms optical density (OD) to log(x+δ). x = OD – Media background. Specify a value for n or choose from the defaults. Note: 0 is not recommended unless all wells contain many repeated measurements for initial density that can be used to accurately estimate the baseline density. See the user manual for more details.">OD Transform</span></h3>
           <%= f.radio_button(:transformation, 0, {:checked => true, :class => "user_enter2 user_enter2_no"}) %>
           <%= f.label(:transformation_zero, "log(x)") %><br />
@@ -68,8 +69,8 @@
           <div class="field optional_input2" style="display:none">
               <%= f.text_field :transformation_input, :placeholder => 'Enter your δ value here'%>
           </div>
-        </li>
-        <li>
+      </div>
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="Choose the preferred growth curve model selection available below.">Growth curve model</span></h3>
           <%= f.radio_button(:model, 1, {:checked => true, :class => "user_enter1 user_enter1_no"})%>
           <%= f.label(:model_one, "Sigmoid curve") %><br />
@@ -80,31 +81,33 @@
           <div class="field optional_input1" style="display:none">
               <%= f.text_field :loess_input, :placeholder => 'Enter the smoothing value here.'%>
           </div>
-        </li>
-        <li>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="Enter the index of the timepoint at which the wells were inoculated with the culture. 
             " >Inoculation timepoint</span></h3>
           <div class="field">
               <%= f.label :start_index, "Enter the timepoint index (positive integer only).  The default value is 1. "  %><br />
               <%= f.text_field(:start_index, :type => 'number', :min =>'1', :size => '3', :value => '1') %>
           </div>
-        </li>
-        <li>
+      </div>
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="Enter a threshold to determine the presence of a growing culture. GCAT rejects curves where the density measurements never reach this value above the specified inoculation timepoint." >Growth Threshold</span></h3>
           <div class="field">
               <%= f.label :growth_threshold, "Enter the growth threshold. The default value is 0.05. "  %><br />
               <%= f.text_field(:growth_threshold, :type => 'number', :min =>'0', :size => '3', :value => '0.05', :step => "0.01") %>
           </div>
-        </li>
-        <li>
+      </div>
+      <div class="form-group col-lg-4">
           <h3><span data-tooltip="Enter indices (as a comma-separated list) of any erroneous reads that should be removed across the entire experiment. " >Points to ignore</span></h3>
           <div class="field">
               <%= f.label :remove_points,"Enter a comma-separated list of points. Example: 2,3,4,5 (positive integers only). The default is an empty list." %><br />
               <%= f.text_field :remove_points %>
           </div>
-<!--<h3><span data-tooltip="GCAT automatically detects sudden changes in OD ('jumps'). Check this box if these instances should be removed when possible. If only one or two jumps are present GCAT will attempt to remove only the affected region." >Remove Jumps</span></h3>-->
-<%#= f.check_box(:remove_jumps) %>
-<%#= f.label(:remove_jumps, "Employ the jump detection algorithm to attempt to remove problematic points.") %>
+          <!--<h3><span data-tooltip="GCAT automatically detects sudden changes in OD ('jumps'). Check this box if these instances should be removed when possible. If only one or two jumps are present GCAT will attempt to remove only the affected region." >Remove Jumps</span></h3>-->
+          <%#= f.check_box(:remove_jumps) %>
+          <%#= f.label(:remove_jumps, "Employ the jump detection algorithm to attempt to remove problematic points.") %>
 <%
 =begin %>
 <h3><span data-tooltip="Enter the number of rows (letters) and columns (numbers) of wells on each of the plates of this experiment." >Plate Dimensions</span></h3>
@@ -118,49 +121,64 @@
   </div>
 <%
 =end  %> 
-  </li>
-  <li> 
-    <div id="time" class="field">
-      <h3><span data-tooltip="Select a correctly formatted timestamp (see user manual for details). The timestamp will be used to convert the time entries into the number of hours." >Timestamp format</span></h3>
-      <%= f.label :timestamp_format %><br />
-      <%#= f.text_field(:timestamp_format, :value => '1/3600', :id => 'adam') %>
-      <%= f.select  :timestamp_format, options_for_select(date_time_options()) %>
+      </div>
     </div>
-  </li>
-  <li>
-    <h3><span data-tooltip="Select value ranges for the heat maps for easier comparison between experiments.">Heat map ranges</span></h3>
-    <div class="field">
-      <%= f.label "Enter the range for the achieved growth on log scale." %><br />
-      <%= f.text_field :totg_min, :size => '5' %>
-      <%= f.label "-" %>
-      <%= f.text_field :totg_max, :size => '5' %>
+    <div class="row">
+      <div class="form-group col-lg-4">
+          <h3><span data-tooltip="Select value ranges for the heat maps for easier comparison between experiments.">Heat map ranges</span></h3>
+          <div class="field">
+            <%= f.label "Enter the range for the achieved growth on log scale." %><br />
+            <%= f.text_field :totg_min, :size => '5' %>
+            <%= f.label "-" %>
+            <%= f.text_field :totg_max, :size => '5' %>
+          </div>
+          <div class="field">
+            <%= f.label "Enter the range for the achieved growth on linear scale." %><br />
+            <%= f.text_field :totg_OD_min, :size => '5' %>
+            <%= f.label "-" %>
+            <%= f.text_field :totg_OD_max, :size => '5' %>
+          </div>
+          <div class="field">
+            <%= f.label "Enter the range for the max specific growth rate." %><br />
+            <%= f.text_field(:specg_min, :size => '5') %>
+            <%= f.label "-" %>
+            <%= f.text_field(:specg_max, :size => '5') %>
+          </div>
+          <div class="field">
+            <%= f.label "Enter the range for the lag time." %><br />
+            <%= f.text_field(:lagT_min, :size => '5') %>
+            <%= f.label "-" %>
+            <%= f.text_field(:lagT_max, :size => '5') %>
+          </div>
+      </div>
+      <div class="form-group col-lg-4">
+          <h3><span data-tooltip="Enter start and end time points for AUC computation, in hours. If no values are entered, GCAT will compute the AUC for the entire time course." >Area Under the Curve (AUC)</span></h3>
+          <div class="field">
+              <%= f.label :area_start_hour, "Start time. Defaults to 0."  %><br />
+              <%= f.text_field(:area_start_hour, :type => 'number', :min =>'0', :size => '3', :step => "0.5") %>
+          </div>
+          <div class="field">
+              <%= f.label :area_end_hour, "End time. If no value entered, defaults to end of time course."  %><br />
+              <%= f.text_field(:area_end_hour, :type => 'number', :min =>'0', :size => '3', :step => "0.5") %>
+          </div>
+      </div>
+      <div class="form-group col-lg-4">
+          <div id="time" class="field">
+            <h3><span data-tooltip="Select a correctly formatted timestamp (see user manual for details). The timestamp will be used to convert the time entries into the number of hours." >Timestamp format</span></h3>
+            <%= f.label :timestamp_format %><br />
+            <%#= f.text_field(:timestamp_format, :value => '1/3600', :id => 'adam') %>
+            <%= f.select  :timestamp_format, options_for_select(date_time_options()) %>
+          </div>
+      </div>
     </div>
-    <div class="field">
-      <%= f.label "Enter the range for the achieved growth on linear scale." %><br />
-      <%= f.text_field :totg_OD_min, :size => '5' %>
-      <%= f.label "-" %>
-      <%= f.text_field :totg_OD_max, :size => '5' %>
+    <div class="form-group">
+        <div class="actions" style="">
+          <%= f.submit %>
+        </div>
     </div>
-    <div class="field">
-      <%= f.label "Enter the range for the max specific growth rate." %><br />
-      <%= f.text_field(:specg_min, :size => '5') %>
-      <%= f.label "-" %>
-      <%= f.text_field(:specg_max, :size => '5') %>
-    </div>
-    <div class="field">
-      <%= f.label "Enter the range for the lag time." %><br />
-      <%= f.text_field(:lagT_min, :size => '5') %>
-      <%= f.label "-" %>
-      <%= f.text_field(:lagT_max, :size => '5') %>
-    </div>
-  </li>
-  <div class="actions" style="margin-top:30px; clear:both;">
-    <%= f.submit %>
   </div>
-  
   <div class="actions" style="margin-top:30px; clear:both;">
     <%= mail_to "gcat.help@glbrc.wisc.edu","Please Send Any Questions To The GLBRC Help Desk And Be Sure To Include 'GCAT' In Your Subject Title", :subject => "GCAT" %>
   </div>
-  </ul>
 </section>
 <% end %>
