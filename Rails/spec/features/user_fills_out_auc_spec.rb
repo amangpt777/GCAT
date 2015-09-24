@@ -3,7 +3,7 @@ require 'rails_helper'
 feature 'User fills out auc' do #, js: true do
   scenario 'with start and end equal to each other' do
     visit new_assay_path
-    fill_in 'assay_area_start_hour', with: '0'
+    fill_in 'assay_area_start_hour', with: '1'
     fill_in 'assay_area_end_hour', with: '1'
     click_button 'Create Assay'
     expect(page).to have_content 'Area end hour must be greater than start hour.'

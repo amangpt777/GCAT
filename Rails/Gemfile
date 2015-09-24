@@ -46,6 +46,8 @@ gem 'rubyzip'
 group :development do
   gem 'thin', '1.6.4'
   gem 'quiet_assets', '1.1.0'
+  gem "spring"
+  gem 'spring-commands-rspec'
 end
 
 group :development, :test do
