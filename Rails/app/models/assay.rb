@@ -111,7 +111,7 @@ class Assay
   validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :area_start_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => :area_start_hour, :message => '- Please Enter a positive real number that is greater than the start.'
+  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number that is greater than the start.'
 
 
   def initialize(attributes = {})
