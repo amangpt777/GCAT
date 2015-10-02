@@ -41,8 +41,7 @@ unlog = function(x, constant.added) {
   exp(x) - constant.added
 }
 
-#' Evaluate estimated OD at any timepoints using the fitted model
-#' @export
+# Evaluate estimated OD at any timepoints using the fitted model
 well.eval = function(fitted.well, Time = NULL){
   # If no timepoints are provided, use the ones collected in the experiment itself.
 	if(!is.numeric(Time))
@@ -203,8 +202,7 @@ baseline = function(fitted.well, digits = Inf){
 	return(base)
 	}
 
-#' Calculate log.OD at inoculation from fitted parameters
-#' @export
+# Calculate log.OD at inoculation from fitted parameters
 inoc.log.OD = function(fitted.well, digits = Inf){
   # Evaluated the fitted model at the inoculation timepoint (should be zero from using <start.times> from table2wells.R)
 	if (is.null(well.eval(fitted.well)))
