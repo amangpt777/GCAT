@@ -7,7 +7,7 @@ feature 'User fills out inoculation point' do
   end
 
 
-   scenario 'only accepts positive value', js:true do
+   scenario 'only accepts positive value' do
      visit new_assay_path
      expect(find('#assay_start_index')[:min]).to eq '1'
    end
