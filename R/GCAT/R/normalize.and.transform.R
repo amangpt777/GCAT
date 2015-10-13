@@ -37,6 +37,8 @@
 #'  \item{average.blank}{subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate}
 #'  \item{average.first}{takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
 #'                     and subtracts this value from all timepoints in all wells on that plate}
+#'  \item{average.layout}{Takes an average of first timepoint or a specified timepoint by start index for wells that are labeled as blank in layout file 
+#'                     and then use this average value as blank.value for all timepoints in all wells on that plate}
 #'  \item{anything else}{do nothing}
 #'  }
 #'  

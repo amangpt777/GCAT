@@ -56,7 +56,7 @@
 gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL, single.plate.ID = NULL, 
   plate.layout = NULL,plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
-  layout.sheet.headers = c("Strain", "Media Definition"),
+  layout.sheet.headers = c("Destination plate name" ,"Row", "Column", "Well ID", "Plate source", "Well Source", "Strain", "Media Definition"),
   blank.value = NULL, start.index = 2, single.plate = F, silent = T){
 
   ########################################################################
