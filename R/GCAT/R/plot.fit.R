@@ -173,7 +173,8 @@ draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0,...){
 		#else
 		#	col1.5 = "red"
     col1.5 = "forestgreen"
-		text1.5 = paste("R squared:", round(model.good.fit(input.well),3))
+		text1.5 = paste("R squared:", round(model.good.fit(input.well),3), 
+		                "; AUC:", auc(input.well), "; AUC.OD:", auc.OD(input.well))
 		}
 	else
 	 col1.5 = text1.5 = NULL

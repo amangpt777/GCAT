@@ -24,7 +24,7 @@ new.output.table = read.table(paste("temp",new.output.file,sep="/"),header=T,sep
 
 #  Remove "pdf.file" column
 old.output.table = old.output.table[names(old.output.table) != "pdf.file"]
-new.output.table = new.output.table[names(new.output.table) != "pdf.file"]
+new.output.table = new.output.table[!names(new.output.table) %in% c("pdf.file","AUC..log.OD","AUC.OD")]
 
 #  Verify that output spreadsheets are identical within rounding error
 #  (relaxed tolerance to 1e-6 to make the test pass on Windows 7 with R 3.2.0)

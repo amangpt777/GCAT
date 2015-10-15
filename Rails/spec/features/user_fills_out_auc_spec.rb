@@ -28,6 +28,7 @@ feature 'User fills out auc' do #, js: true do
     expect(page).to have_content 'Area end hour - Please Enter a positive real number.'
   end
 
+=begin
   scenario 'with valid start and no end' do
     visit new_assay_path
     fill_in_valid_defaults
@@ -44,7 +45,7 @@ feature 'User fills out auc' do #, js: true do
     click_button 'Create Assay'
     expect(page).to have_selector '.alert', text: 'Your assay processed!'
   end
-
+=end
 
   # This will fill out the assay form with minimal needed to succeed. Should
   # always be filling out the area under curve in tests above, not here.
