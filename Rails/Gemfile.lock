@@ -177,6 +177,7 @@ DEPENDENCIES
   pry
   quiet_assets (= 1.1.0)
   rails (= 3.2.15)
+  rake
   rinruby
   rspec-rails (~> 3.0)
   rubyzip
