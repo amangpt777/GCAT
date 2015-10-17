@@ -25,8 +25,10 @@ Normalize OD readings for an entire array of well objects
 Note: This function does not write any new OD values to the well objects in the array - it only
   fills the "norm" slot of each well object in the array with a value that will be subtracted
   from all OD measurements when returning data from the wells using the function <data.from> (see well.class.R)
+  For "average.layout" the function instead of filling "norm" slot writes a list "averagedTimestamp" in screen.data
+  This averagedTimestamp is a list of average of only Empty wells as defined in layout file for each timestamp
 
- These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
+   These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
 
  note this is the only normalization function that acts on an entire array instead of an individual well.
 
@@ -37,6 +39,8 @@ Note: This function does not write any new OD values to the well objects in the 
  \item{average.blank}{subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate}
  \item{average.first}{takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
                     and subtracts this value from all timepoints in all wells on that plate}
+ \item{average.layout}{Takes an average of all ODs at each timestamp taking into consideration only "Empty" wells as defined in layout file
+                    It then stores the list of average timestamps as averagedTimestamp in screen.data of every well}
  \item{anything else}{do nothing}
  }
 }

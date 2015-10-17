@@ -25,8 +25,10 @@
 #'  Note: This function does not write any new OD values to the well objects in the array - it only 
 #'   fills the "norm" slot of each well object in the array with a value that will be subtracted 
 #'   from all OD measurements when returning data from the wells using the function <data.from> (see well.class.R) 
+#'   For "average.layout" the function instead of filling "norm" slot writes a list "averagedTimestamp" in screen.data
+#'   This averagedTimestamp is a list of average of only Empty wells as defined in layout file for each timestamp
 #'
-#'  These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
+#'    These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
 #'  
 #'  note this is the only normalization function that acts on an entire array instead of an individual well.
 #'  
@@ -37,6 +39,8 @@
 #'  \item{average.blank}{subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate}
 #'  \item{average.first}{takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
 #'                     and subtracts this value from all timepoints in all wells on that plate}
+#'  \item{average.layout}{Takes an average of all ODs at each timestamp taking into consideration only "Empty" wells as defined in layout file
+#'                     It then stores the list of average timestamps as averagedTimestamp in screen.data of every well}
 #'  \item{anything else}{do nothing}
 #'  }
 #'  
@@ -80,14 +84,48 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = raw.data(well)[start,2] - blank.averages[plate.name(well)] - add.constant  
 			return(well)})
-		}	
+	}	
+  else if (normalize.method == "average.layout"){
+    # Works only for single plate
+    # For each timestamp our blank value is the average of OD 
+    #         of only those wells that are marked Empty in layout file
+    
+    # blank.ODs will be a big list of OD
+    # The ODs at every timestamp for all non Empty wells will be -25.0000
+    blank.ODs = unlist(aapply(well.array, function(well, blank.value){
+      if(is.null(blank.value) && well@well.info$Strain[1] == "Empty") 
+        OD = well@screen.data$OD
+      else
+        OD = rep(-25, length(well@screen.data$OD))
+      return(OD)}, blank.value))
+    
+    # Create back the matrix of timestamp as our rows and wells as columns
+    #           with values of non empty wells at each timestamp as -25.0000
+    Input_OD_Data<-matrix(unlist(blank.ODs),ncol=length(well.array),byrow = FALSE)
+    
+    # Take the average of only Empty wells for each timestamp
+    avgTimestamps = unlist(apply(Input_OD_Data, 1, function(x){
+      x=setdiff(x, c(-25.0000))
+      timestamp.average = mean(x) - add.constant
+      return(timestamp.average)}))
+    
+    # Store in each well's screen data the averagedTimestamp
+    well.array = aapply(well.array, function(well, avgTimestamps){
+      well@screen.data$averagedTimestamp = avgTimestamps
+    return(well)},avgTimestamps)
+    well.array
+    # Set this value (minus the constant to be added) to the "norm" slot of each well. 
+    #well.array = aapply(well.array, function(well){
+     # well@norm = blank.average - add.constant
+      #return(well)})
+  }
 	else{
     # Simply set the negative constant to be added to the "norm" slot of each well. 
 		well.array = aapply(well.array, function(well){
 			well@norm = - add.constant
      			return(well)})
 		}
-  if(is.null(blank.value))
+  if(is.null(blank.value) && !(normalize.method == "average.layout"))
     well.array = aapply(well.array, remove.points, 1)
   return(well.array)
 	}

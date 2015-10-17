@@ -96,6 +96,7 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param points.to.remove A list of numbers referring to troublesome points that should be removed across all wells.
 #' @param remove.jumps Should the slope checking function be on the lookout for large jumps in OD?
 #' @param time.input The time setting in which the current system is running?
+#' @param normalize.method Describes the method used by \code{normalize.ODs} to normalize cell density values using blank reads.
 #' @param plate.nrow The number of rows in a plate.
 #' @param plate.ncol The number of columns in a plate.
 #' @param input.skip.lines If specified, this number of lines shall be skipped from the top when reading the input file with read.csv 
@@ -121,7 +122,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
   lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
-  points.to.remove = 0, remove.jumps = F, time.input = NA,
+  points.to.remove = 0, remove.jumps = F, time.input = NA, normalize.method = "default",
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
   layout.sheet.headers = c("Strain", "Media Definition"),
@@ -177,7 +178,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
       # Call <gcat.fit.main> on the file with single plate options
     	fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",   
           single.plate = single.plate, layout.file = layout.file, start.index = start.index, 
-          time.input = time.input, add.constant = add.constant, blank.value = blank.value, 
+          time.input = time.input, normalize.method=normalize.method, add.constant = add.constant, blank.value = blank.value, 
           growth.cutoff = growth.cutoff, points.to.remove = points.to.remove, remove.jumps = remove.jumps,
     	    use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param,
           plate.nrow = plate.nrow, plate.ncol = plate.ncol, multi.column.headers = multi.column.headers, 
@@ -271,7 +272,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
 #' @return An array of well objects 
 gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout.file = NULL, 
   single.plate = F, blank.value = NULL, start.index = 2, time.input = NA,
-  normalize.method = "default", add.constant = 1, use.log = T, points.to.remove = 0,
+  normalize.method=normalize.method, add.constant = 1, use.log = T, points.to.remove = 0,
   use.linear.param=F, use.loess=F, smooth.param=0.1,
   fall.cutoff = -0.0025, growth.cutoff = 0.05, remove.jumps = F,  
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
