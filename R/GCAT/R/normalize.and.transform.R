@@ -108,7 +108,7 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
       x=setdiff(x, c(-25.0000))
       timestamp.average = mean(x) - add.constant
       return(timestamp.average)}))
-    
+
     # Store in each well's screen data the averagedTimestamp
     well.array = aapply(well.array, function(well, avgTimestamps){
       well@screen.data$averagedTimestamp = avgTimestamps

@@ -88,4 +88,3 @@ Depending on return.fit setting, an array of fitted well objects or a list of ou
 \description{
 Top-level GCAT function
 }
-
