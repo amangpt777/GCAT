@@ -82,14 +82,49 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = raw.data(well)[start,2] - blank.averages[plate.name(well)] - add.constant  
 			return(well)})
-		}	
+	}	
+  else if (normalize.method == "average.layout"){
+    # Works only for single plate
+    # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
+    # For calculating average for a plate the function takes into account only those wells which have
+    #                     their strain as Empty in the layout file
+    blank.ODs = unlist(aapply(well.array, function(well, blank.value){
+      if(is.null(blank.value) && well@well.info$Strain[1] == "Empty") 
+        OD = well@screen.data$OD
+      else
+        OD = rep(-25, length(well@screen.data$OD))
+        
+     #   blank.value = raw.data(well)[1,2]
+      #else
+        #Set blank value to a negative number and later exclude this well from our average calculation
+       # blank.value = -25
+      return(OD)}, blank.value))
+    #Excluding all the wells with blank ODs as -25
+    blank.ODs
+    Input_OD_Data<-matrix(unlist(blank.ODs),ncol=length(well.array),byrow = FALSE)
+    avgTimestamps = unlist(apply(Input_OD_Data, 1, function(x){
+      x=setdiff(x, c(-25.0000))
+      timestamp.average = mean(x) - add.constant
+      return(timestamp.average)}))
+    #blank.ODs = setdiff(blank.ODs, c(-25.0000))
+    #blank.average = mean(blank.ODs)
+    avgTimestamps
+    well.array = aapply(well.array, function(well, avgTimestamps){
+      well@screen.data$averagedTimestamp = avgTimestamps
+    return(well)},avgTimestamps)
+    well.array
+    # Set this value (minus the constant to be added) to the "norm" slot of each well. 
+    #well.array = aapply(well.array, function(well){
+     # well@norm = blank.average - add.constant
+      #return(well)})
+  }
 	else{
     # Simply set the negative constant to be added to the "norm" slot of each well. 
 		well.array = aapply(well.array, function(well){
 			well@norm = - add.constant
      			return(well)})
 		}
-  if(is.null(blank.value))
+  if(is.null(blank.value) && !(normalize.method == "average.layout"))
     well.array = aapply(well.array, remove.points, 1)
   return(well.array)
 	}
