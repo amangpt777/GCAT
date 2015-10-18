@@ -147,6 +147,13 @@ transform <- function(input.well, ...) {
 #' The raw data is kept intact.  
 #' It also checks to see if any of the raw OD values (before a certain timepoint) is below the blank OD.  
 #' This can be disastrous for the log(OD) transform.  
+#' 
+#'  normalize.method settings: 
+#'  \describe{
+#'  \item{average.layout}{Use 'averagedTimestamp' of well's screen.data at everytimestamp for taking log}
+#'  \item{anything else}{Use 'norm' of well as the blank OD for taking log}
+#'  }
+#' 
 #' @param input.well an object of class well 
 #' @param use.log gets added to the "use.log" slot of the well object. this will determine whether the log-transformed data  
 #'              or raw normalized data is returned using the function \code{data.from}.    
@@ -154,43 +161,73 @@ transform <- function(input.well, ...) {
 #' @param start.index which timepoint should be used as the first one after inoculation (defaults to the 2th one) 
 #' @param negative.OD.cutoff if any ODs below the specified blank value are detected before this index timepoint, the entire well is discarded.
 #' @param constant.added similar to added.constant.
+#' @param normalize.method see Details
 #' @param ... Additional arguments for this function.
-transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.index = 2, negative.OD.cutoff = 10, constant.added = 1.0, ...){
+transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.index = 2, negative.OD.cutoff = 10, constant.added = 1.0, normalize.method = normalize.method, ...){
  
   # The default value for the log-transformed ODs will be NA. Valid values will be filled in. 
-	log.OD = rep(NA, length(input.well))
+  log.OD = rep(NA, length(input.well))
   OD = raw.data(input.well)[,2]
   
-	 # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
-  if(is.null(blank.value))
-      blank.value = OD[1]
-
-  # Remove any points from the analysis that weren't already removed and fall below the blank value (using <remove.points> below)
-  OD[input.well@screen.data$Remove] = NA
-  
-  negative.points = which(OD  + 0.2 * constant.added < blank.value)
-  if(length(negative.points) > 0)
-	  input.well = remove.points(input.well, negative.points)
+  # normalize.method is not equal to average.layout then use 'norm' slot to calculate log
+  if(!(normalize.method == "average.layout")){
     
-  # If any points fall below the blank value by more than 0.2 * <constant.added> and before the cutoff index <negative.OD.cutoff>, remove the well from analysis. 
-  # First adjust the cutoff to compensate for curves that don't start at timepoint 1
-  negative.OD.cutoff = negative.OD.cutoff + start.index - 1
+	  # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
+    if(is.null(blank.value))
+        blank.value = OD[1]
+
+    # Remove any points from the analysis that weren't already removed and fall below the blank value (using <remove.points> below)
+    OD[input.well@screen.data$Remove] = NA
   
-  if(any(negative.points <= negative.OD.cutoff)){
-    input.well = remove.points(input.well, rep(T,length(input.well)))
-    input.well@add.info = paste("ODs at timepoint(s)", paste(negative.points[negative.points <= negative.OD.cutoff],collapse=" "), "were below blank OD; well discarded")
-    }
+    negative.points = which(OD  + 0.2 * constant.added < blank.value)
+    if(length(negative.points) > 0)
+	    input.well = remove.points(input.well, negative.points)
+    
+    # If any points fall below the blank value by more than 0.2 * <constant.added> and before the cutoff index <negative.OD.cutoff>, remove the well from analysis. 
+    # First adjust the cutoff to compensate for curves that don't start at timepoint 1
+    negative.OD.cutoff = negative.OD.cutoff + start.index - 1
+  
+    if(any(negative.points <= negative.OD.cutoff)){
+      input.well = remove.points(input.well, rep(T,length(input.well)))
+      input.well@add.info = paste("ODs at timepoint(s)", paste(negative.points[negative.points <= negative.OD.cutoff],collapse=" "), "were below blank OD; well discarded")
+      }
 
-  # Take the natural log of the rest of the OD values (after subtracting the normalization value)
-  log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
+    # Take the natural log of the rest of the OD values (after subtracting the normalization value)
+    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
 	
-	# Add a column to the "screen.data" slot of the well
-	input.well@screen.data$log.OD = log.OD	
-	# Update the "use.log" slot of the well 
-	input.well@use.log = use.log	
+	  # Add a column to the "screen.data" slot of the well
+	  input.well@screen.data$log.OD = log.OD	
+	  # Update the "use.log" slot of the well 
+	  input.well@use.log = use.log	
 
-	return(input.well)
-	}
+	    return(input.well)
+  }
+  else{
+    # Remove any points from the analysis that weren't already removed and fall below the blank value (using <remove.points> below)
+    OD[input.well@screen.data$Remove] = NA
+    negative.points = which(OD  + 0.2 * constant.added < input.well@screen.data$averagedTimestamp)
+    if(length(negative.points) > 0)
+      input.well = remove.points(input.well, negative.points)
+    
+    # If any points fall below the blank value by more than 0.2 * <constant.added> and before the cutoff index <negative.OD.cutoff>, remove the well from analysis. 
+    # First adjust the cutoff to compensate for curves that don't start at timepoint 1
+    negative.OD.cutoff = negative.OD.cutoff + start.index - 1
+    
+    if(any(negative.points <= negative.OD.cutoff)){
+      input.well = remove.points(input.well, rep(T,length(input.well)))
+      input.well@add.info = paste("ODs at timepoint(s)", paste(negative.points[negative.points <= negative.OD.cutoff],collapse=" "), "were below blank OD; well discarded")
+    }
+    # Take the natural log of the rest of the OD values (after subtracting the normalization value)
+    log.OD[which(OD > input.well@screen.data$averagedTimestamp)] = log(OD[which(OD > input.well@screen.data$averagedTimestamp)] - input.well@screen.data$averagedTimestamp)
+      
+    # Add a column to the "screen.data" slot of the well
+    input.well@screen.data$log.OD = log.OD	
+    # Update the "use.log" slot of the well 
+    input.well@use.log = use.log	
+      
+    return(input.well)
+  }
+}
 
 ########################################################################
 ########################################################################

@@ -5,7 +5,8 @@
 \title{Log-transform OD readings for a single well object}
 \usage{
 \method{transform}{ODs}(input.well, use.log = T, blank.value = NULL,
-  start.index = 2, negative.OD.cutoff = 10, constant.added = 1, ...)
+  start.index = 2, negative.OD.cutoff = 10, constant.added = 1,
+  normalize.method = normalize.method, ...)
 }
 \arguments{
 \item{input.well}{an object of class well}
@@ -21,6 +22,8 @@ or raw normalized data is returned using the function \code{data.from}.}
 
 \item{constant.added}{similar to added.constant.}
 
+\item{normalize.method}{see Details}
+
 \item{...}{Additional arguments for this function.}
 }
 \description{
@@ -28,5 +31,12 @@ This function adds a "log.OD" column to the "screen.data" slot of a well object 
 The raw data is kept intact.
 It also checks to see if any of the raw OD values (before a certain timepoint) is below the blank OD.
 This can be disastrous for the log(OD) transform.
+}
+\details{
+normalize.method settings:
+ \describe{
+ \item{average.layout}{Use 'averagedTimestamp' of well's screen.data at everytimestamp for taking log}
+ \item{anything else}{Use 'norm' of well as the blank OD for taking log}
+ }
 }
 

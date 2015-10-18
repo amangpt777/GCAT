@@ -385,7 +385,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   # Transform ODs on the logarithmic scale, regardless of whether <use.log> is true 
   #   an extra column of log-transformed values is added to the "well.array" slot of each well 
   #   the "use.log" slot of each well is set instead to determine whether the transformed values will be returned when data is retrieved from the well.
-  well.array = try(aapply(well.array, transform.ODs, start.index = start.index, blank.value = blank.value, use.log = use.log, constant.added = add.constant),silent=silent)
+  well.array = try(aapply(well.array, transform.ODs, start.index = start.index, blank.value = blank.value, use.log = use.log, constant.added = add.constant, normalize.method = normalize.method),silent=silent)
   
       # Return an error if there is a problem with transformation
       if (class(well.array) == "try-error")
