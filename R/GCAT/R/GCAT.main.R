@@ -133,10 +133,18 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   main.envir = c(as.list(environment()))
   
   #  Check blank value and start index
-  if (is.null(blank.value) && start.index==1) {
+  if (is.null(blank.value) && start.index==1 && !(normalize.method == "average.layout")) {
     exception("", "If inoculation time point is 1, the user must specify a blank value")
   }
 
+  if ((normalize.method == "average.layout") && !(is.null(blank.value))) {
+      exception("", "If normalize.method is 'average.layout' then blank value should be null")
+  }
+  
+  if ((normalize.method == "average.layout") && is.null(layout.file)) {
+    exception("", "If normalize.method is 'average.layout' then a layout file should be specified")
+  }
+  
     # MB: Not the best solution.
     if (is.na(time.input)) {
       if (single.plate)
