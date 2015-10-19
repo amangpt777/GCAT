@@ -22,20 +22,22 @@ require 'zip'
 # require 'zip/zipfilesystem'
 require 'fileutils'
 include FileUtils
+require_relative 'DataPassingError'
 
 # single-plate timestamp
 SECONDS = "1/3600".to_r.to_f
 MAX_FILE_SIZE = 10000000.0
 
 class Assay
+
   
   include ActiveModel::Validations
   include ActiveModel::Conversion
   extend ActiveModel::Naming
   attr_accessor :input_file, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
   :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input, :console_out, :specg_min,
-  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input, :area_start_hour, :area_end_hour
-  
+  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input, :area_start_hour, :area_end_hour,
+  :uploaded_files_directory, :generated_files_directory, :input_file_path, :layout_file_path
 
   # (1) Validation of input data file
   validates_presence_of :input_file, :message => '- No input file was specified.'
@@ -98,7 +100,7 @@ class Assay
   #validates :plate_dimensions_row, :numericality => { :only_integer => true, :greater_than => 0 }
   
   # (7) validate inoculation timepoint
-  validates :start_index, :numericality => { :only_integer => true, :greater_than => 0}
+  validates :start_index, :numericality => { :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number'}
   
   # (8) validate heatmap ranges
 #validates_numericality_of :blank_value_input,:if => :user_input?,  :message => '- Invalid OD blank value. Please Enter A Real Number.'
@@ -111,8 +113,8 @@ class Assay
   validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
 
-  validates_numericality_of :area_start_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :area_end_hour, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :area_start_hour,  :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  validates_numericality_of :area_end_hour,  :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validate :area_under_curve
 
   # Validates the area under curve start and end as they are mutually dependent.
@@ -125,19 +127,25 @@ class Assay
   #     area_start_hour > 0, area_end_hour = nil
   # Note that negativity of these numbers is tested above in 'validates_numericality_of' statements.
   def area_under_curve
-    test_area_start_hour = area_start_hour != '' ? Float(area_start_hour) : nil
-    test_area_end_hour = area_end_hour != '' ? Float(area_end_hour) : nil
+    #gy. Oct9
+    self.area_start_hour ||= ''
+    self.area_end_hour ||= ''
 
+    test_area_start_hour = area_start_hour != '' ? self.area_start_hour.to_f : nil
+    test_area_end_hour = area_end_hour != '' ? self.area_end_hour.to_f : nil
+    
     if test_area_end_hour
+    puts 'enter validation function'
       if test_area_end_hour <= 0
-        errors.add(:area_end_hour, "must be greater than 0.")
+        self.errors.add(:area_end_hour, "must be greater than 0.")
       end
       if test_area_start_hour and test_area_start_hour >= test_area_end_hour
-        errors.add(:area_end_hour, "must be greater than start hour.")
-        errors.add(:area_start_hour, "must be less than end hour.")
+        puts 'enter core area'
+        self.errors.add(:area_end_hour, "must be greater than start hour.")
+        self.errors.add(:area_start_hour, "must be less than end hour.")
       end
     elsif test_area_start_hour and test_area_start_hour < 0
-      errors.add(:area_start_hour, "must be greater than 0.")
+      self.errors.add(:area_start_hour, "must be greater than 0.")
     end
 
 
@@ -201,7 +209,7 @@ class Assay
     
     # (5) remove points [a space-separated list of points. Example: 2 3 4 5 (Positive Integer Number)]
     self.remove_points = self.remove_points.gsub(/\r/,"")  # "Some text with a carriage return \r"
-    self.remove_points = self.remove_points.gsub(/\r\n/,"\n") # "Some text with a carriage return \r\n"
+    #self.remove_points = self.remove_points.gsub(/\r\n/,"\n") # "Some text with a carriage return \r\n"
     self.remove_points = self.remove_points.gsub(/\s+/, "")  # remove white spaces
 
     ##collect! calls .to_i on each string in the array and replaces the string with the result of the conversion.
@@ -245,60 +253,73 @@ class Assay
   def pad_date(unit)
     unit.to_i < 10 ? "0" + unit.to_s : unit.to_s
   end
-    
-  def r_calculation
 
+  def getUniqueID
     # uniqueID = Process.pid.to_s + "-" + Time.now.to_i.to_s
     #wanted the date to be easier to extract NWD 2/26/14
     today = Time.now
     
     uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
+  end
+  
+  def generate_directory_names
+    uniqueID = getUniqueID
     # set working directories for uploaded and generated files
-    directoryPath = Rails.root + "public/uploadedFiles/" + uniqueID
-    outDir = Rails.root + "public/generatedFiles/" + uniqueID
-    out_dir_path = outDir.to_s
-    
-    # make directory and set permission 
-    FileUtils.mkdir_p(outDir)
-    FileUtils.chmod 0777, outDir
-    FileUtils.mkdir_p(directoryPath)
-    FileUtils.chmod 0777, directoryPath
+    @uploaded_files_directory = (Rails.root + "public/uploadedFiles/" + uniqueID).to_s
+    @generated_files_directory = (Rails.root + "public/generatedFiles/" + uniqueID).to_s
+  end
 
+  #Raise Argument Error is file too large
+  def generate_directory_and_move_files
+    
+    generate_directory_names
+
+    # make directory and set permission 
+    FileUtils.mkdir_p @uploaded_files_directory
+    FileUtils.chmod 0777, @uploaded_files_directory
+    FileUtils.mkdir_p @generated_files_directory
+    FileUtils.chmod 0777, @generated_files_directory
+   
     # upload input data file from where it locates into web server via uri/url
     fromfile = self.input_file
-    inputfile = directoryPath + fromfile.original_filename
-    FileUtils.copy( fromfile.tempfile.path, inputfile )
- 
+    @input_file_path = @uploaded_files_directory + fromfile.original_filename
+      #supports testing scripts that directly uploads tempfile
+    if fromfile.respond_to?(:tempfile)
+      FileUtils.copy( fromfile.tempfile.path, @input_file_path )
+    else 
+      FileUtils.copy( fromfile.path, @input_file_path )
+    end
+    
     # upload layout data file from where it locates into web server via uri/url
     unless self.layout_file.nil?
       fromfile = self.layout_file
-      layout_file = directoryPath + fromfile.original_filename
-      FileUtils.copy( fromfile.tempfile.path, layout_file )
+      @layout_file_path = @uploaded_files_directory + fromfile.original_filename
+      if fromfile.respond_to?(:tempfile)
+        FileUtils.copy( fromfile.tempfile.path, @layout_file_path )
+      else
+        FileUtils.copy( fromfile.path, @layout_file_path )
+      end
     end
+   
+   raise DataPassingError, 'Input file too big', {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@input_file} unless File.size(@input_file_path) < MAX_FILE_SIZE
+   raise DataPassingError, 'Layout file too big', {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@layout_file} unless File.size(@input_file_path) < MAX_FILE_SIZE
+ 
+  end
 
-    #do not massive files
-    if(File.size(inputfile) > MAX_FILE_SIZE)
-      return {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE/(10**6)} MB.", :path => inputfile}
-    end
-    
-    # Try to override stdout to redirect the console output.
-    $stdout = File.new(out_dir_path + '/console.out', 'w')
-    $stdout.sync = true 
-
+  def bind_arguments_to_r
     # use web interface parsed parameters to call R function/library via Rinruby  
     R.eval ('library(GCAT)')
-    R.assign "out.dir", out_dir_path
+    R.assign "out.dir", @generated_files_directory
     # That is for Single Plate case. Need modification for multiple plate case
     #Use one set.constants call only!
-       
-      if self.plate_type == 's'
-        R.assign 'single.plate', 'T'
-        timestamp_format = SECONDS #self.timestamp_format.to_r.to_f
-      elsif self.plate_type == 'm'
-        R.assign 'single.plate', 'F'
-        timestamp_format = ""+self.timestamp_format+""
-      end
 
+    if self.plate_type == 's'
+      R.assign 'single.plate', 'T'
+      timestamp_format = SECONDS #self.timestamp_format.to_r.to_f
+    elsif self.plate_type == 'm'
+      R.assign 'single.plate', 'F'
+      timestamp_format = ""+self.timestamp_format+""
+    end
     
     #################for warringer data###########################################
     # used for custom dims 
@@ -315,24 +336,33 @@ class Assay
 
 
     # (1) input data file
-    R.assign "file", inputfile.to_s
+    R.assign "file", @input_file_path
 
     first_rows = ["Well positions", "Destination plate name", "Plate ID"]
     begin
       file_row = ""
-      File.open(inputfile) {|f| file_row = f.readline.split(",").first}
-      if(first_rows.include?(file_row) == false)
-        return {:error_message => "Error: Unknown file format.", :path => inputfile}
+      File.open(@input_file_path) {|f| file_row = f.readline.split(",").first}
+      unless first_rows.include?(file_row)
+        raise DataPassingError,'Unknown file format', {:error_message => "Error: Unknown file format.", :path => input_file}
       end
     rescue
       #bad encoding try to validate in R
       first_rows.collect! {|r| r.gsub(" ", ".")} # convert to R format
       R.eval("test.out <- read.csv(file)")
-      R.eval("first_entry <- names(test.out)[1]")
-      if(first_rows.include?(R.first_entry) == false)
-        return {:error_message => "Error: Unknown file format.", :path => inputfile}
+      R.eval("first_entry <- names(test.out)[1]")     
+=begin      
+      puts 'first entry is'
+      puts R.pull('names(test.out)[2]')
+      puts R.first_entry
+      puts R.file
+      puts 'lala'
+=end
+
+      unless first_rows.include?(R.first_entry)
+        raise DataPassingError,'Unknown file format', {:error_message => "Error: Unknown file format.", :path => input_file}
       end
     end
+  
 
     # (2) transformation. N value (A Real Number)
     R.assign "add.constant", self.transformation
@@ -348,8 +378,8 @@ class Assay
     end
 
     # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is nil.
-    if(self.blank_value == nil && self.start_index == 1)
-      return {:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => inputfile}
+    if(self.blank_value == nil && start_index == 1)
+      raise DataPassingError,'inoculation point error', {:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => input_file}
     else 
       R.assign "start.index", self.start_index
     end
@@ -359,10 +389,10 @@ class Assay
     
     R.assign  "growth.cutoff", self.growth_threshold
     
-     if (self.layout_file ==nil)
+     if (self.layout_file_path ==nil)
       R.eval "layout.file <- NULL"
     else
-      R.assign "layout.file", layout_file.to_s
+      R.assign "layout.file", layout_file_path
     end
     
     #debugger
@@ -437,6 +467,26 @@ class Assay
     else
       R.eval 'auc.end <- NULL'
     end
+  end
+
+
+    
+  def r_calculation
+    begin
+      generate_directory_and_move_files
+    rescue DataPassingError => err
+      return err.data
+    end
+
+    # Try to override stdout to redirect the console output.
+    $stdout = File.new(@generated_files_directory + '/console.out', 'w')
+    $stdout.sync = true 
+    
+    begin
+      bind_arguments_to_r
+    rescue DataPassingError => err
+      return err.data
+    end
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
     R.eval 'R_file_return_value <- gcat.analysis.main(
                         file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
@@ -467,7 +517,7 @@ class Assay
         print split_s
         split_s.each {|x| error_message = x}
       end
-      return {:error_message => error_message, :path => inputfile, :console_msg => console_message}
+      return {:error_message => error_message, :path => input_file, :console_msg => console_message}
     end
     
     # process generated files
@@ -516,11 +566,11 @@ class Assay
     raise "no overview files generated" if overviewFiles.empty?
 
     if self.plate_type == 'm'
-      zipfile = out_dir_path + "/multiplePlateAnalysis.zip"
+      zipfile = @generated_files_directory + "/multiplePlateAnalysis.zip"
     else
-      zipfile = out_dir_path + "/singlePlateAnalysis.zip"
+      zipfile = @generated_files_directory + "/singlePlateAnalysis.zip"
     end
-    consoleOut = out_dir_path + "/console.out"
+    consoleOut = @generated_files_directory + "/console.out"
     self.console_out = consoleOut
     # create Zip files at current directory
     Zip::File.open(zipfile, Zip::File::CREATE) { |zf|
@@ -532,7 +582,7 @@ class Assay
     #zip files, jpg of overviews, txt file for datagrid, pdf file
     
     
-    {:status => status, :overviewFiles => overviewFiles, :zipfile => zipfile, :txtFile => txtFile, :pdfFile => pdfFile, :inputfile => inputfile, :layout_file => layout_file, :model => self.model,
+    {:status => status, :overviewFiles => overviewFiles, :zipfile => zipfile, :txtFile => txtFile, :pdfFile => pdfFile, :inputfile => input_file, :layout_file => layout_file, :model => self.model,
      :consoleout => consoleOut}
   end # end of r_calculation method
 
