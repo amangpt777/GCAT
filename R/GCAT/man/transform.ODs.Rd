@@ -22,7 +22,7 @@ or raw normalized data is returned using the function \code{data.from}.}
 
 \item{constant.added}{similar to added.constant.}
 
-\item{normalize.method}{see Details}
+\item{normalize.method}{To specify if we are using average.layout method to set our blank value at each timestamp as average of}
 
 \item{...}{Additional arguments for this function.}
 }
@@ -31,12 +31,5 @@ This function adds a "log.OD" column to the "screen.data" slot of a well object 
 The raw data is kept intact.
 It also checks to see if any of the raw OD values (before a certain timepoint) is below the blank OD.
 This can be disastrous for the log(OD) transform.
-}
-\details{
-normalize.method settings:
- \describe{
- \item{average.layout}{Use 'averagedTimestamp' of well's screen.data at everytimestamp for taking log}
- \item{anything else}{Use 'norm' of well as the blank OD for taking log}
- }
 }
 
