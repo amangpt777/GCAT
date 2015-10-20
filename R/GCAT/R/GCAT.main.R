@@ -96,7 +96,6 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @param points.to.remove A list of numbers referring to troublesome points that should be removed across all wells.
 #' @param remove.jumps Should the slope checking function be on the lookout for large jumps in OD?
 #' @param time.input The time setting in which the current system is running?
-#' @param normalize.method Describes the method used by \code{normalize.ODs} to normalize cell density values using blank reads.
 #' @param plate.nrow The number of rows in a plate.
 #' @param plate.ncol The number of columns in a plate.
 #' @param input.skip.lines If specified, this number of lines shall be skipped from the top when reading the input file with read.csv 
@@ -122,7 +121,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
   lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
-  points.to.remove = 0, remove.jumps = F, time.input = NA, normalize.method = "default",
+  points.to.remove = 0, remove.jumps = F, time.input = NA,
   plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
   layout.sheet.headers = c("Strain", "Media Definition"),
@@ -132,15 +131,19 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
   
+  # Set normalize.method to default
+  normalize.method = "default"
+  
   #  Check blank value and start index
-  if (is.null(blank.value) && start.index==1 && !(normalize.method == "average.layout")) {
+  if (is.null(blank.value) && start.index==1) {
     exception("", "If inoculation time point is 1, the user must specify a blank value")
   }
-
-  if ((normalize.method == "average.layout") && !(is.null(blank.value))) {
-      exception("", "If normalize.method is 'average.layout' then blank value should be null")
+  
+  if(!is.null(blank.value) && blank.value == "average.layout") {
+    normalize.method = "average.layout"
   }
   
+  # With average.layout option a layout file should always be passed
   if ((normalize.method == "average.layout") && is.null(layout.file)) {
     exception("", "If normalize.method is 'average.layout' then a layout file should be specified")
   }
