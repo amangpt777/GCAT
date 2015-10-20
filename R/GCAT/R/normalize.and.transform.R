@@ -92,12 +92,12 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
     
     # blank.ODs will be a big list of OD
     # The ODs at every timestamp for all non Empty wells will be -25.0000
-    blank.ODs = unlist(aapply(well.array, function(well, blank.value){
-      if(is.null(blank.value) && well@well.info$Strain[1] == "Empty") 
+    blank.ODs = unlist(aapply(well.array, function(well){
+      if(well@well.info$Strain[1] == "Empty") 
         OD = well@screen.data$OD
       else
         OD = rep(-25, length(well@screen.data$OD))
-      return(OD)}, blank.value))
+      return(OD)}))
     
     # Create back the matrix of timestamp as our rows and wells as columns
     #           with values of non empty wells at each timestamp as -25.0000
