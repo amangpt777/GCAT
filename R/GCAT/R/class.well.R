@@ -310,7 +310,8 @@ setMethod("show", "well",
 setMethod("plot",
           signature(x = "well", y="missing"),
           function (x, y, constant.added = 1.0, xlim = NULL, ylim = NULL,
-                    well.number = NULL, scale = 1, number.points = T, draw.symbols = F, show.text = T, show.calc = T, draw.guess = NULL, ...) 
+                    well.number = NULL, scale = 1, number.points = T, draw.symbols = F, show.text = T, show.calc = T, 
+                    draw.guess = NULL, auc.start = NULL, auc.end = NULL, ...) 
           {
             # Determine the boundaries for the axes (if user did not specify them)
             if(is.null(ylim)){
@@ -343,7 +344,8 @@ setMethod("plot",
             
             # Draw text info if specified. 
             if(show.text)
-              draw.text(x, scale = scale * 0.5, xlim = xlim, ylim = ylim,...)
+              draw.text(x, scale = scale * 0.5, xlim = xlim, ylim = ylim, auc.start = auc.start, 
+                        auc.end = auc.end, ...)
             
             # Show calculated parameters if specified. 
             if (show.calc)
