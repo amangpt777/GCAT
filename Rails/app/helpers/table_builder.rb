@@ -13,8 +13,9 @@ module TableBuilder
 			offsets[:pdf] = -7
 			offsets[:page] = -6
 		end
-		rel_path = result[:txtFile]
-		pdf_path = File.dirname @result[:txtFile] #Rails.root.join("public/"+result[:pdfFile])
+    puts result[:txtFile]
+		rel_path = result[:txtFile][0]
+		pdf_path = File.dirname @result[:txtFile][0] #Rails.root.join("public/"+result[:pdfFile])
 		path = Rails.root.join("public/"+rel_path)
 		raise "File not found" unless File.exists? path
 		file = File.open path

@@ -22,44 +22,74 @@ require 'zip'
 # require 'zip/zipfilesystem'
 require 'fileutils'
 include FileUtils
-require_relative 'DataPassingError'
 
 # single-plate timestamp
 SECONDS = "1/3600".to_r.to_f
 MAX_FILE_SIZE = 10000000.0
 
+class ValidationError < ArgumentError
+  attr_accessor :data
+  def initialize(message=nil, data=nil)
+    super(message)
+    @data = data
+  end
+end
+
 class Assay
 
-  
   include ActiveModel::Validations
   include ActiveModel::Conversion
   extend ActiveModel::Naming
-  attr_accessor :input_file, :blank_value, :blank_value_input, :start_index, :remove_points, :remove_jumps, :plate_type,
-  :plate_dimensions_row, :plate_dimensions_column, :timestamp_format, :growth_threshold, :layout_file,:filename,:content_type, :model, :loess_input, :console_out, :specg_min,
-  :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,:transformation, :transformation_input, :area_start_hour, :area_end_hour,
-  :uploaded_files_directory, :generated_files_directory, :input_file_path, :layout_file_path
+  
+  def initialize(attributes = {})
+    attributes.each do |name, value|
+      send("#{name}=", value)
+    end
+  end
+
+  def persisted?  #
+    false
+  end
+  
+  attr_accessor :input_file, 
+    :layout_file,
+    :blank_value, :blank_value_input, 
+    :start_index, 
+    :remove_points, 
+    :remove_jumps, 
+    :plate_type,
+    :plate_dimensions_row, :plate_dimensions_column, 
+    :timestamp_format, 
+    :growth_threshold, 
+    :content_type, 
+    :model, 
+    :loess_input, 
+    :console_out, 
+    :specg_min, :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,
+    :transformation, :transformation_input, 
+    :area_start_hour, :area_end_hour,
+    :uploaded_files_directory, :generated_files_directory, 
+    :input_file_path, :layout_file_path,
+    :overviewFiles, :pdfFiles, :txtFiles, :consoleOut
 
   # (1) Validation of input data file
   validates_presence_of :input_file, :message => '- No input file was specified.'
-  #Either look for .csv as file extension, or in mime type (content_type). No need to validate if there is not filename
-  #validates_format_of :filename, :with => %r{\.(csv|xlsx)$}i, :message => "- You can only upload csv and xlsx files.", :unless => lambda { self.input_file == nil }
+  # Either look for .csv as file extension, or in mime type (content_type). 
+  # No need to validate if there is not filename
+  # Change the regex to %r{\.(csv|xlsx)$}i to accept both csv and xlsx files
   validates_format_of :filename, :with => %r{\.(csv)$}i, :message => "- You can only upload csv files.", :unless => lambda { self.input_file == nil }
   
   def filename
-    unless self.input_file.nil?
-      self.filename = self.input_file.original_filename
-    end
+      self.input_file.original_filename unless self.input_file.nil?
   end
   
   def content_type
-    unless self.input_file.nil?
-      self.content_type = self.input_file.content_type
-    end
+      self.content_type = self.input_file.content_type unless self.input_file.nil?
   end
   
   # (2)Validation of transformation
   # if user input is chosen, the user should enter a valid Delta value (A Real Number)
-  validates_presence_of :transformation_input,  :if => :user_input_r_value?, :message => '- Please Enter Your Delta Value.'
+  validates_presence_of :transformation_input, :if => :user_input_r_value?, :message => '- Please Enter Your Delta Value.'
   validates_numericality_of :transformation_input, :if => :user_input_r_value? , :greater_than_or_equal_to => 0 , :message => '- Invalid value for Delta. Please Enter a positive real number.'
   def user_input_r_value?
     transformation == "-1"
@@ -68,28 +98,17 @@ class Assay
   # (3) Validation of OD blank value
   # if user input is chosen,, the user should enter a valid OD blank value(A Real Number)
   #validates_inclusion_of :blank_value, :in => %w( default user  ), :message => '- Invalid blank value. Please choose one of options'
-  validates_presence_of :blank_value_input,  :if => :user_input?, :message => '- Please Enter Your OD Blank Value.'
-  validates_numericality_of :blank_value_input,:if => :user_input?,  :message => '- Invalid OD blank value. Please Enter A Real Number.'
-  def user_input?
-    blank_value == "user"
-  end
-  
+  validates_presence_of :blank_value_input,  :if => "blank_value==\"user\"", :message => '- Please Enter Your OD Blank Value.'
+  validates_numericality_of :blank_value_input,:if => "blank_value==\"user\"",  :message => '- Invalid OD blank value. Please Enter A Real Number.'
   
   # (4) Validation of start_index
   # if user does not enter anything, the system uses the default value start_index = 2
-  validates_format_of :start_index,:with => /^[0-9\s]*$/i, :unless => :default_value?,:message => '- Invalid value for start index. Please Enter A Positive Integer Number'
-  def default_value?
-    start_index == '' 
-  end
-  
+  validates_numericality_of :start_index, :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number', :allow_blank => true
   
   # (5) Validation of remove_points
   # if user does not enter anything, the system uses the default value remove_points = 0, that is an empty list
   #validates_format_of :remove_points,:with => /^[0-9 \,\s]*$/i, :unless => :remove_points_default_value?, :message => '- Please Enter a comma-separated list of points. Example: 2,3,4,5 (Positive Integer Number)'
-  validates_format_of :remove_points,:with => /^(\d|\d+\s*,\s*)*$/i, :unless => :remove_points_default_value?, :message => '- Please Enter a comma-separated list of points. Example: 2,3,4,5 (Positive Integer Number)'
-  def remove_points_default_value?
-    remove_points == '' 
-  end
+  validates_format_of :remove_points,:with => /^(\d|\d+\s*,\s*)*$/i, :message => '- Please Enter a comma-separated list of points. Example: 2,3,4,5 (Positive Integer Number)', :allow_blank => true 
   
   # (6) Validation of growth threshold
   validates_numericality_of :growth_threshold, :message => '- Please enter a number.'
@@ -100,93 +119,55 @@ class Assay
   #validates :plate_dimensions_row, :numericality => { :only_integer => true, :greater_than => 0 }
   
   # (7) validate inoculation timepoint
-  validates :start_index, :numericality => { :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number'}
+  validates_numericality_of :start_index, :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number'
   
   # (8) validate heatmap ranges
-#validates_numericality_of :blank_value_input,:if => :user_input?,  :message => '- Invalid OD blank value. Please Enter A Real Number.'
-  validates_numericality_of :totg_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :totg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :totg_OD_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :totg_OD_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :specg_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :specg_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :lagT_min, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-  validates_numericality_of :lagT_max, :if => :user_input?, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
-
+  HEATMAP_SYMBOLS = [:totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :specg_min, :specg_max, :lagT_min, :lagT_max]
+  for s in HEATMAP_SYMBOLS
+    validates_numericality_of s, :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
+  end
+  
   validates_numericality_of :area_start_hour,  :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validates_numericality_of :area_end_hour,  :allow_blank => true, :greater_than_or_equal_to => 0, :message => '- Please Enter a positive real number.'
   validate :area_under_curve
 
   # Validates the area under curve start and end as they are mutually dependent.
+  # area_start_hour and area_end_hour must both be >= 0
   # Valid conditions:
   #     area_start_hour = nil, area_end_hour == nil
   #     area_start_hour >=0, area_end_hour == nil
-  #     area_start_hour < area_end_hour, >=0, area_end_hour > 0
-  # Invalid conditions:
-  #     area_start_hour >= area_end_hour
-  #     area_start_hour > 0, area_end_hour = nil
+  #     area_start_houe = nil, area_end_hour>=0
+  #     0 <= area_start_hour < area_end_hour
   # Note that negativity of these numbers is tested above in 'validates_numericality_of' statements.
   def area_under_curve
-    #gy. Oct9
-    self.area_start_hour ||= ''
-    self.area_end_hour ||= ''
-
-    test_area_start_hour = area_start_hour != '' ? self.area_start_hour.to_f : nil
-    test_area_end_hour = area_end_hour != '' ? self.area_end_hour.to_f : nil
-    
-    if test_area_end_hour
-    puts 'enter validation function'
-      if test_area_end_hour <= 0
-        self.errors.add(:area_end_hour, "must be greater than 0.")
-      end
-      if test_area_start_hour and test_area_start_hour >= test_area_end_hour
-        puts 'enter core area'
+    s = self.area_start_hour.to_f unless self.area_start_hour.nil? or self.area_start_hour == ""
+    e = self.area_end_hour.to_f unless self.area_end_hour.nil? or self.area_end_hour == ""
+    if s and e and s >= e
         self.errors.add(:area_end_hour, "must be greater than start hour.")
         self.errors.add(:area_start_hour, "must be less than end hour.")
-      end
-    elsif test_area_start_hour and test_area_start_hour < 0
-      self.errors.add(:area_start_hour, "must be greater than 0.")
-    end
-
-
-    # if not test_area_start_hour and not test_area_end_hour
-    #   return
-    # end
-    # if not test_area_end_hour and test_area_start_hour >=0
-    #   return
-    # end
-    # if not test_area_start_hour and test_area_end_hour > 0
-    #   return
-    # end
-
-
-  end
-
-
-  def initialize(attributes = {})
-    attributes.each do |name, value|
-      send("#{name}=", value)
     end
   end
 
-  def persisted?  #
-    false
-  end
-
+  #parse the strings provided in the input to proper types
+  #and proper value
+  #This method is supposed to be called after validation
+  #and before bind_params_to_r
   def parse_form_params
     
     # (1) input data file
     
     # (2) transformation. N value (A Real Number)
+    # -1 means use user entered value
+    # otherwise paese self.transformation directly
     if self.transformation == '-1'
-      self.transformation =  Float(self.transformation_input)
+      self.transformation = self.transformation_input.to_f
     else
       self.transformation = self.transformation.to_f
     end
 
     # Soothing parameter for growth curve model. Applied for Loess model only.
     if self.model == '-1' and self.loess_input != ""
-        self.loess_input = Float(self.loess_input)
+        self.loess_input = self.loess_input.to_f
     end
 
     # (3) blank value (A Real Number)
@@ -195,23 +176,19 @@ class Assay
     elsif self.blank_value == 'zero'
       self.blank_value = 0
     else
-      self.blank_value = Float(self.blank_value_input)
+      self.blank_value = self.blank_value_input.to_f
     end
 
     # (4) start index (A Positive Integer Number)
-    if 
-      start_index == ''
+    if start_index == ''
       self.start_index = 1
     else  
       self.start_index.gsub(/\s+/, "")  # remove white spaces
       self.start_index = self.start_index.to_i
     end
     
-    # (5) remove points [a space-separated list of points. Example: 2 3 4 5 (Positive Integer Number)]
-    self.remove_points = self.remove_points.gsub(/\r/,"")  # "Some text with a carriage return \r"
-    #self.remove_points = self.remove_points.gsub(/\r\n/,"\n") # "Some text with a carriage return \r\n"
+    # (5) remove points [a comma-separated list of points. Example: 2,3,4,5 (Positive Integer Number)]
     self.remove_points = self.remove_points.gsub(/\s+/, "")  # remove white spaces
-
     ##collect! calls .to_i on each string in the array and replaces the string with the result of the conversion.
     self.remove_points = self.remove_points.split(',').collect! {|n| n.to_i}
 
@@ -241,13 +218,9 @@ class Assay
     end
 
     # Area under curve
-    self.area_start_hour = self.area_start_hour != '' ? Float(self.area_start_hour) : nil
-    self.area_end_hour = self.area_end_hour != '' ? Float(self.area_end_hour) : nil
-
-############################################################################################
-
-    return self
-
+    self.area_start_hour = self.area_start_hour != '' ? self.area_start_hour.to_f : nil
+    self.area_end_hour = self.area_end_hour != '' ? self.area_end_hour.to_f : nil
+  
   end # end of parse_form_params method
 
   def pad_date(unit)
@@ -258,22 +231,29 @@ class Assay
     # uniqueID = Process.pid.to_s + "-" + Time.now.to_i.to_s
     #wanted the date to be easier to extract NWD 2/26/14
     today = Time.now
-    
     uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
   end
   
   def generate_directory_names
     uniqueID = getUniqueID
     # set working directories for uploaded and generated files
-    @uploaded_files_directory = (Rails.root + "public/uploadedFiles/" + uniqueID).to_s
-    @generated_files_directory = (Rails.root + "public/generatedFiles/" + uniqueID).to_s
+    @uploaded_files_directory = Rails.root.join("public", "uploadedFiles", uniqueID)
+    @generated_files_directory = Rails.root.join("public", "generatedFiles", uniqueID)
   end
 
   #Raise Argument Error is file too large
   def generate_directory_and_move_files
     
-    generate_directory_names
-
+    unless self.input_file.size < MAX_FILE_SIZE
+      raise ValidationError.new({:error_message=> "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@input_file_path}), 'Input file too big' 
+    end
+    
+    unless self.layout_file.nil? or self.layout_file.size < MAX_FILE_SIZE
+      raise ValidationError.new({:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@layout_file_path}), 'Layout file too big'  
+    end
+    
+    generate_directory_names unless not @uploaded_files_directory.nil?
+    
     # make directory and set permission 
     FileUtils.mkdir_p @uploaded_files_directory
     FileUtils.chmod 0777, @uploaded_files_directory
@@ -282,7 +262,7 @@ class Assay
    
     # upload input data file from where it locates into web server via uri/url
     fromfile = self.input_file
-    @input_file_path = @uploaded_files_directory + fromfile.original_filename
+    @input_file_path = @uploaded_files_directory.join(fromfile.original_filename)
       #supports testing scripts that directly uploads tempfile
     if fromfile.respond_to?(:tempfile)
       FileUtils.copy( fromfile.tempfile.path, @input_file_path )
@@ -293,23 +273,20 @@ class Assay
     # upload layout data file from where it locates into web server via uri/url
     unless self.layout_file.nil?
       fromfile = self.layout_file
-      @layout_file_path = @uploaded_files_directory + fromfile.original_filename
+      @layout_file_path = @uploaded_files_directory.join(fromfile.original_filename)
       if fromfile.respond_to?(:tempfile)
         FileUtils.copy( fromfile.tempfile.path, @layout_file_path )
       else
         FileUtils.copy( fromfile.path, @layout_file_path )
       end
     end
-   
-   raise DataPassingError, 'Input file too big', {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@input_file} unless File.size(@input_file_path) < MAX_FILE_SIZE
-   raise DataPassingError, 'Layout file too big', {:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@layout_file} unless File.size(@input_file_path) < MAX_FILE_SIZE
- 
+  
   end
 
   def bind_arguments_to_r
     # use web interface parsed parameters to call R function/library via Rinruby  
     R.eval ('library(GCAT)')
-    R.assign "out.dir", @generated_files_directory
+    R.assign "out.dir", @generated_files_directory.to_s
     # That is for Single Plate case. Need modification for multiple plate case
     #Use one set.constants call only!
 
@@ -318,7 +295,7 @@ class Assay
       timestamp_format = SECONDS #self.timestamp_format.to_r.to_f
     elsif self.plate_type == 'm'
       R.assign 'single.plate', 'F'
-      timestamp_format = ""+self.timestamp_format+""
+      timestamp_format = self.timestamp_format.to_s
     end
     
     #################for warringer data###########################################
@@ -336,14 +313,14 @@ class Assay
 
 
     # (1) input data file
-    R.assign "file", @input_file_path
+    R.assign "file", @input_file_path.to_s
 
     first_rows = ["Well positions", "Destination plate name", "Plate ID"]
     begin
       file_row = ""
       File.open(@input_file_path) {|f| file_row = f.readline.split(",").first}
       unless first_rows.include?(file_row)
-        raise DataPassingError,'Unknown file format', {:error_message => "Error: Unknown file format.", :path => input_file}
+        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => input_file}),'Unknown file format' 
       end
     rescue
       #bad encoding try to validate in R
@@ -359,7 +336,7 @@ class Assay
 =end
 
       unless first_rows.include?(R.first_entry)
-        raise DataPassingError,'Unknown file format', {:error_message => "Error: Unknown file format.", :path => input_file}
+        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => input_file}),'Unknown file format' 
       end
     end
   
@@ -379,7 +356,7 @@ class Assay
 
     # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is nil.
     if(self.blank_value == nil && start_index == 1)
-      raise DataPassingError,'inoculation point error', {:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => input_file}
+      raise ValidationError.new({:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => input_file}),'inoculation point error'
     else 
       R.assign "start.index", self.start_index
     end
@@ -469,24 +446,68 @@ class Assay
     end
   end
 
+  #remove path components before (including) /public/
+  #and then strip spaces from path
+  def strip_path(path)
+    path.gsub(Rails.root.to_s + '/public','')#.gsub(/\s+/, "")
+  end
 
+  def categorize_generated_files(files)
+      @overviewFiles = []
+      @pdfFiles = []
+      @txtFiles = []
+      @consoleOut = @generated_files_directory.join("console.out").to_s
+
+      for f in files
+        if f.include? "_overview.jpg"
+          @overviewFiles.push(strip_path(f))
+          #overviewFiles = overviewFiles + files[i] +  "\n"
+        end
+
+        if f.include? "_plots"
+          @pdfFiles.push(strip_path(f))
+          #pdfFile = pdfFile + files[i] +  "\n"
+        end
+
+        if f.include? ".txt"
+          @txtFiles.push(strip_path(f))
+          #txtFile = txtFile + files[i] +  "\n"
+        end
+      end
+  end
+
+  def zip_files(files)
+    if self.plate_type == 'm'
+      @zipfile = @generated_files_directory.join("multiplePlateAnalysis.zip").to_s
+    else
+      @zipfile = @generated_files_directory.join("singlePlateAnalysis.zip").to_s
+    end
+    # create Zip files at current directory
     
-  def r_calculation
+    Zip::File.open(@zipfile, Zip::File::CREATE) { |zf| 
+      for f in files
+        zf.add(File.basename(f), f)
+      end
+      #files.each{|file| zf.add(file.sub(out_dir_path + "/", ""), file))}
+      #zf.add(File.basename(consoleOut), consoleOut)
+    }
+    
+  end
+    
+  def r_calculation 
+    original_stdout = $stdout
     begin
       generate_directory_and_move_files
-    rescue DataPassingError => err
-      return err.data
-    end
-
-    # Try to override stdout to redirect the console output.
-    $stdout = File.new(@generated_files_directory + '/console.out', 'w')
-    $stdout.sync = true 
-    
-    begin
+      
+      # Try to override stdout to redirect the console output.
+#      $stdout = File.new(@generated_files_directory.join('console.out'), 'w')
+      $stdout.sync = true 
+      
       bind_arguments_to_r
-    rescue DataPassingError => err
+    rescue ValidationError => err
       return err.data
     end
+    
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
     R.eval 'R_file_return_value <- gcat.analysis.main(
                         file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
@@ -501,8 +522,8 @@ class Assay
     print R.R_file_return_value
     
     R.eval ('R_array_return_length <- length(R_file_return_value)')
+    
     unless  R.R_array_return_length == 1
-      puts R.R_file_return_value, "\n"
       files = R.R_file_return_value  # returns a list of file path
       status = true
     else
@@ -517,74 +538,23 @@ class Assay
         print split_s
         split_s.each {|x| error_message = x}
       end
-      return {:error_message => error_message, :path => input_file, :console_msg => console_message}
+      return {:error_message => error_message, :path => @input_file_path, :console_msg => console_message}
     end
     
     # process generated files
     raise "no files generated" if files.empty?
-    #search for "_overview.jpg files" from Array of files
-    overviewFiles = ""
-    pdfFile = ""
-    txtFile = ""
-    consoleOut = ""
-    files_Array_Size = files.size - 1
-
-    for i in 0..files_Array_Size
-      if files[i].include? "_overview.jpg"
-        overviewFiles = overviewFiles + files[i] +  "\n"
-      end
-
-      if files[i].include? "_plots"
-        pdfFile = pdfFile + files[i] +  "\n"
-      end
-
-      if files[i].include? ".txt"
-        txtFile = txtFile + files[i] +  "\n"
-      end
-    end
- 
-
-    unless pdfFile.empty?
-      #pdfFile = pdfFile.sub!(Rails.root.to_s + '/public/', '') #sub!(pattern, replacement) will return nil if no substitutions were performed
-      pdfFile = pdfFile.gsub(Rails.root.to_s + '/public/', '') #Oct. 04 2011 by Enhai
-      pdfFile = pdfFile.gsub(/\r/,"")  # "Some text with a carriage return \r"
-      pdfFile = pdfFile.gsub(/\r\n/,"\n") # "Some text with a carriage return \r\n"
-      pdfFile = pdfFile.gsub(/\s+/, "")  # remove white spaces
-    end
-
-    unless txtFile.empty?
-      #txtFile = txtFile.sub!(Rails.root.to_s + '/public/', '')#sub!(pattern, replacement) will return nil if no substitutions were performed
-      txtFile = txtFile.gsub(Rails.root.to_s + '/public/', '') #Oct. 04 2011 by Enhai
-      txtFile = txtFile.gsub(/\r/,"")  # "Some text with a carriage return \r"
-      txtFile = txtFile.gsub(/\r\n/,"\n") # "Some text with a carriage return \r\n"
-      txtFile = txtFile.gsub(/\s+/, "")  # remove white spaces
-    end
-
-    # build array named overviewFiles that contains "_overview.jpg files"
-    overviewFiles = overviewFiles.split("\n")
    
-    raise "no overview files generated" if overviewFiles.empty?
+   puts files
 
-    if self.plate_type == 'm'
-      zipfile = @generated_files_directory + "/multiplePlateAnalysis.zip"
-    else
-      zipfile = @generated_files_directory + "/singlePlateAnalysis.zip"
-    end
-    consoleOut = @generated_files_directory + "/console.out"
-    self.console_out = consoleOut
-    # create Zip files at current directory
-    Zip::File.open(zipfile, Zip::File::CREATE) { |zf|
-      files.each{|file| zf.add(File.basename(file), file)}
-      #files.each{|file| zf.add(file.sub(out_dir_path + "/", ""), file))}
-      #zf.add(File.basename(consoleOut), consoleOut)
-    }
+    categorize_generated_files(files)
+   
+    raise "no overview files generated" if @overviewFiles.empty?
+    
+    zip_files files
+
     #return results unless error
     #zip files, jpg of overviews, txt file for datagrid, pdf file
-    
-    
-    {:status => status, :overviewFiles => overviewFiles, :zipfile => zipfile, :txtFile => txtFile, :pdfFile => pdfFile, :inputfile => input_file, :layout_file => layout_file, :model => self.model,
-     :consoleout => consoleOut}
+    {:status => status, :overviewFiles => @overviewFiles, :zipfile => @zipfile, :txtFile => @txtFiles, :pdfFile => @pdfFiles, :inputfile => @input_file_path, :layout_file => @layout_file_path, :model => @model, :consoleout => @consoleOut}
   end # end of r_calculation method
-
   
 end # class Assay

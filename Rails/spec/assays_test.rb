@@ -510,6 +510,14 @@ context "Validation" do
       expect(@assay.errors[:area_start_hour]).to be_empty
       expect(@assay.errors[:area_end_hour]).to be_empty
     end
+    
+    it "should allow start to be nil while end is not" do
+      @assay.area_start_hour = ""
+      @assay.area_end_hour = "1"
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:area_start_hour]).to be_empty
+      expect(@assay.errors[:area_end_hour]).to be_empty
+    end
 
   end
 #end of area under curve
@@ -612,8 +620,12 @@ context "Parse Form Params" do
 end
 
 context "R_Calculation" do
+  before(:each) do
+    #skip #this may take too much time
+  end
+  
   after(:each) do
-    FileUtils.rm_rf(Rails.root + 'tmp/testing')
+    FileUtils.rm_rf(Rails.root.join('tmp','testing'))
   end
 
   context "generate directory and move files" do
@@ -625,8 +637,8 @@ context "R_Calculation" do
       uniqueid = "testing"
       @assay.input_file = fixture_file_upload('spec/fixtures/files/single_plate_input.csv','test/csv')
       @assay.layout_file = fixture_file_upload('spec/fixtures/files/single_plate_layout.csv','test/csv')
-      @assay.uploaded_files_directory = Rails.root + "tmp/testing/uploadedfiles" + uniqueid
-      @assay.generated_files_directory = Rails.root + "tmp/testing/generatedfiles" + uniqueid
+      @assay.uploaded_files_directory = Rails.root.join("tmp/testing/uploadedfiles", uniqueid)
+      @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
       @assay.generate_directory_and_move_files
       expect(File.exist?(@assay.uploaded_files_directory)).to be true
       expect(File.exist?(@assay.generated_files_directory)).to be true
@@ -636,9 +648,9 @@ context "R_Calculation" do
       uniqueid = "testing"
       @assay.input_file = fixture_file_upload('spec/fixtures/files/large_file.csv','test/csv')
       @assay.layout_file = fixture_file_upload('spec/fixtures/files/single_plate_layout.csv','test/csv')
-      @assay.uploaded_files_directory = Rails.root + "tmp/testing/uploadedfiles" + uniqueid
-      @assay.generated_files_directory = Rails.root + "tmp/testing/generatedfiles" + uniqueid
-      expect{@assay.generate_directory_and_move_files}.to raise_error(ArgumentError)
+      @assay.uploaded_files_directory = Rails.root.join("tmp/testing/uploadedfiles", uniqueid)
+      @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
+      expect{@assay.generate_directory_and_move_files}.to raise_error(ValidationError)
       expect(File.exist?(@assay.uploaded_files_directory)).to be false
       expect(File.exist?(@assay.generated_files_directory)).to be false 
     end
@@ -651,7 +663,7 @@ context "R_Calculation" do
       @assay.blank_value = "zero"
       @assay.generated_files_directory = "random"
       @assay.plate_type = 's'
-      @assay.timestamp_format = "format"
+      @assay.timestamp_format = "%Y-%m-%d %I:%M:%S %p"
       @assay.input_file_path = 'spec/fixtures/files/single_plate_input.csv'
       @assay.layout_file_path = nil
       @assay.transformation = '0'
@@ -703,9 +715,9 @@ context "R_Calculation" do
     end
     
     it "binds time.input correctly - 2" do
-      @assay.plate_type = 's'
+      @assay.plate_type = 'm'
       @assay.bind_arguments_to_r
-      expect(R.pull('time.input')).to eq "format"
+      expect(R.pull('time.input')).to eq "%Y-%m-%d %I:%M:%S %p"
     end
 
     it "binds load.type correctly" do
@@ -720,14 +732,16 @@ context "R_Calculation" do
 
     it "tries to verify input data file" do
       @assay.input_file_path = 'spec/fixtures/files/bad_file.csv'
-      expect{@assay.bind_arguments_to_r}.to raise_error(ArgumentError)
+      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
     end
+
 =begin
     it "disallows non-valid file" do
       @assay.input_file_path = 'spec/fixtures/files/bad_file_2.csv'
       expect{@assay.bind_arguments_to_r}.to raise_error(ArgumentError)
     end
 =end
+
     it "allows good file" do
       @assay.input_file_path = 'spec/fixtures/files/single_plate_input.csv'
       expect{@assay.bind_arguments_to_r}.not_to raise_error
@@ -768,7 +782,7 @@ EOF
     it "cannot allow start index to be 1 when blank value is nil" do
       @assay.blank_value = nil;
       @assay.start_index = 1;
-      expect{@assay.bind_arguments_to_r}.to raise_error(ArgumentError)
+      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
     end
 
     it "binds start index correctly" do
@@ -995,4 +1009,62 @@ EOF
 
   end
 end
+
+
+context "Analyze R Generated Values" do
+  before(:each) do
+    f = File.open("spec/fixtures/files/r_generated_files.txt",'r')
+    @r_output = f.read()
+    f.close()
+  end
+ 
+  after(:each) do
+    FileUtils.rm_rf(Rails.root.join('tmp','testing'))
+  end
+  
+  it "strips path correctly" do
+    path = Rails.root.to_s + '/public/A/ B/ c .txt'
+    expect(@assay.strip_path(path)).to eq "/A/ B/ c .txt"
+  end
+
+  it "categorizes file correctly" do
+    uniqueid = 'testing'
+    @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
+    files = [
+      Rails.root.to_s + '/public/A/B/ t1 .txt',
+      Rails.root.to_s + '/public/A/B/ o1 _overview.jpg',
+      Rails.root.to_s + '/public/A/B/ p1 _plots.pdf',
+      Rails.root.to_s + '/public/A/ t2 .txt',
+      Rails.root.to_s + '/public/ o2 _overview.jpg',
+      Rails.root.to_s + '/public/ p2 _plots.pdf'
+    ]
+    @assay.categorize_generated_files files
+    expect(@assay.txtFiles).to include "/A/B/ t1 .txt"
+    expect(@assay.overviewFiles).to include "/A/B/ o1 _overview.jpg"
+    expect(@assay.pdfFiles).to include "/A/B/ p1 _plots.pdf"
+    expect(@assay.txtFiles).to include "/A/ t2 .txt"
+    expect(@assay.overviewFiles).to include "/ o2 _overview.jpg"
+    expect(@assay.pdfFiles).to include "/ p2 _plots.pdf"
+    expect(@assay.consoleOut).to eq @assay.generated_files_directory.join("console.out").to_s
+  end
+  
+  it "generates correct zip files - multiple" do
+    uniqueid = 'testing'
+    @assay.plate_type = 'm'
+    @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
+    FileUtils.mkdir_p @assay.generated_files_directory
+    @assay.zip_files [Rails.root.join("spec/fixtures/files/samplefile.jpg")]
+    expect(File.exist?(@assay.generated_files_directory.join("multiplePlateAnalysis.zip"))).to be true
+  end
+
+  it "generates correct zip files - single" do
+    uniqueid = 'testing'
+    @assay.plate_type = 's'
+    @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
+    FileUtils.mkdir_p @assay.generated_files_directory
+    @assay.zip_files [Rails.root.join("spec/fixtures/files/samplefile.jpg")]
+    expect(File.exist?(@assay.generated_files_directory.join("singlePlateAnalysis.zip"))).to be true
+  end
+end
+
 end
