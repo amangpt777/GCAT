@@ -183,6 +183,3 @@ DEPENDENCIES
   thin (= 1.6.4)
   turn
   uglifier
-
-BUNDLED WITH
-   1.10.6
