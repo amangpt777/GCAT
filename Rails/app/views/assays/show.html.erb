@@ -11,16 +11,17 @@
   <% end %>
   <h1>Analysis Results</h1>
   <p>
-    Uploaded file: <%=h @result[:inputfile].to_s %>
+    Uploaded file: <%=h relative_path(@result[:inputfile]).to_s %>
     <br>
     <% if @result[:layout_file] %>
-      Layout file: <%=h @result[:layout_file].to_s %>
+      Layout file: <%=h relative_path(@result[:layout_file]).to_s %>
     <% end %>
   </p>
   <%= link_to 'New Assay', new_assay_path%>
   <p>
     <% @result[:overviewFiles].each do | overview_file | %>
-      <%= link_to image_tag(relative_path(overview_file),
+      <% overview_file %>
+      <%= link_to image_tag(overview_file,
                   :alt => "Your Submission",
                   :style => "vertical-align:middle;"),
                   relative_path(@result[:zipfile])%>
