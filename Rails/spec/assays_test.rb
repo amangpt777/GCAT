@@ -953,12 +953,6 @@ end
 
 
 context "Analyze R Generated Values" do
-  before(:each) do
-    f = File.open("spec/fixtures/files/r_generated_files.txt",'r')
-    @r_output = f.read()
-    f.close()
-  end
- 
   after(:each) do
     FileUtils.rm_rf(Rails.root.join('tmp','testing'))
   end
