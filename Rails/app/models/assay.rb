@@ -69,7 +69,7 @@ class Assay
     :transformation, :transformation_input, 
     :area_start_hour, :area_end_hour,
     :uploaded_files_directory, :generated_files_directory, 
-    :input_file_path, :layout_file_path,
+    :input_file_path, :layout_file_path, #pathname object, not string
     :overviewFiles, :pdfFiles, :txtFiles, :consoleOut
 
   # (1) Validation of input data file
@@ -148,81 +148,6 @@ class Assay
     end
   end
 
-  #parse the strings provided in the input to proper types
-  #and proper value
-  #This method is supposed to be called after validation
-  #and before bind_params_to_r
-  def parse_form_params
-    
-    # (1) input data file
-    
-    # (2) transformation. N value (A Real Number)
-    # -1 means use user entered value
-    # otherwise paese self.transformation directly
-    if self.transformation == '-1'
-      self.transformation = self.transformation_input.to_f
-    else
-      self.transformation = self.transformation.to_f
-    end
-
-    # Soothing parameter for growth curve model. Applied for Loess model only.
-    if self.model == '-1' and self.loess_input != ""
-        self.loess_input = self.loess_input.to_f
-    end
-
-    # (3) blank value (A Real Number)
-    if self.blank_value == 'default'
-      self.blank_value = nil
-    elsif self.blank_value == 'zero'
-      self.blank_value = 0
-    else
-      self.blank_value = self.blank_value_input.to_f
-    end
-
-    # (4) start index (A Positive Integer Number)
-    if start_index == ''
-      self.start_index = 1
-    else  
-      self.start_index.gsub(/\s+/, "")  # remove white spaces
-      self.start_index = self.start_index.to_i
-    end
-    
-    # (5) remove points [a comma-separated list of points. Example: 2,3,4,5 (Positive Integer Number)]
-    self.remove_points = self.remove_points.gsub(/\s+/, "")  # remove white spaces
-    ##collect! calls .to_i on each string in the array and replaces the string with the result of the conversion.
-    self.remove_points = self.remove_points.split(',').collect! {|n| n.to_i}
-
-    ## (6) remove jumps (true/false)
-    if self.remove_jumps == 1
-      self.remove_jumps = true
-    else
-      self.remove_jumps = false
-    end
-
-    ## (7) Heatmap values
-    if (self.specg_min != '' && self.specg_max != '')
-      self.specg_max = Float(self.specg_max)
-      self.specg_min = Float(self.specg_min)
-    end
-    if (self.totg_min != '' && self.totg_max != '')
-      self.totg_min = Float(self.totg_min)
-      self.totg_max = Float(self.totg_max)
-    end
-    if (self.totg_OD_min != '' && self.totg_OD_max != '')
-      self.totg_OD_min = Float(self.totg_OD_min)
-      self.totg_OD_max = Float(self.totg_OD_max)
-    end
-    if (self.lagT_min != '' && self.lagT_max != '')
-      self.lagT_max = Float(self.lagT_max)
-      self.lagT_min = Float(self.lagT_min)
-    end
-
-    # Area under curve
-    self.area_start_hour = self.area_start_hour != '' ? self.area_start_hour.to_f : nil
-    self.area_end_hour = self.area_end_hour != '' ? self.area_end_hour.to_f : nil
-  
-  end # end of parse_form_params method
-
   def pad_date(unit)
     unit.to_i < 10 ? "0" + unit.to_s : unit.to_s
   end
@@ -233,7 +158,8 @@ class Assay
     today = Time.now
     uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
   end
-  
+
+ 
   def generate_directory_names
     uniqueID = getUniqueID
     # set working directories for uploaded and generated files
@@ -311,7 +237,6 @@ class Assay
     R.assign "load.type", "csv"
     ext = "csv" 
 
-
     # (1) input data file
     R.assign "file", @input_file_path.to_s
 
@@ -320,49 +245,56 @@ class Assay
       file_row = ""
       File.open(@input_file_path) {|f| file_row = f.readline.split(",").first}
       unless first_rows.include?(file_row)
-        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => input_file}),'Unknown file format' 
+        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
       end
     rescue
       #bad encoding try to validate in R
       first_rows.collect! {|r| r.gsub(" ", ".")} # convert to R format
       R.eval("test.out <- read.csv(file)")
       R.eval("first_entry <- names(test.out)[1]")     
-=begin      
-      puts 'first entry is'
-      puts R.pull('names(test.out)[2]')
-      puts R.first_entry
-      puts R.file
-      puts 'lala'
-=end
-
+      
       unless first_rows.include?(R.first_entry)
-        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => input_file}),'Unknown file format' 
+        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
       end
     end
-  
 
     # (2) transformation. N value (A Real Number)
-    R.assign "add.constant", self.transformation
-    # R.assign "add.constant", 0
-
-    # (3) blank value (A Real Number)
-    if (self.blank_value == nil)
-      R.eval "blank.value <- NULL"
-    elsif (self.blank_value == 0)
-      R.eval "blank.value <- 0"
+    # -1 means use user entered value
+    # otherwise paese self.transformation directly
+    if self.transformation == '-1'
+      R.assign "add.constant", self.transformation_input.to_f
     else
-      R.assign "blank.value", self.blank_value
+      R.assign "add.constant", self.transformation.to_f
     end
 
-    # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is nil.
-    if(self.blank_value == nil && start_index == 1)
-      raise ValidationError.new({:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => input_file}),'inoculation point error'
+    # (3) blank value (A Real Number)
+    if (self.blank_value == 'default')
+      R.eval "blank.value <- NULL"
+    elsif (self.blank_value == 'zero')
+      R.eval "blank.value <- 0"
+    elsif (self.blank_value == 'average')
+      R.eval "blank.value <- \"average.layout\""
+    elsif (self.blank_value == 'user')
+      R.assign "blank.value", self.blank_value_input.to_f
+    end
+
+    # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is default.
+    if (self.blank_value == 'default')
+      if (self.start_index == '' or self.start_index.to_i == 1)
+        raise ValidationError.new({:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => @input_file_path}),'inoculation point error'
+      end
+    end
+
+    if(self.start_index == '')
+      R.assign "start.index", 1
     else 
-      R.assign "start.index", self.start_index
+      R.assign "start.index", self.start_index.to_i
     end
     
     # (5) remove points [a space-separated list of points. Example: 2,3,4,5 (Positive Integer Number)]
-    R.assign "points.to.remove", self.remove_points
+    ##collect! calls .to_i on each string in the array and replaces the string with the result of the conversion.
+    
+    R.assign "points.to.remove", self.remove_points.gsub(/\s+/,"").split(',').collect! {|n| n.to_i}
     
     R.assign  "growth.cutoff", self.growth_threshold
     
@@ -377,22 +309,25 @@ class Assay
     #R.assign "plate.ncol", self.plate_dimensions_column
     
     ## (6) remove jumps (true/false)
-    if (self.remove_jumps == true)
+    if (self.remove_jumps == 1)
       R.eval "remove.jumps <- T"
     else
       R.eval "remove.jumps <- F"
     end
+    
+    
     # Using growth curve model. By default if this if block
     # is not taken then the Sigmund model is used.
-    if (self.model == -1.to_s)
+    if (self.model == '-1')
       R.assign 'use.loess', 'T'
+      # Soothing parameter for growth curve model. Applied for Loess model only.
       if (self.loess_input != "")
-        R.assign 'smooth.param', self.loess_input
+        R.assign 'smooth.param', self.loess_input.to_f
       else
         R.assign 'smooth.param', 0.1
       end
       R.assign 'use.linear.param', 'F'
-    elsif (self.model == 0.to_s)
+    elsif (self.model == '0')
       # Currently not in use. May return someday... NWD 9/1
       #R.assign 'use.linear.param', 'T'
       R.assign 'use.linear.param', 'F' #must be false
@@ -406,41 +341,44 @@ class Assay
 
     ## Heatmap values
     if (self.specg_max != '' && self.specg_min != '')
-      R.assign 'specMin', self.specg_min
-      R.assign 'specMax', self.specg_max
+      R.assign 'specMin', self.specg_min.to_f
+      R.assign 'specMax', self.specg_max.to_f
       R.eval "specRange <- c(specMin, specMax)"
     else
       R.eval 'specRange <- NA'
     end
+
     if (self.totg_min != '' && self.totg_max != '')
-      R.assign 'totMin', self.totg_min
-      R.assign 'totMax', self.totg_max
+      R.assign 'totMin', self.totg_min.to_f
+      R.assign 'totMax', self.totg_max.to_f
       R.eval "totalRange <- c(totMin, totMax)"
     else
       R.eval 'totalRange <- NA'
     end
     if (self.totg_OD_min != '' && self.totg_OD_max != '')
-      R.assign 'totODMin', self.totg_OD_min
-      R.assign 'totODMax', self.totg_OD_max
+      R.assign 'totODMin', self.totg_OD_min.to_f
+      R.assign 'totODMax', self.totg_OD_max.to_f
       R.eval "totalODRange <- c(totODMin, totODMax)"
     else
       R.eval 'totalODRange <- NA'
     end
     if (self.lagT_min != '' && self.lagT_max != '')
-      R.assign 'lagT_min', self.lagT_min
-      R.assign 'lagT_max', self.lagT_max
+      R.assign 'lagT_min', self.lagT_min.to_f
+      R.assign 'lagT_max', self.lagT_max.to_f
       R.eval "lagRange <- c(lagT_min, lagT_max)"
     else
       R.eval 'lagRange <- NA'
     end
+
+
     # Area under curve
     if self.area_start_hour != nil
-      R.assign 'auc.start', self.area_start_hour
+      R.assign 'auc.start', self.area_start_hour.to_f
     else
       R.eval 'auc.start <- NULL'
     end
     if self.area_end_hour != nil
-      R.assign 'auc.end', self.area_end_hour
+      R.assign 'auc.end', self.area_end_hour.to_f
     else
       R.eval 'auc.end <- NULL'
     end
@@ -500,7 +438,7 @@ class Assay
       generate_directory_and_move_files
       
       # Try to override stdout to redirect the console output.
-#      $stdout = File.new(@generated_files_directory.join('console.out'), 'w')
+      $stdout = File.new(@generated_files_directory.join('console.out'), 'w')
       $stdout.sync = true 
       
       bind_arguments_to_r
@@ -544,8 +482,6 @@ class Assay
     # process generated files
     raise "no files generated" if files.empty?
    
-   puts files
-
     categorize_generated_files(files)
    
     raise "no overview files generated" if @overviewFiles.empty?

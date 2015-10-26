@@ -68,9 +68,11 @@ $(document).ready(function(){
 	  var value = $(this).val();
 	  if(value=='s') {
 	    $("#time").hide();
+      $("#assay_blank_value_average_div").show();
 	  }
 	  else if(value=='m') {
 	    $("#time").show();
+      $("#assay_blank_value_average_div").hide();
 	   }
 	});        
 });

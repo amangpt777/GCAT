@@ -31,7 +31,7 @@ module ApplicationHelper
   	dirs = Dir.glob(Rails.root + "public/generatedFiles/*") + Dir.glob(Rails.root + "public/uploadedFiles/*")
   	dirs.compact.each do |dir|
   		date = extract_date(dir)
-  		if(date != cur_date)
+      if(date != cur_date)
         puts "Removing: " + dir #log deletions
   			%x[ rm -rf #{dir} ]
 	    end
@@ -44,7 +44,6 @@ module ApplicationHelper
   	  part = "Files/"
   	  segment = path.partition(part).last
   	  date = segment.split(/-[0-9]+/).first
-  	  date.to_i
     end
 
 

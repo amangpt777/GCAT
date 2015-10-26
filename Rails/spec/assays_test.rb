@@ -524,101 +524,6 @@ context "Validation" do
 #########################################################
 end
 
-context "Parse Form Params" do
-  before(:each) do
-    @assay.transformation = '0'
-    @assay.blank_value = 'default'
-    @assay.start_index = ''
-    @assay.remove_points = ''
-    @assay.area_start_hour = ''
-    @assay.area_end_hour = ''
-    for s in SYMBOLS
-      @assay.send("#{s}=",'')
-    end
-  end
-
-  it "correctly parses transformation - 1" do
-    @assay.transformation = '-1'  
-    @assay.transformation_input = '2.34'
-    @assay.parse_form_params
-    expect(@assay.transformation).to eq Float('2.34')
-  end
-
-  it "correctly parses transformation - 2" do
-    @assay.transformation = '0'
-    @assay.transformation_input = '2.34' # should be ignored
-    @assay.parse_form_params
-    expect(@assay.transformation).to eq '0'.to_f
-  end
-
-  it "correctly parses Loess parameter" do
-    @assay.model = '-1'
-    @assay.loess_input = "1.234"
-    @assay.parse_form_params
-    expect(@assay.loess_input).to eq Float("1.234")
-  end
-
-  it "sets blank_value to nil if it is 'default'" do
-    @assay.blank_value = 'default'
-    @assay.parse_form_params
-    expect(@assay.blank_value).to be nil
-  end
-
-  it "sets blank_value to zero if it is 'zero'" do
-    @assay.blank_value = 'zero'
-    @assay.parse_form_params
-    expect(@assay.blank_value).to eq 0
-  end
-  
-  it "sets blank_value to blank_value_input if otherwise" do
-    @assay.blank_value = ''
-    @assay.blank_value_input = '1.234'
-    @assay.parse_form_params
-    expect(@assay.blank_value).to eq Float('1.234')
-  end
-
-  it "sets start index to 1 if it is ''" do
-    @assay.start_index = ''
-    @assay.parse_form_params
-    expect(@assay.start_index).to eq 1
-  end
-  
-  it "correctly parses start index if it is not ''" do
-    @assay.start_index = '123'
-    @assay.parse_form_params
-    expect(@assay.start_index).to eq 123
-  end
-
-  it "removes spaces of, splits, and parses remove_points" do
-    @assay.remove_points = "1,   \n 2 , \r 3,  \n  4,   5,"
-    @assay.parse_form_params
-    expect(@assay.remove_points).to eq [1,2,3,4,5]
-  end
-
-  it "parses remove jump correctly - 1" do
-    @assay.remove_jumps = 1
-    @assay.parse_form_params
-    expect(@assay.remove_jumps).to be true
-  end
-  
-  it "parses remove jump correctly - 2" do
-    @assay.remove_jumps = 0
-    @assay.parse_form_params
-    expect(@assay.remove_jumps).to be false
-  end
-
-  it "parses heatmap and auc ranges correcly" do
-    for s in SYMBOLS
-      @assay.send("#{s}=",'1.234')
-    end
-    @assay.parse_form_params
-    for s in SYMBOLS
-      expect(@assay.send(s)).to be Float('1.234')
-    end
-  end
-
-end
-
 context "R_Calculation" do
   before(:each) do
     #skip #this may take too much time
@@ -748,13 +653,21 @@ context "R_Calculation" do
     end
 
     it "binds add.constant correctly" do
-      @assay.transformation = '1'
+      @assay.transformation = '-1'
+      @assay.transformation_input = '3.2'
       @assay.bind_arguments_to_r
-      expect(R.pull('add.constant')).to eq '1'
+      expect(R.pull('add.constant')).to eq 3.2
+    end
+    
+    it "binds add.constant correctly - 2" do
+      @assay.transformation = '1'
+      @assay.transformation_input = '3.2'
+      @assay.bind_arguments_to_r
+      expect(R.pull('add.constant')).to eq 1
     end
 
     it "binds blank.value correctly - 1" do
-      @assay.blank_value = nil
+      @assay.blank_value = 'default'
       #work around limitation of rinruby
       #rinruby cannot pull NULL, need to change it to -1
       #instead
@@ -767,35 +680,56 @@ EOF
       expect(R.pull('blank.value')).to eq -1
     end
 
-    it "binds blank.value correctly - 2" do
-      @assay.blank_value = 0
-      @assay.bind_arguments_to_r
-      expect(R.pull('blank.value')).to eq 0
-    end
 
     it "binds blank.value correctly - 1" do
-      @assay.blank_value = 0.123
+      @assay.blank_value = 'user'
+      @assay.blank_value_input = '0.123'
       @assay.bind_arguments_to_r
       expect(R.pull('blank.value')).to eq 0.123
     end
+    
+    it "binds blank.value correctly - 2" do
+      @assay.blank_value = 'zero'
+      @assay.bind_arguments_to_r
+      expect(R.pull('blank.value')).to eq 0
+    end
+    
+    it "binds blank.value correctly - 3" do
+      @assay.blank_value = 'average'
+      @assay.bind_arguments_to_r
+      expect(R.pull('blank.value')).to eq 'average.layout'
+    end
 
-    it "cannot allow start index to be 1 when blank value is nil" do
-      @assay.blank_value = nil;
-      @assay.start_index = 1;
+    it "cannot allow start index to be 1 when blank value is default" do
+      @assay.blank_value = 'default'
+      @assay.start_index = ''
+      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
+    end
+    
+    it "cannot allow start index to be 1 when blank value is default - 2" do
+      @assay.blank_value = 'default'
+      @assay.start_index = '1'
       expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
     end
 
     it "binds start index correctly" do
-      @assay.blank_value = 1;
-      @assay.start_index = 1;
+      @assay.blank_value = 'zero'
+      @assay.start_index = '3'
+      @assay.bind_arguments_to_r
+      expect(R.pull('start.index')).to eq 3
+    end
+    
+    it "binds start index correctly - 2" do
+      @assay.blank_value = 'zero'
+      @assay.start_index = ''
       @assay.bind_arguments_to_r
       expect(R.pull('start.index')).to eq 1
     end
 
     it "binds remove points correctly" do
-      @assay.remove_points = '1,2,3'
+      @assay.remove_points = "1,   \n 2 , \r 3,  \n  4,   5,"
       @assay.bind_arguments_to_r
-      expect(R.pull('points.to.remove')).to eq '1,2,3'
+      expect(R.pull('points.to.remove')).to eq [1,2,3,4,5]
     end
 
     it "binds growth cutoff correctly" do
@@ -825,7 +759,7 @@ EOF
     end
 
     it "binds remove.jumps correctly - 1" do
-      @assay.remove_jumps = true
+      @assay.remove_jumps = 1
       #work around limitation of rinruby
       #rinruby cannot pull boolean, need to change it to 0
       #instead
@@ -833,13 +767,15 @@ EOF
       R.eval <<EOF
         if (identical(remove.jumps,TRUE)){
           remove.jumps <- 1
+        }else{
+          remove.jumps <- 0
         }
 EOF
       expect(R.pull('remove.jumps')).to eq 1
     end
     
     it "binds remove.jumps correctly - 2" do
-      @assay.remove_jumps = false
+      @assay.remove_jumps = 0
       #work around limitation of rinruby
       #rinruby cannot pull boolean, need to change it to 0
       #instead
@@ -847,13 +783,15 @@ EOF
       R.eval <<EOF
         if (identical(remove.jumps,FALSE)){
           remove.jumps <- 0
+        }else{
+          remove.jumps <- 1
         }
 EOF
       expect(R.pull('remove.jumps')).to eq 0
     end
 
-    it "binds models correctly - sigmund && not loess" do
-      @assay.model = -1.to_s
+    it "binds models correctly - sigmund && no loess input" do
+      @assay.model = '-1'
       @assay.loess_input = ""
       @assay.bind_arguments_to_r
       #workaround
@@ -874,9 +812,9 @@ EOF
       expect(R.pull('use.linear.param')).to eq 0
     end
     
-    it "binds models correctly - sigmund && loess" do
+    it "binds models correctly - sigmund && loess input" do
       @assay.model = '-1'
-      @assay.loess_input = 0.2
+      @assay.loess_input = '0.2'
       @assay.bind_arguments_to_r
       #workaround
       R.eval <<EOF
@@ -942,13 +880,14 @@ EOF
         [:totalRange, :totg_min, :totg_max], 
         [:totalODRange, :totg_OD_min, :totg_OD_max], 
         [:lagRange, :lagT_min, :lagT_max]]
+      
       for r_range, ruby_min, ruby_max in symbols
-        @assay.send("#{ruby_min}=",0)
-        @assay.send("#{ruby_max}=",1)
+        @assay.send("#{ruby_min}=","0")
+        @assay.send("#{ruby_max}=","1")
       end
-
+      
       @assay.bind_arguments_to_r
-     
+      
       for r_range, ruby_min, ruby_max in symbols
         expect(R.pull("#{r_range}[1]")).to eq 0
         expect(R.pull("#{r_range}[2]")).to eq 1
@@ -960,10 +899,12 @@ EOF
         [:totalRange, :totg_min, :totg_max], 
         [:totalODRange, :totg_OD_min, :totg_OD_max], 
         [:lagRange, :lagT_min, :lagT_max]]
+      
       for r_range, ruby_min, ruby_max in symbols
         @assay.send("#{ruby_min}=",0)
         @assay.send("#{ruby_max}=","")
       end 
+     
       @assay.bind_arguments_to_r
       
       for r_range, ruby_min, ruby_max in symbols
@@ -980,8 +921,8 @@ EOF
     end
 
     it "binds auc.start and auc.end correctly - 1" do
-      @assay.area_start_hour = 1
-      @assay.area_end_hour = 2
+      @assay.area_start_hour = '1'
+      @assay.area_end_hour = '2'
       @assay.bind_arguments_to_r
       expect(R.pull("auc.start")).to eq 1
       expect(R.pull("auc.end")).to eq 2
