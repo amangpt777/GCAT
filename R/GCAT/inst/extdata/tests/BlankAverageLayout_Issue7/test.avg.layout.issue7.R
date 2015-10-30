@@ -2,9 +2,12 @@
 #  GCAT normalize.ODs option to subtract an average of control wells at each time point for single plate
 
 #  Initializing Variables
+
+context("Blank Average Layout Testing")
+
 INPUT.FILE = system.file("extdata/default_examples","single_YPDAFEXglucoseTests_2-25-10.csv",package="GCAT")
 INPUT.LAYOUT = system.file("extdata/default_examples","single_YPDAFEXglucoseTests_2-25-10_Layout.csv",package="GCAT")
-OUTPUT.DIR = paste(getwd(),"GCAT_test_out_avg_layout_issue7",sep="/")
+#OUTPUT.DIR = paste(getwd(),"GCAT_test_out_avg_layout_issue7",sep="/")
 start.index = 1
 time.input = 1/3600
 normalize.method = "average.layout"
@@ -12,7 +15,7 @@ blank.value = NULL
 add.constant = 0
 
 library(GCAT)
-context("Blank Average Layout Testing")
+
 
 plate.layout = read.csv(INPUT.LAYOUT,header=T,stringsAsFactors=F)
 
@@ -47,3 +50,6 @@ test_that("output well array has norm as a list", {
 test_that("output average of 38th timestamp of well A1", {
   expect_equal(well.array[[1,1,1]]@norm[38], 0.08868409)
 })
+
+
+

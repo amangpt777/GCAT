@@ -190,7 +190,7 @@ transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.inde
 
   # Take the natural log of the rest of the OD values (after subtracting the normalization value)
   if(normalize.method == "average.layout")
-    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm[which[OD > input.well@norm]])
+    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm[which(OD > input.well@norm)])
 	else
 	  log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
 	# Add a column to the "screen.data" slot of the well
