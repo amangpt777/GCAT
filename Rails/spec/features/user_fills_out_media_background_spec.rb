@@ -13,6 +13,9 @@ feature 'User fills out media background' do
     choose('assay_blank_value_zero')
     expect(page).not_to have_selector '#assay_blank_value_input'
     
+    choose('assay_blank_value_average')
+    expect(page).not_to have_selector '#assay_blank_value_input'
+    
     choose('assay_blank_value_user')
     expect(page).to have_selector '#assay_blank_value_input'
   end
