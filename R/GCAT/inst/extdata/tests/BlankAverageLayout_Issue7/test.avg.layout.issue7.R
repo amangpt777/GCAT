@@ -20,17 +20,17 @@ library(GCAT)
 plate.layout = read.csv(INPUT.LAYOUT,header=T,stringsAsFactors=F)
 
 #  Load data and initializing well.array to test our normalize.ODs
-well.array = gcat.load.data(file.name = INPUT.FILE, input.data = NULL, plate.layout = plate.layout,
+well.array = GCAT:::gcat.load.data(file.name = INPUT.FILE, input.data = NULL, plate.layout = plate.layout,
                             plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
                             multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
                             layout.sheet.headers = c("Strain", "Media Definition"),
                          blank.value = blank.value, start.index = start.index,
                          silent = T,  single.plate = T, load.type = csv)
 
-well.array = aapply(well.array, gcat.start.times, start.index = start.index, time.input = time.input)
-well.array = aapply(well.array, remove.points, points = 0)
+well.array = GCAT:::aapply(well.array, GCAT:::gcat.start.times, start.index = start.index, time.input = time.input)
+well.array = GCAT:::aapply(well.array, GCAT:::remove.points, points = 0)
 
-well.array = normalize.ODs(well.array, normalize.method = normalize.method, 
+well.array = GCAT:::normalize.ODs(well.array, normalize.method = normalize.method, 
                                start.index = start.index, blank.value = blank.value, add.constant = add.constant)
 
 #  Test output well.array for any issues
