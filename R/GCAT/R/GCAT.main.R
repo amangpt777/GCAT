@@ -579,7 +579,8 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
   
 	graphic.files = try(pdf.by.plate(fitted.well.array, out.prefix=out.prefix, upload.timestamp = upload.timestamp, 
     unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, lagRange = lagRange, specRange = specRange, totalRange = totalRange,
-    totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow),silent=silent)
+    totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow, auc.start = auc.start, 
+    auc.end = auc.end),silent=silent)
   
   if (class(graphic.files) == "try-error")
 		stop("Error in <pdf.by.plate>: ", graphic.files)

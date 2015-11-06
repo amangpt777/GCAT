@@ -8,7 +8,7 @@
 \S4method{plot}{well,missing}(x, y, constant.added = 1, xlim = NULL,
   ylim = NULL, well.number = NULL, scale = 1, number.points = T,
   draw.symbols = F, show.text = T, show.calc = T, draw.guess = NULL,
-  ...)
+  auc.start = NULL, auc.end = NULL, ...)
 }
 \arguments{
 \item{x}{object of class well}

@@ -129,7 +129,7 @@ plot_model = function(input.well, col = 1, scale = 1, lty = 1, time = NULL, unlo
 ########################################################################
 #   Put various parameters and info in text form on the graphs         #
 #			
-draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0,...){
+draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0, auc.start = NULL, auc.end = NULL, ...){
 
 	#input.data = data.from(input.well, remove = F, remove.tanking = F)
 	#fit = input.well@fit.par
@@ -173,7 +173,9 @@ draw.text = function(input.well, scale = 0.5, xlim = 0, ylim = 0,...){
 		#else
 		#	col1.5 = "red"
     col1.5 = "forestgreen"
-		text1.5 = paste("R squared:", round(model.good.fit(input.well),3))
+		text1.5 = paste("R squared:", round(model.good.fit(input.well),3), 
+		                "; AUC:", auc(input.well, start = auc.start, end = auc.end), 
+		                "; AUC.OD:", auc.OD(input.well, start = auc.start, end = auc.end))
 		}
 	else
 	 col1.5 = text1.5 = NULL
@@ -485,7 +487,7 @@ plate.overview = function(fitted.well.array, scale = 1, plate.ncol = 12, plate.n
 view.fit = function(fitted.data, indices = 1:length(fitted.data), 
       unlog = F, constant.added, xlim = NULL, ylim = NULL, display.legend = T, 
 		  show.text = T, show.calc = T, draw.guess = NULL, draw.symbols = F, number.points = T, 
-			user.advance = T, show.residuals = F, scale = 1,...){
+			user.advance = T, show.residuals = F, scale = 1, auc.start = NULL, auc.end = NULL, ...){
 
   if(!is.array(fitted.data))
     fitted.data = list(fitted.data)
@@ -530,7 +532,8 @@ view.fit = function(fitted.data, indices = 1:length(fitted.data),
       # plot the well
       fitted.well = fitted.data[[well.number]]
       plot(x=fitted.well, constant.added = constant.added, xlim = xlim, ylim = ylim,
-           unlog = unlog, well.number = well.number, scale = scale, number.points = T, draw.symbols = F, show.text = T, show.calc = T, draw.guess = NULL, ...)
+           unlog = unlog, well.number = well.number, scale = scale, number.points = T, draw.symbols = F, show.text = T, 
+           show.calc = T, draw.guess = NULL, auc.start = auc.start, auc.end = auc.end, ...)
       
       if(user.advance)
         cat("\n[", well.number, "] ", plate.name(fitted.well), " ", well.name(fitted.well), ".", sep = "")
@@ -616,7 +619,8 @@ well.fit.legend = function(xlim, ylim, scale = 1, constant.added){
 #  Generate pdf files
 pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL, 
   out.dir = getwd(), unlog = F, constant.added, silent = T, overview.jpgs = T, plate.ncol = 12, plate.nrow = 8,
-  lagRange = NA, specRange = NA, totalRange = NA, totalODRange = NA, ...){
+  lagRange = NA, specRange = NA, totalRange = NA, totalODRange = NA, auc.start = NULL, 
+  auc.end = NULL, ...){
  
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
@@ -678,7 +682,8 @@ pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL,
     pdf(pdf.name, title = paste("R Graphics output for plate", plate.ID))
     
     # Call <view.fit> to draw each well on the plate to the pdf. 
-    view.fit.out = try(view.fit(fitted.data, indices = plate.indices, unlog=unlog, constant.added=constant.added, user.advance=F,...),silent=T) 
+    view.fit.out = try(view.fit(fitted.data, indices = plate.indices, unlog=unlog, constant.added=constant.added, 
+                                user.advance=F, auc.start = auc.start, auc.end = auc.end, ...),silent=T) 
    
     if(class(view.fit.out) == "try-error")
       stop("Error in <view.fit>: ", view.fit.out)
