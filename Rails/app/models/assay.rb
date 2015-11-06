@@ -269,7 +269,6 @@ class Assay
       file_row = ""
       File.open(@input_file_path) {|f| file_row = f.readline.split(",").first}
       unless first_rows.include?(file_row)
-      oassay.generate_directory_and_move_files
         raise GCATError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
       end
     rescue
