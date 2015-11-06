@@ -1,9 +1,0 @@
-require "rails_helper"
-require "spec_helper"
-require_relative "../app/helpers/table_builder"
-
-describe TableBuilder do
-  it "should format correctly" do
-    l_ar = []
-  end
-end
