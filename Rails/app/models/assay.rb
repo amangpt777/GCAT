@@ -25,11 +25,11 @@ include FileUtils
 
 # single-plate timestamp
 SECONDS = "1/3600".to_r.to_f
-MAX_FILE_SIZE = 10000000.0
+MAX_FILE_SIZE_MB = 10
 
-class ValidationError < ArgumentError
+class GCATError < ArgumentError
   attr_accessor :data
-  def initialize(message=nil, data=nil)
+  def initialize(data=nil, message=nil)
     super(message)
     @data = data
   end
@@ -42,6 +42,9 @@ class Assay
   extend ActiveModel::Naming
   
   def initialize(attributes = {})
+    if attributes.nil?
+      return
+    end
     attributes.each do |name, value|
       send("#{name}=", value)
     end
@@ -79,6 +82,26 @@ class Assay
   # Change the regex to %r{\.(csv|xlsx)$}i to accept both csv and xlsx files
   validates_format_of :filename, :with => %r{\.(csv)$}i, :message => "- You can only upload csv files.", :unless => lambda { self.input_file == nil }
   
+  validate :validate_file_size, :unless => "self.input_file.nil?"
+
+  #simple 'validate_size_of' won't work for both case
+  #it will only work for our tests and will fail in real forms
+  #this can work is both cases
+  def validate_file_size
+    if self.input_file.respond_to?(:tempfile)
+      self.errors[:input_file] << "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE_MB} MB" unless self.input_file.tempfile.size < MAX_FILE_SIZE_MB.megabytes 
+    else 
+      self.errors[:input_file] << "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE_MB} MB" unless self.input_file.size < MAX_FILE_SIZE_MB.megabytes 
+    end
+    unless self.layout_file.nil?
+      if self.layout_file.respond_to?(:tempfile)
+        self.errors[:layout_file] << "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE_MB} MB" unless self.layout_file.tempfile.size < MAX_FILE_SIZE_MB.megabytes 
+      else 
+        self.errors[:layout_file] << "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE_MB} MB" unless self.layout_file.size < MAX_FILE_SIZE_MB.megabytes 
+      end
+    end
+  end
+
   def filename
       self.input_file.original_filename unless self.input_file.nil?
   end
@@ -92,16 +115,17 @@ class Assay
   validates_presence_of :transformation_input, :if => :user_input_r_value?, :message => '- Please Enter Your Delta Value.'
   validates_numericality_of :transformation_input, :if => :user_input_r_value? , :greater_than_or_equal_to => 0 , :message => '- Invalid value for Delta. Please Enter a positive real number.'
   def user_input_r_value?
-    transformation == "-1"
+    transformation == "user"
   end
   
   # (3) Validation of OD blank value
   # if user input is chosen,, the user should enter a valid OD blank value(A Real Number)
   #validates_inclusion_of :blank_value, :in => %w( default user  ), :message => '- Invalid blank value. Please choose one of options'
+  validates :blank_value, inclusion:{in: ['default','zero','average','user'], message: "- Invalid Blank Value Choice"}
   validates_presence_of :blank_value_input,  :if => "blank_value==\"user\"", :message => '- Please Enter Your OD Blank Value.'
   validates_numericality_of :blank_value_input,:if => "blank_value==\"user\"",  :message => '- Invalid OD blank value. Please Enter A Real Number.'
   
-  # (4) Validation of start_index
+  # (4) Validation of start_index, previously (7) innuculation point
   # if user does not enter anything, the system uses the default value start_index = 2
   validates_numericality_of :start_index, :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number', :allow_blank => true
   
@@ -117,9 +141,6 @@ class Assay
   #v1 not including custom plate dimensions
   #validates :plate_dimensions_column, :numericality => { :only_integer => true, :greater_than => 0}
   #validates :plate_dimensions_row, :numericality => { :only_integer => true, :greater_than => 0 }
-  
-  # (7) validate inoculation timepoint
-  validates_numericality_of :start_index, :only_integer => true, :greater_than => 0, :message => '- Invalid value for start index. Please Enter A Positive Integer Number'
   
   # (8) validate heatmap ranges
   HEATMAP_SYMBOLS = [:totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :specg_min, :specg_max, :lagT_min, :lagT_max]
@@ -148,6 +169,13 @@ class Assay
     end
   end
 
+  #validation of model
+  validates_presence_of :model
+  validates :model, inclusion:{in: ['sigmoid','sigmoid-linear','loess'], message:"Invalid model"}
+  
+  #validation of plate type
+  validates :plate_type, inclusion:{in: ['multiple','single'], message:"Invalid plate type"}
+
   def pad_date(unit)
     unit.to_i < 10 ? "0" + unit.to_s : unit.to_s
   end
@@ -157,6 +185,7 @@ class Assay
     #wanted the date to be easier to extract NWD 2/26/14
     today = Time.now
     uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
+	# + rand(36**8).to_s(36) if we want it more randominzed
   end
 
  
@@ -170,21 +199,13 @@ class Assay
   #Raise Argument Error is file too large
   def generate_directory_and_move_files
     
-    unless self.input_file.size < MAX_FILE_SIZE
-      raise ValidationError.new({:error_message=> "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@input_file_path}), 'Input file too big' 
-    end
-    
-    unless self.layout_file.nil? or self.layout_file.size < MAX_FILE_SIZE
-      raise ValidationError.new({:error_message => "Error: File too big. Maximum file size allowed is #{MAX_FILE_SIZE}/(10**6) MB", :path =>@layout_file_path}), 'Layout file too big'  
-    end
-    
     generate_directory_names unless not @uploaded_files_directory.nil?
     
     # make directory and set permission 
     FileUtils.mkdir_p @uploaded_files_directory
-    FileUtils.chmod 0777, @uploaded_files_directory
+    FileUtils.chmod 0755, @uploaded_files_directory
     FileUtils.mkdir_p @generated_files_directory
-    FileUtils.chmod 0777, @generated_files_directory
+    FileUtils.chmod 0755, @generated_files_directory
    
     # upload input data file from where it locates into web server via uri/url
     fromfile = self.input_file
@@ -216,14 +237,17 @@ class Assay
     # That is for Single Plate case. Need modification for multiple plate case
     #Use one set.constants call only!
 
-    if self.plate_type == 's'
+    #it is possible to post data without the validation from
+    #the front-end. So assign it a default value so that we
+    #don't have to deal with nil anymore
+    self.plate_type ||= 'single'
+    if self.plate_type == 'single'
       R.assign 'single.plate', 'T'
       timestamp_format = SECONDS #self.timestamp_format.to_r.to_f
-    elsif self.plate_type == 'm'
+    else
       R.assign 'single.plate', 'F'
       timestamp_format = self.timestamp_format.to_s
-    end
-    
+    end    
     #################for warringer data###########################################
     # used for custom dims 
     #R.assign 'plate.nrow', 10
@@ -245,7 +269,8 @@ class Assay
       file_row = ""
       File.open(@input_file_path) {|f| file_row = f.readline.split(",").first}
       unless first_rows.include?(file_row)
-        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
+      oassay.generate_directory_and_move_files
+        raise GCATError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
       end
     rescue
       #bad encoding try to validate in R
@@ -253,21 +278,30 @@ class Assay
       R.eval("test.out <- read.csv(file)")
       R.eval("first_entry <- names(test.out)[1]")     
       
+      begin
+        #Rinruby will raise exception if it it nil
+        R.first_entry
+      rescue
+        raise GCATError.new({:error_message => "Error: Unknown file format."}),'Unknown file format' 
+      end
+      
       unless first_rows.include?(R.first_entry)
-        raise ValidationError.new({:error_message => "Error: Unknown file format.", :path => @input_file_path}),'Unknown file format' 
+        raise GCATError.new({:error_message => "Error: Unknown file format."}),'Unknown file format' 
       end
     end
 
     # (2) transformation. N value (A Real Number)
     # -1 means use user entered value
     # otherwise paese self.transformation directly
-    if self.transformation == '-1'
+    self.transformation ||= '0'
+    if self.transformation == 'user'
       R.assign "add.constant", self.transformation_input.to_f
     else
       R.assign "add.constant", self.transformation.to_f
     end
 
     # (3) blank value (A Real Number)
+    self.blank_value ||= 'zero'
     if (self.blank_value == 'default')
       R.eval "blank.value <- NULL"
     elsif (self.blank_value == 'zero')
@@ -279,9 +313,10 @@ class Assay
     end
 
     # (4) start index (A Positive Integer Number).  Cannot be 1 if blank value is default.
+    self.start_index ||= '1'
     if (self.blank_value == 'default')
       if (self.start_index == '' or self.start_index.to_i == 1)
-        raise ValidationError.new({:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank", :path => @input_file_path}),'inoculation point error'
+        raise GCATError.new({:error_message => "Error: inoculation timepoint cannot be 1 if using first OD reading as blank"}),'inoculation point error'
       end
     end
 
@@ -293,15 +328,16 @@ class Assay
     
     # (5) remove points [a space-separated list of points. Example: 2,3,4,5 (Positive Integer Number)]
     ##collect! calls .to_i on each string in the array and replaces the string with the result of the conversion.
-    
+    self.remove_points ||= ''
     R.assign "points.to.remove", self.remove_points.gsub(/\s+/,"").split(',').collect! {|n| n.to_i}
     
+    self.growth_threshold ||= ''
     R.assign  "growth.cutoff", self.growth_threshold
     
-     if (self.layout_file_path ==nil)
+    if (self.layout_file_path == nil)
       R.eval "layout.file <- NULL"
     else
-      R.assign "layout.file", layout_file_path
+      R.assign "layout.file", self.layout_file_path.to_s
     end
     
     #debugger
@@ -309,6 +345,7 @@ class Assay
     #R.assign "plate.ncol", self.plate_dimensions_column
     
     ## (6) remove jumps (true/false)
+    self.remove_jumps ||= 0
     if (self.remove_jumps == 1)
       R.eval "remove.jumps <- T"
     else
@@ -318,7 +355,8 @@ class Assay
     
     # Using growth curve model. By default if this if block
     # is not taken then the Sigmund model is used.
-    if (self.model == '-1')
+    self.model ||= 'sigmoid'
+    if (self.model == 'loess')
       R.assign 'use.loess', 'T'
       # Soothing parameter for growth curve model. Applied for Loess model only.
       if (self.loess_input != "")
@@ -327,12 +365,12 @@ class Assay
         R.assign 'smooth.param', 0.1
       end
       R.assign 'use.linear.param', 'F'
-    elsif (self.model == '0')
+    elsif (self.model == 'sigmoid-linear')
       # Currently not in use. May return someday... NWD 9/1
       #R.assign 'use.linear.param', 'T'
       R.assign 'use.linear.param', 'F' #must be false
       R.assign 'use.loess', 'F'
-    else
+    elsif (self.model == 'sigmoid')
       # Initialize values for growth curve models.
       R.assign 'use.loess', 'F'
       R.assign 'use.linear.param', 'F'
@@ -340,6 +378,8 @@ class Assay
     end
 
     ## Heatmap values
+    self.specg_max ||= ''
+    self.specg_min ||= ''
     if (self.specg_max != '' && self.specg_min != '')
       R.assign 'specMin', self.specg_min.to_f
       R.assign 'specMax', self.specg_max.to_f
@@ -348,6 +388,8 @@ class Assay
       R.eval 'specRange <- NA'
     end
 
+    self.totg_max ||= ''
+    self.totg_min ||= ''
     if (self.totg_min != '' && self.totg_max != '')
       R.assign 'totMin', self.totg_min.to_f
       R.assign 'totMax', self.totg_max.to_f
@@ -355,6 +397,9 @@ class Assay
     else
       R.eval 'totalRange <- NA'
     end
+    
+    self.totg_OD_max ||= ''
+    self.totg_OD_min ||= ''
     if (self.totg_OD_min != '' && self.totg_OD_max != '')
       R.assign 'totODMin', self.totg_OD_min.to_f
       R.assign 'totODMax', self.totg_OD_max.to_f
@@ -362,6 +407,9 @@ class Assay
     else
       R.eval 'totalODRange <- NA'
     end
+    
+    self.lagT_max ||= ''
+    self.lagT_min ||= ''
     if (self.lagT_min != '' && self.lagT_max != '')
       R.assign 'lagT_min', self.lagT_min.to_f
       R.assign 'lagT_max', self.lagT_max.to_f
@@ -372,12 +420,14 @@ class Assay
 
 
     # Area under curve
-    if self.area_start_hour != nil
+    self.area_start_hour ||= ''
+    self.area_end_hour ||= ''
+    if self.area_start_hour != ""
       R.assign 'auc.start', self.area_start_hour.to_f
     else
       R.eval 'auc.start <- NULL'
     end
-    if self.area_end_hour != nil
+    if self.area_end_hour != ""
       R.assign 'auc.end', self.area_end_hour.to_f
     else
       R.eval 'auc.end <- NULL'
@@ -394,7 +444,7 @@ class Assay
       @overviewFiles = []
       @pdfFiles = []
       @txtFiles = []
-      @consoleOut = @generated_files_directory.join("console.out").to_s
+      @consoleOut = @generated_files_directory.join("console_out.txt").to_s
 
       for f in files
         if f.include? "_overview.jpg"
@@ -433,19 +483,6 @@ class Assay
   end
     
   def r_calculation 
-    original_stdout = $stdout
-    begin
-      generate_directory_and_move_files
-      
-      # Try to override stdout to redirect the console output.
-      $stdout = File.new(@generated_files_directory.join('console.out'), 'w')
-      $stdout.sync = true 
-      
-      bind_arguments_to_r
-    rescue ValidationError => err
-      return err.data
-    end
-    
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
     R.eval 'R_file_return_value <- gcat.analysis.main(
                         file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
@@ -476,21 +513,21 @@ class Assay
         print split_s
         split_s.each {|x| error_message = x}
       end
-      return {:error_message => error_message, :path => @input_file_path, :console_msg => console_message}
+      raise GCATError.new({:error_message => error_message, :console_msg => console_message}), 'Error during calculation'
     end
     
     # process generated files
-    raise "no files generated" if files.empty?
+    raise GCATError.new(), "No files generated" if files.empty?
    
     categorize_generated_files(files)
    
-    raise "no overview files generated" if @overviewFiles.empty?
+    raise GCATError.new(), "No overview files generated" if @overviewFiles.empty?
     
     zip_files files
-
+      
     #return results unless error
     #zip files, jpg of overviews, txt file for datagrid, pdf file
-    {:status => status, :overviewFiles => @overviewFiles, :zipfile => @zipfile, :txtFile => @txtFiles, :pdfFile => @pdfFiles, :inputfile => @input_file_path, :layout_file => @layout_file_path, :model => @model, :consoleout => @consoleOut}
+    return {:status => status, :overviewFiles => @overviewFiles, :zipfile => @zipfile, :txtFile => @txtFiles, :pdfFile => @pdfFiles, :inputfile => @input_file_path, :layout_file => @layout_file_path, :model => @model, :consoleout => @consoleOut}
   end # end of r_calculation method
   
 end # class Assay

@@ -1,0 +1,61 @@
+Welcome to the Rails side of GCAT!
+
+This article is designed to be a short walk through to get you
+familiarized with the sturcture of GCAT, so that you can more
+easily maintain it, or add new features to it.
+
+Structure:
+  The structure of GCAT is really simple.
+  There are three different views:
+    The Form:
+      This is where you upload files, input values. When your input is not
+      valid, or missing required fields, this page will be re-rendered,
+      showing the invalid fileds.
+    The Error Page:
+      Not all the errors can be catch by the validation process. Sometimes
+      the file it self can be corrupted (see cheat_file.txt in fixtures).
+      In this case, it is the R side that catches the error. And we present
+      the error, and console message here to the user.
+    The Success Page:
+      If everything is successful, then the overview files and the form will
+      be displayed on this page.
+
+Testing:
+  There are many tests available.
+  For UI testings:
+
+    bundle exec rspec spec/features/
+    
+    These tests mainly tests if the javascripts are working correctly. For example, 
+    if the website is showing a field when it is not supposed to, or vise versa.
+    This will execute every tests that ends with _spec inside that directory.
+    In some sense it can also be counted as integration tests, since it
+    also requires the cooperation of validation system.
+
+  For Unit testing:
+    
+    bundle exec rspec spec/unit
+
+    These tests are the unit tests for the controller and model.
+    More specifically, it includes (but not limited to) tests the validation process,
+    how the values are bind to the R side, and how the overall systems handles error.
+    
+    These tests may take longer to run (90 seconds or so), since RinRuby connection is slow.
+
+  For Integration testing:
+    
+    bundle exec rspec spec/integration
+
+    These tests are supposed to be testing the overall functionalities of GCAT. 
+    It simulates the process of user filling in all the fields and clicks
+    submit, then it checks to see whether the expected things shows up. This
+    is essentially a more integrated version of UI testing.
+
+  All the tests can also be run as:
+    
+    bundle exec spring rspec *
+    
+    Spring is a gem that keeps a rails server running in the background, so
+    theoretically it should take less time to load the modules.
+    However the effect is not significant in our case. Maybe it is a 
+    configuration thing.

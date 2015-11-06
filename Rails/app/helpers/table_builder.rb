@@ -36,6 +36,7 @@ module TableBuilder
       	output << format_row(l_ar, pdf_path, offsets)
     	end
 		end
+    file.close
 		return output
 	end
 
@@ -52,6 +53,7 @@ module TableBuilder
 			if(entry.to_f.zero?)
 				entry.gsub "\"", ""
 			elsif(view_context.number_with_precision(entry.to_f, precision: 2, significant: true).size > 15)
+				#if it is too big, use scientific notation
 				"%E" % view_context.number_with_precision(entry.to_f, precision: 2, significant: true)
 			else
 				view_context.number_with_precision(entry.to_f, precision: 2, significant: true)

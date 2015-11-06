@@ -29,6 +29,8 @@ feature 'User fills out auc' do #, js: true do
   end
 
 =begin
+#time consuming
+  
   scenario 'with valid start and no end' do
     visit new_assay_path
     fill_in_valid_defaults

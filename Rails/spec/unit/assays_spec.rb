@@ -1,6 +1,6 @@
 require "rails_helper"
 require "spec_helper"
-require_relative "../app/models/assay"
+require "assay"
 
 describe Assay  do
   before(:each) do
@@ -26,13 +26,64 @@ context "Validation" do
     end
 
     it "should accept .csv file" do
-      f = fixture_file_upload('spec/fixtures/files/samplefile.csv','test/csv')
+      f = fixture_file_upload('spec/fixtures/files/samplefile.csv','text/csv')
       @assay.input_file = f
       expect(@assay.valid?).to be false
       expect(@assay.errors[:filename].first).to be nil
     end
+    
+    it "should not allow input file greater than 10 mb" do
+      @assay.input_file = fixture_file_upload('spec/fixtures/files/large_file.csv','text/csv')
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:input_file]).to include 'Error: File too big. Maximum file size allowed is 10 MB'
+    end
+    
+    it "should not allow layout file greater than 10 mb" do
+      @assay.input_file = fixture_file_upload('spec/fixtures/files/samplefile.csv','text/csv')
+      @assay.layout_file = fixture_file_upload('spec/fixtures/files/large_file.csv','text/csv')
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:layout_file]).to include 'Error: File too big. Maximum file size allowed is 10 MB'
+    end
   end
 #end of context Input File
+#########################################################
+
+#########################################################
+#begin of plate type
+  context "plate type" do
+    BAD_PLATE_TYPE = 'Invalid plate type'
+    it "should accept single" do
+      @assay.plate_type = 'single'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:plate_type]).not_to include BAD_PLATE_TYPE
+    end
+
+    it "should accept multiple" do
+      @assay.plate_type = 'multiple'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:plate_type]).not_to include BAD_PLATE_TYPE
+    end
+
+    it "should not accept invalid plate type" do
+      @assay.plate_type = 'something'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:plate_type]).to include BAD_PLATE_TYPE
+    end
+    
+    it "should not accept empty plate type" do
+      @assay.plate_type = ''
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:plate_type]).to include BAD_PLATE_TYPE
+    end
+    
+    it "should not accept nil plate type" do
+      @assay.plate_type = nil
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:plate_type]).to include BAD_PLATE_TYPE
+    end
+
+  end
+#end of plate type
 #########################################################
 
 #########################################################
@@ -43,7 +94,7 @@ context "Validation" do
   context "OD Transform" do
     context "User choose log(x+delta)" do
       before(:each) do
-        @assay.transformation = "-1"
+        @assay.transformation = "user"
       end
 
       it "should warn if delta is not provided" do
@@ -260,6 +311,44 @@ context "Validation" do
   end
 #end of start index
 #########################################################
+
+#########################################################
+#start of model
+  context "model" do
+    BAD_MODEL = 'Invalid model'
+    it "should accept sigmoid" do
+      @assay.model = 'sigmoid'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:model]).not_to include BAD_MODEL
+    end
+    
+    it "should accept sigmoid-linear" do
+      @assay.model = 'sigmoid-linear'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:model]).not_to include BAD_MODEL
+    end
+    
+    it "should accept loess" do
+      @assay.model = 'loess'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:model]).not_to include BAD_MODEL
+    end
+    
+    it "should not accept invalid model" do
+      @assay.model = 'invalid'
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:model]).to include BAD_MODEL
+    end
+    
+    it "should not accept empty model" do
+      @assay.model = ''
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:model]).to include BAD_MODEL
+    end
+  end
+#end of model
+#########################################################
+
 
 #########################################################
 #start of remove points
@@ -549,25 +638,16 @@ context "R_Calculation" do
       expect(File.exist?(@assay.generated_files_directory)).to be true
     end
 
-    it "should not allow input file greater than 10**6 kb" do
-      uniqueid = "testing"
-      @assay.input_file = fixture_file_upload('spec/fixtures/files/large_file.csv','test/csv')
-      @assay.layout_file = fixture_file_upload('spec/fixtures/files/single_plate_layout.csv','test/csv')
-      @assay.uploaded_files_directory = Rails.root.join("tmp/testing/uploadedfiles", uniqueid)
-      @assay.generated_files_directory = Rails.root.join("tmp/testing/generatedfiles", uniqueid)
-      expect{@assay.generate_directory_and_move_files}.to raise_error(ValidationError)
-      expect(File.exist?(@assay.uploaded_files_directory)).to be false
-      expect(File.exist?(@assay.generated_files_directory)).to be false 
-    end
   end
 
   context "argument binding" do
-    before(:each) do 
+    before(:each) do
+      #skip
       #R = RinRuby.new(false)
       R.echo(enable=false, stderr=nil)
       @assay.blank_value = "zero"
       @assay.generated_files_directory = "random"
-      @assay.plate_type = 's'
+      @assay.plate_type = 'single'
       @assay.timestamp_format = "%Y-%m-%d %I:%M:%S %p"
       @assay.input_file_path = 'spec/fixtures/files/single_plate_input.csv'
       @assay.layout_file_path = nil
@@ -577,7 +657,7 @@ context "R_Calculation" do
       @assay.remove_points = ""
       @assay.growth_threshold = 0
       @assay.remove_jumps = true
-      @assay.model = '-1'
+      @assay.model = 'sigmoid'
       @assay.loess_input = ""
       symbols = [[:specg_min, :specg_max], 
         [:totg_min, :totg_max], 
@@ -602,25 +682,25 @@ context "R_Calculation" do
     end
   
     it "binds single.plate correctly - 1" do
-      @assay.plate_type = 's'
+      @assay.plate_type = 'single'
       @assay.bind_arguments_to_r
       expect(R.pull('single.plate')).to eq "T" 
     end
   
     it "binds single.plate correctly - 2" do
-      @assay.plate_type = 'm'
+      @assay.plate_type = 'multiple'
       @assay.bind_arguments_to_r
       expect(R.pull('single.plate')).to eq "F" 
     end
-
+    
     it "binds time.input correctly - 1" do
-      @assay.plate_type = 's'
+      @assay.plate_type = 'single'
       @assay.bind_arguments_to_r
       expect(R.pull('time.input')).to eq SECONDS
     end
     
     it "binds time.input correctly - 2" do
-      @assay.plate_type = 'm'
+      @assay.plate_type = 'multiple'
       @assay.bind_arguments_to_r
       expect(R.pull('time.input')).to eq "%Y-%m-%d %I:%M:%S %p"
     end
@@ -637,7 +717,7 @@ context "R_Calculation" do
 
     it "tries to verify input data file" do
       @assay.input_file_path = 'spec/fixtures/files/bad_file.csv'
-      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
+      expect{@assay.bind_arguments_to_r}.to raise_error(GCATError)
     end
 
 =begin
@@ -653,17 +733,17 @@ context "R_Calculation" do
     end
 
     it "binds add.constant correctly" do
-      @assay.transformation = '-1'
+      @assay.transformation = 'user'
       @assay.transformation_input = '3.2'
       @assay.bind_arguments_to_r
       expect(R.pull('add.constant')).to eq 3.2
     end
     
     it "binds add.constant correctly - 2" do
-      @assay.transformation = '1'
+      @assay.transformation = '0.1'
       @assay.transformation_input = '3.2'
       @assay.bind_arguments_to_r
-      expect(R.pull('add.constant')).to eq 1
+      expect(R.pull('add.constant')).to eq 0.1
     end
 
     it "binds blank.value correctly - 1" do
@@ -703,13 +783,13 @@ EOF
     it "cannot allow start index to be 1 when blank value is default" do
       @assay.blank_value = 'default'
       @assay.start_index = ''
-      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
+      expect{@assay.bind_arguments_to_r}.to raise_error(GCATError)
     end
     
     it "cannot allow start index to be 1 when blank value is default - 2" do
       @assay.blank_value = 'default'
       @assay.start_index = '1'
-      expect{@assay.bind_arguments_to_r}.to raise_error(ValidationError)
+      expect{@assay.bind_arguments_to_r}.to raise_error(GCATError)
     end
 
     it "binds start index correctly" do
@@ -790,8 +870,8 @@ EOF
       expect(R.pull('remove.jumps')).to eq 0
     end
 
-    it "binds models correctly - sigmund && no loess input" do
-      @assay.model = '-1'
+    it "binds models correctly - loess input" do
+      @assay.model = 'loess'
       @assay.loess_input = ""
       @assay.bind_arguments_to_r
       #workaround
@@ -812,8 +892,8 @@ EOF
       expect(R.pull('use.linear.param')).to eq 0
     end
     
-    it "binds models correctly - sigmund && loess input" do
-      @assay.model = '-1'
+    it "binds models correctly - loess default" do
+      @assay.model = 'loess'
       @assay.loess_input = '0.2'
       @assay.bind_arguments_to_r
       #workaround
@@ -834,8 +914,9 @@ EOF
       expect(R.pull('use.linear.param')).to eq 0
     end
 
-    it "binds models correctly - model is 0" do
-      @assay.model = 0.to_s
+#currently unused
+    it "binds models correctly - model is sigmoid-linear" do
+      @assay.model = 'sigmoid-linear'
       @assay.bind_arguments_to_r
       #workaround
       R.eval <<EOF
@@ -854,8 +935,8 @@ EOF
       expect(R.pull('use.linear.param')).to eq 0
     end
     
-    it "binds models correctly - model is not -1 nor 0" do
-      @assay.model = '1'
+    it "binds models correctly - sigmoid" do
+      @assay.model = 'sigmoid'
       @assay.bind_arguments_to_r
       #workaround
       R.eval <<EOF
@@ -929,6 +1010,26 @@ EOF
     end
     
     it "binds auc.start and auc.end correctly - 2" do
+      @assay.area_start_hour = ""
+      @assay.area_end_hour = ""
+      @assay.bind_arguments_to_r
+      R.eval <<EOF
+          if (is.null(auc.start)){
+            auc.start <- 0
+          }else{
+            auc.start <- 1
+          }
+          if (is.null(auc.end)){
+            auc.end <- 0
+          }else{
+            auc.end <- 1
+          }
+EOF
+      expect(R.pull("auc.start")).to eq 0
+      expect(R.pull("auc.end")).to eq 0
+    end
+    
+    it "binds auc.start and auc.end correctly - 2" do
       @assay.area_start_hour = nil
       @assay.area_end_hour = nil
       @assay.bind_arguments_to_r
@@ -980,7 +1081,7 @@ context "Analyze R Generated Values" do
     expect(@assay.txtFiles).to include "/A/ t2 .txt"
     expect(@assay.overviewFiles).to include "/ o2 _overview.jpg"
     expect(@assay.pdfFiles).to include "/ p2 _plots.pdf"
-    expect(@assay.consoleOut).to eq @assay.generated_files_directory.join("console.out").to_s
+    expect(@assay.consoleOut).to eq @assay.generated_files_directory.join("console_out.txt").to_s
   end
   
   it "generates correct zip files - multiple" do

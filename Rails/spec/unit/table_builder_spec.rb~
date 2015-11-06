@@ -1,0 +1,18 @@
+require "rails_helper"
+require "spec_helper"
+require "assay"
+
+describe Assay  do
+  before(:each) do
+    @assay = Assay.new
+  end
+ 
+context "Minimum valid assay" do  
+  it "shoule be valid" do
+     #@assay.input_file = fixture_file_upload('spec/fixtures/files/cheat_file.csv','text/csv')
+     #@assay.blank_value = 'zero'
+     #@assay.start_index = '1'
+     expect(false).to be true
+  end
+end
+end

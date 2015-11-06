@@ -54,10 +54,10 @@ $(document).ready(function(){
 			console.error("Error: unknown selector in reset_optional_fields()");
 		}
 	}
-	reset_optional_fields($('#assay_plate_type_m'), $("#time"));
+	reset_optional_fields($('#assay_plate_type_multiple'), $("#time"));
 	reset_optional_fields($("input#assay_blank_value_user"), $("div.optional_input3"));
-	reset_optional_fields($("input#assay_transformation_-1"), $("div.optional_input2"));
-	reset_optional_fields($("input#assay_model_-1"), $("div.optional_input1"));
+	reset_optional_fields($("input#assay_transformation_user"), $("div.optional_input2"));
+	reset_optional_fields($("input#assay_model_loess"), $("div.optional_input1"));
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	$('#new_assay').submit(function() {
@@ -66,11 +66,11 @@ $(document).ready(function(){
 
 	$("input[name$='assay[plate_type]']").click(function(){
 	  var value = $(this).val();
-	  if(value=='s') {
+	  if(value=='single') {
 	    $("#time").hide();
       $("#assay_blank_value_average_div").show();
 	  }
-	  else if(value=='m') {
+	  else if(value=='multiple') {
 	    $("#time").show();
       $("#assay_blank_value_average_div").hide();
 	   }

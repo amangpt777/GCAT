@@ -17,9 +17,9 @@
   <div class="row">
     <div class="form-group col-md-4">
       <h3>Plate Type</h3>
-      <%= f.radio_button(:plate_type, 's', :checked => true) %>
+      <%= f.radio_button(:plate_type, 'single', :checked => true) %>
       <%= f.label(:plate_type_single, "Single-plate") %><br />
-      <%= f.radio_button(:plate_type, 'm', :checked => false) %>
+      <%= f.radio_button(:plate_type, 'multiple', :checked => false) %>
       <%= f.label(:plate_type_single, "Multiple-plate") %><br />
     </div>
     <div class="form-group col-md-4">
@@ -65,23 +65,23 @@
       </div>
       <div class="form-group col-md-4">
           <h3><span data-tooltip="GCAT transforms optical density (OD) to log(x+δ). x = OD – Media background. Specify a value for n or choose from the defaults. Note: 0 is not recommended unless all wells contain many repeated measurements for initial density that can be used to accurately estimate the baseline density. See the user manual for more details.">OD Transform</span></h3>
-          <%= f.radio_button(:transformation, 0, {:checked => true, :class => "user_enter2 user_enter2_no"}) %>
+          <%= f.radio_button(:transformation, "0", {:checked => true, :class => "user_enter2 user_enter2_no"}) %>
           <%= f.label(:transformation_zero, "log(x)") %><br />
-          <%= f.radio_button(:transformation, 0.1, {:class => "user_enter2 user_enter2_no"}) %>
+          <%= f.radio_button(:transformation, "0.1", {:class => "user_enter2 user_enter2_no"}) %>
           <%= f.label(:transformation_one, "log(x + 0.1)") %><br />
-          <%= f.radio_button(:transformation, -1, {:class => "user_enter2 user_enter2_yes"}) %>
-          <%= f.label(:transformation_any, "log(x + δ)") %> 
+          <%= f.radio_button(:transformation, "user", {:class => "user_enter2 user_enter2_yes"}) %>
+          <%= f.label(:transformation_user, "log(x + δ)") %> 
           <div class="field optional_input2" style="display:none">
               <%= f.text_field :transformation_input, :placeholder => 'Enter your δ value here'%>
           </div>
       </div>
       <div class="form-group col-md-4">
           <h3><span data-tooltip="Choose the preferred growth curve model selection available below.">Growth curve model</span></h3>
-          <%= f.radio_button(:model, 1, {:checked => true, :class => "user_enter1 user_enter1_no"})%>
+          <%= f.radio_button(:model, "sigmoid", {:checked => true, :class => "user_enter1 user_enter1_no"})%>
           <%= f.label(:model_one, "Sigmoid curve") %><br />
           <%#= f.radio_button(:model, 0, {:class => "user_enter1 user_enter1_no"}) %>
           <%#= f.label(:model_zero, "Sigmoid + linear") %>
-          <%= f.radio_button(:model, -1, {:class => "user_enter1 user_enter1_yes"}) %>
+          <%= f.radio_button(:model, "loess", {:class => "user_enter1 user_enter1_yes"}) %>
           <%= f.label(:model_any, "LOESS. The default smoothing value is 0.1.") %>
           <div class="field optional_input1" style="display:none">
               <%= f.text_field :loess_input, :placeholder => 'Enter the smoothing value here.'%>

@@ -35,7 +35,7 @@ module ApplicationHelper
         puts "Removing: " + dir #log deletions
   			%x[ rm -rf #{dir} ]
 	    end
-	  end
+	end
   end
 
   private
