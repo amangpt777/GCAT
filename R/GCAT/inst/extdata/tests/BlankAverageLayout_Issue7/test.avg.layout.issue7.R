@@ -10,23 +10,12 @@ INPUT.LAYOUT = system.file("extdata/default_examples","single_YPDAFEXglucoseTest
 start.index = 1
 normalize.method = "average.layout"
 blank.value = NULL
+
 add.constant = 0
 
 library(GCAT)
 
-
-#plate.layout = read.csv(INPUT.LAYOUT,header=T,stringsAsFactors=F)
-
 #  Load data and initializing well.array to test our normalize.ODs
-#well.array = GCAT:::gcat.load.data(file.name = INPUT.FILE, input.data = NULL, plate.layout = plate.layout,
- #                           plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
-  #                          multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
-   #                         layout.sheet.headers = c("Strain", "Media Definition"),
-    #                     blank.value = blank.value, start.index = start.index,
-     #                    silent = T,  single.plate = T, load.type = csv)
-
-#well.array = GCAT:::aapply(well.array, GCAT:::gcat.start.times, start.index = start.index, time.input = time.input)
-#well.array = GCAT:::aapply(well.array, GCAT:::remove.points, points = 0)
 load(system.file("extdata/tests/BlankAverageLayout_Issue7", "wellArray.RData", package="GCAT"))
 well.array = GCAT:::normalize.ODs(well.array, normalize.method = normalize.method, 
                                start.index = start.index, blank.value = blank.value, add.constant = add.constant)

@@ -193,6 +193,7 @@ transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.inde
     log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm[which(OD > input.well@norm)])
 	else
 	  log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
+  
 	# Add a column to the "screen.data" slot of the well
 	input.well@screen.data$log.OD = log.OD	
 	# Update the "use.log" slot of the well 
