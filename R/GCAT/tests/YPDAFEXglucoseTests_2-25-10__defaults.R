@@ -5,6 +5,9 @@ INPUT.DIR =  system.file("extdata/tests/YPDAFEXglucoseTests_2-25-10",package="GC
 OUTPUT.DIR = paste(INPUT.DIR,"temp",sep="/")
 INPUT.FILE = "YPDAFEXglucoseTests_2-25-10.csv"
 
+#  Clean up if output dir is not empty before running test
+unlink(OUTPUT.DIR, recursive=T)
+
 #  Run GCAT
 library(GCAT)
 setwd(INPUT.DIR)

@@ -131,7 +131,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
   
-  # Set normalize.method to default
+  #  Set normalize.method to default
   normalize.method = "default"
   
   #  Check blank value and start index
@@ -139,11 +139,12 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     exception("", "If inoculation time point is 1, the user must specify a blank value")
   }
   
+  #  Logic to switch normalize.method based on blank.value being passed
   if(!is.null(blank.value) && blank.value == "average.layout") {
     normalize.method = "average.layout"
   }
   
-  # With average.layout option a layout file should always be passed
+  #  With average.layout option a layout file should always be passed
   if ((normalize.method == "average.layout") && is.null(layout.file)) {
     exception("", "If normalize.method is 'average.layout' then a layout file should be specified")
   }

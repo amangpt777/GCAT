@@ -58,7 +58,7 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
       # Set the blank OD (minus the constant to be added) to the "norm" slot of each well.
     	well@norm = blank.value - add.constant
     	return(well)}, blank.value)
-    }
+  }
   else if (normalize.method == "average.blank"){ 
     # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
 		blank.ODs = unlist(aapply(well.array, function(well, blank.value){
@@ -70,7 +70,7 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = blank.averages[plate.name(well)] - add.constant
 			return(well)})
-		}
+	}
 	else if (normalize.method == "average.first"){
 	  # Find the mean difference between starting OD (timepoint specified by <start>) and blank OD (first timepoint) for each plate
     # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
@@ -124,11 +124,11 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = - add.constant
      			return(well)})
-		}
+	}
   if(is.null(blank.value) && !(normalize.method == "average.layout"))
     well.array = aapply(well.array, remove.points, 1)
   return(well.array)
-	}
+}
 
 ########################################################################
 ########################################################################
@@ -191,8 +191,8 @@ transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.inde
   # Take the natural log of the rest of the OD values (after subtracting the normalization value)
   if(normalize.method == "average.layout")
     log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm[which(OD > input.well@norm)])
-	else
-	  log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
+  else
+    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
   
 	# Add a column to the "screen.data" slot of the well
 	input.well@screen.data$log.OD = log.OD	

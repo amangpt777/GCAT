@@ -11,6 +11,9 @@ blank.value = "average.layout"
 INPUT.DIR =  system.file("extdata/tests/BlankAverageLayout_Issue7",package="GCAT")
 OUTPUT.DIR = paste(INPUT.DIR,"temp",sep="/")
 
+#  Clean up if output dir is not empty before running test
+unlink(OUTPUT.DIR, recursive=T)
+
 #  Run GCAT
 library(GCAT)
 setwd(INPUT.DIR)
