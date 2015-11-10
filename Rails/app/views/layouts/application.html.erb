@@ -15,6 +15,9 @@
       <div id='contents'>
         <%= yield %>
       </div>
+      <div class="actions" style="padding-left:20px;padding-right:20px;margin-top:30px; clear:both;">
+        <%= mail_to "gcat.help@glbrc.wisc.edu","Please Send Any Questions To The GLBRC Help Desk And Be Sure To Include 'GCAT' In Your Subject Title", :subject => "GCAT" %>
+      </div>
       <div id='footer' style='padding-left:20px;padding-right:20px'>
         Copyright &copy; 2012 The Board of Regents of the University of Wisconsin System
         </br>
