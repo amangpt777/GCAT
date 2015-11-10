@@ -51,7 +51,7 @@
           <%= f.radio_button(:blank_value, "user", {:checked => true, :class => "user_enter3 user_enter3_yes"}) %>
           <%= f.label(:blank_value_user, "User Input.") %>
           <div class="field optional_input3" style="display:none">
-            <%= f.text_field :blank_value_input, :placeholder => 'Enter your OD blank value here' %>
+            <%= f.number_field :blank_value_input, :min=>0, :step=>"any", :placeholder => 'Enter your OD blank value here' %>
           </div>
           <br>
           <%= f.radio_button(:blank_value, "default", {:class => "user_enter3 user_enter3_no"}) %>

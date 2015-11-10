@@ -199,10 +199,10 @@ context "Validation" do
         expect(@assay.errors[:blank_value_input]).to include BAD_OD_BLANK
       end
 
-      it "should accept negative value" do
+      it "should not accept negative value" do
         @assay.blank_value_input = '-0.23'
         expect(@assay.valid?).to be false
-        expect(@assay.errors[:blank_value_input]).not_to include BAD_OD_BLANK
+        expect(@assay.errors[:blank_value_input]).to include BAD_OD_BLANK
       end
       
       it "should accept 0" do

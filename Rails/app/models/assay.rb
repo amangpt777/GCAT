@@ -123,7 +123,7 @@ class Assay
   #validates_inclusion_of :blank_value, :in => %w( default user  ), :message => '- Invalid blank value. Please choose one of options'
   validates :blank_value, inclusion:{in: ['default','zero','average','user'], message: "- Invalid Blank Value Choice"}
   validates_presence_of :blank_value_input,  :if => "blank_value==\"user\"", :message => '- Please Enter Your OD Blank Value.'
-  validates_numericality_of :blank_value_input,:if => "blank_value==\"user\"",  :message => '- Invalid OD blank value. Please Enter A Real Number.'
+  validates_numericality_of :blank_value_input, :greater_than_or_equal_to => 0, :if => "blank_value==\"user\"",  :message => '- Invalid OD blank value. Please Enter A Real Number.'
   
   # (4) Validation of start_index, previously (7) innuculation point
   # if user does not enter anything, the system uses the default value start_index = 2
