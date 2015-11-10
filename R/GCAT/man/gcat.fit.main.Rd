@@ -6,7 +6,7 @@
 \usage{
 gcat.fit.main(file.name, input.data = NULL, load.type = "csv",
   layout.file = NULL, single.plate = F, blank.value = NULL,
-  start.index = 2, time.input = NA, normalize.method = normalize.method,
+  start.index = 2, time.input = NA, normalize.method = "default",
   add.constant = 1, use.log = T, points.to.remove = 0,
   use.linear.param = F, use.loess = F, smooth.param = 0.1,
   fall.cutoff = -0.0025, growth.cutoff = 0.05, remove.jumps = F,
