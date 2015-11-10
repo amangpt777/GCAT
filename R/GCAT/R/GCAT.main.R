@@ -131,11 +131,24 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
   
+  #  Set normalize.method to default
+  normalize.method = "default"
+  
   #  Check blank value and start index
   if (is.null(blank.value) && start.index==1) {
     exception("", "If inoculation time point is 1, the user must specify a blank value")
   }
-
+  
+  #  Logic to switch normalize.method based on blank.value being passed
+  if(!is.null(blank.value) && blank.value == "average.layout") {
+    normalize.method = "average.layout"
+  }
+  
+  #  With average.layout option a layout file should always be passed
+  if ((normalize.method == "average.layout") && is.null(layout.file)) {
+    exception("", "If normalize.method is 'average.layout' then a layout file should be specified")
+  }
+  
     # MB: Not the best solution.
     if (is.na(time.input)) {
       if (single.plate)
@@ -177,7 +190,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
       # Call <gcat.fit.main> on the file with single plate options
     	fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",   
           single.plate = single.plate, layout.file = layout.file, start.index = start.index, 
-          time.input = time.input, add.constant = add.constant, blank.value = blank.value, 
+          time.input = time.input, normalize.method=normalize.method, add.constant = add.constant, blank.value = blank.value, 
           growth.cutoff = growth.cutoff, points.to.remove = points.to.remove, remove.jumps = remove.jumps,
     	    use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param,
           plate.nrow = plate.nrow, plate.ncol = plate.ncol, multi.column.headers = multi.column.headers, 
@@ -384,7 +397,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   # Transform ODs on the logarithmic scale, regardless of whether <use.log> is true 
   #   an extra column of log-transformed values is added to the "well.array" slot of each well 
   #   the "use.log" slot of each well is set instead to determine whether the transformed values will be returned when data is retrieved from the well.
-  well.array = try(aapply(well.array, transform.ODs, start.index = start.index, blank.value = blank.value, use.log = use.log, constant.added = add.constant),silent=silent)
+  well.array = try(aapply(well.array, transform.ODs, start.index = start.index, blank.value = blank.value, use.log = use.log, constant.added = add.constant, normalize.method = normalize.method),silent=silent)
   
       # Return an error if there is a problem with transformation
       if (class(well.array) == "try-error")

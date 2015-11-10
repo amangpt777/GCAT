@@ -1,10 +1,12 @@
 #  Regression testing script for GCAT.
 #  Yury V Bukhman, 17 Nov 2014
 #  This script tests outputs generated from the example dataset "YPDAFEXglucoseTests_2-25-10" with default GCAT settings.
-
-INPUT.DIR =  system.file("extdata/YPDAFEXglucoseTests_2-25-10",package="GCAT")
+INPUT.DIR =  system.file("extdata/tests/YPDAFEXglucoseTests_2-25-10",package="GCAT")
 OUTPUT.DIR = paste(INPUT.DIR,"temp",sep="/")
 INPUT.FILE = "YPDAFEXglucoseTests_2-25-10.csv"
+
+#  Clean up if output dir is not empty before running test
+unlink(OUTPUT.DIR, recursive=T)
 
 #  Run GCAT
 library(GCAT)

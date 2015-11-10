@@ -25,8 +25,10 @@
 #'  Note: This function does not write any new OD values to the well objects in the array - it only 
 #'   fills the "norm" slot of each well object in the array with a value that will be subtracted 
 #'   from all OD measurements when returning data from the wells using the function <data.from> (see well.class.R) 
+#'   For "average.layout" the function instead of filling "norm" slot writes a list "averagedTimestamp" in screen.data
+#'   This averagedTimestamp is a list of average of only Empty wells as defined in layout file for each timestamp
 #'
-#'  These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
+#'    These functions make use of <raw.data> which simply returns the raw time and OD of a well (also see well.class.R)
 #'  
 #'  note this is the only normalization function that acts on an entire array instead of an individual well.
 #'  
@@ -37,6 +39,8 @@
 #'  \item{average.blank}{subtracts the mean of all first OD timepoints on a plate from all timepoints in all wells on that plate}
 #'  \item{average.first}{takes the mean of the difference between the OD of the specified <start> timepoint and the first timepoint of all wells on a plate
 #'                     and subtracts this value from all timepoints in all wells on that plate}
+#'  \item{average.layout}{Takes an average of all ODs at each timestamp taking into consideration only "Empty" wells as defined in layout file
+#'                     It then stores the list of average timestamps as averagedTimestamp in screen.data of every well}
 #'  \item{anything else}{do nothing}
 #'  }
 #'  
@@ -54,7 +58,7 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
       # Set the blank OD (minus the constant to be added) to the "norm" slot of each well.
     	well@norm = blank.value - add.constant
     	return(well)}, blank.value)
-    }
+  }
   else if (normalize.method == "average.blank"){ 
     # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
 		blank.ODs = unlist(aapply(well.array, function(well, blank.value){
@@ -66,7 +70,7 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = blank.averages[plate.name(well)] - add.constant
 			return(well)})
-		}
+	}
 	else if (normalize.method == "average.first"){
 	  # Find the mean difference between starting OD (timepoint specified by <start>) and blank OD (first timepoint) for each plate
     # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
@@ -80,17 +84,51 @@ normalize.ODs = function(well.array, normalize.method = "default", blank.value =
 		well.array = aapply(well.array, function(well){
 			well@norm = raw.data(well)[start,2] - blank.averages[plate.name(well)] - add.constant  
 			return(well)})
-		}	
+	}	
+  else if (normalize.method == "average.layout"){
+    # Works only for single plate
+    # For each timestamp our blank value is the average of OD 
+    #         of only those wells that are marked Empty in layout file
+    
+    # blank.ODs will be a list of all OD
+    # The ODs at every timestamp for all non Empty wells will be -25.0000
+    blank.ODs = unlist(aapply(well.array, function(well){
+      if(well@well.info$Strain[1] == "Empty") 
+        OD = well@screen.data$OD
+      else
+        OD = rep(-25, length(well@screen.data$OD))
+      return(OD)}))
+    
+    # Create back the matrix of timestamp as our rows and wells as columns
+    #           with values of non empty wells at each timestamp as -25.0000
+    Input_OD_Data<-matrix(unlist(blank.ODs),ncol=length(well.array),byrow = FALSE)
+    
+    # Take the average of only Empty wells for each timestamp
+    avgBlanks = unlist(apply(Input_OD_Data, 1, function(x){
+      x=setdiff(x, c(-25.0000))
+      blank.average = mean(x) - add.constant
+      return(blank.average)}))
+
+    # Store in each well's screen data the averagedTimestamp
+    well.array = aapply(well.array, function(well, avgBlanks){
+      #well@screen.data$averagedBlankValues = avgBlanks
+      well@norm = avgBlanks
+    return(well)},avgBlanks)
+    # Set this value (minus the constant to be added) to the "norm" slot of each well. 
+    #well.array = aapply(well.array, function(well){
+     # well@norm = blank.average - add.constant
+      #return(well)})
+  }
 	else{
     # Simply set the negative constant to be added to the "norm" slot of each well. 
 		well.array = aapply(well.array, function(well){
 			well@norm = - add.constant
      			return(well)})
-		}
-  if(is.null(blank.value))
+	}
+  if(is.null(blank.value) && !(normalize.method == "average.layout"))
     well.array = aapply(well.array, remove.points, 1)
   return(well.array)
-	}
+}
 
 ########################################################################
 ########################################################################
@@ -104,11 +142,12 @@ transform <- function(input.well, ...) {
 }
 
 #' Log-transform OD readings for a single well object 
-#'  
+#'
 #' This function adds a "log.OD" column to the "screen.data" slot of a well object with log-transformed data.  
 #' The raw data is kept intact.  
 #' It also checks to see if any of the raw OD values (before a certain timepoint) is below the blank OD.  
 #' This can be disastrous for the log(OD) transform.  
+#' 
 #' @param input.well an object of class well 
 #' @param use.log gets added to the "use.log" slot of the well object. this will determine whether the log-transformed data  
 #'              or raw normalized data is returned using the function \code{data.from}.    
@@ -116,23 +155,29 @@ transform <- function(input.well, ...) {
 #' @param start.index which timepoint should be used as the first one after inoculation (defaults to the 2th one) 
 #' @param negative.OD.cutoff if any ODs below the specified blank value are detected before this index timepoint, the entire well is discarded.
 #' @param constant.added similar to added.constant.
+#' @param normalize.method To specify if we are using average.layout method to set our blank value at each timestamp as average of
+#               OD values of only those wells which are marked Empty
 #' @param ... Additional arguments for this function.
-transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.index = 2, negative.OD.cutoff = 10, constant.added = 1.0, ...){
+transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.index = 2, negative.OD.cutoff = 10, constant.added = 1.0, normalize.method = normalize.method, ...){
  
   # The default value for the log-transformed ODs will be NA. Valid values will be filled in. 
-	log.OD = rep(NA, length(input.well))
+  log.OD = rep(NA, length(input.well))
   OD = raw.data(input.well)[,2]
   
-	 # Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
+    
+	# Use the blank OD value if specified; otherwise, get it from the first OD timepoint.
   if(is.null(blank.value))
       blank.value = OD[1]
 
+  else if(normalize.method == "average.layout")
+      blank.value = input.well@norm
+    
   # Remove any points from the analysis that weren't already removed and fall below the blank value (using <remove.points> below)
   OD[input.well@screen.data$Remove] = NA
   
   negative.points = which(OD  + 0.2 * constant.added < blank.value)
   if(length(negative.points) > 0)
-	  input.well = remove.points(input.well, negative.points)
+	   input.well = remove.points(input.well, negative.points)
     
   # If any points fall below the blank value by more than 0.2 * <constant.added> and before the cutoff index <negative.OD.cutoff>, remove the well from analysis. 
   # First adjust the cutoff to compensate for curves that don't start at timepoint 1
@@ -141,18 +186,22 @@ transform.ODs = function(input.well, use.log = T, blank.value = NULL, start.inde
   if(any(negative.points <= negative.OD.cutoff)){
     input.well = remove.points(input.well, rep(T,length(input.well)))
     input.well@add.info = paste("ODs at timepoint(s)", paste(negative.points[negative.points <= negative.OD.cutoff],collapse=" "), "were below blank OD; well discarded")
-    }
+  }
 
   # Take the natural log of the rest of the OD values (after subtracting the normalization value)
-  log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
-	
+  if(normalize.method == "average.layout")
+    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm[which(OD > input.well@norm)])
+  else
+    log.OD[which(OD > input.well@norm)] = log(OD[which(OD > input.well@norm)] - input.well@norm)
+  
 	# Add a column to the "screen.data" slot of the well
 	input.well@screen.data$log.OD = log.OD	
 	# Update the "use.log" slot of the well 
 	input.well@use.log = use.log	
 
 	return(input.well)
-	}
+  
+}
 
 ########################################################################
 ########################################################################

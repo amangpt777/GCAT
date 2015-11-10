@@ -1,7 +1,7 @@
 #  Test AUC computation
 
 library(GCAT)
-load(system.file("extdata/YPDAFEXglucoseTests_2-25-10","default_output.RData",package="GCAT"))
+load(system.file("extdata/tests/YPDAFEXglucoseTests_2-25-10","default_output.RData",package="GCAT"))
 
 #  Compute upper bound of the AUC
 well = out[[30]]
