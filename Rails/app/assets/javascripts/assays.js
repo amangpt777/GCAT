@@ -74,5 +74,16 @@ $(document).ready(function(){
 	    $("#time").show();
       $("#assay_blank_value_average_div").hide();
 	   }
-	});        
+	});
+
+  //automatically change inoculation point to 2 if user selects "take the first OD as blank option" and current inoculation point is 1
+  $("#assay_blank_value_default").click(function(){
+    if($(this).is(':checked')){
+      var start_index_field = $("#assay_start_index");
+      if(start_index_field.val() == "1"){
+        start_index_field.val("2");
+      }
+    }
+  });
+
 });
