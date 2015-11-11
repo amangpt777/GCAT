@@ -10,7 +10,7 @@
 </div>
 <% end %>
 <div class="actions" style="margin-top:30px;">
-    <%= link_to "GCAT Users Manual","/resources/GCAT_users_manual.pdf" %> </br>
+    <%= link_to "GCAT Users Manual","/resources/GCAT_users_manual.pdf" %> <br/>
     <%= link_to "GCAT Release Notes","/resources/Release_Notes.pdf" %>
 </div>
 <section>
@@ -24,23 +24,23 @@
     </div>
     <div class="form-group col-md-4">
       <h3>Input Data File</h3>
-      Please specify a  plate results file to upload for analysis:<br>
+      Please specify a  plate results file to upload for analysis:<br/>
       <div class="field">
         <%= f.file_field :input_file, :class=>'control-label' %>  
       </div>
       <div class="actions" style="margin-top:30px;">
-        <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br>
-        <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br>
+        <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br/>
+        <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br/>
       </div>
     </div>
     <div class="form-group col-md-4">
       <h3><span data-tooltip="Optionally upload a companion .csv file containing identifying information for all wells in the experiments(s) to be analyzed, including strain identifiers and growth media (or growth environment) definitions, which are used for graphic output.">Plate Layout File</span></h3>
-      Optionally upload a plate layout file:<br>
+      Optionally upload a plate layout file:<br/>
       <div class="field">
         <%= f.file_field :layout_file %>  
       </div>
       <div class="actions" style="margin-top:30px;">
-        <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br>
+        <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br/>
         <%= link_to "Multi-Plate Layout Example File","/resources/MultiPlateLayout_plateID.csv" %>
       </div>
     </div>
@@ -55,9 +55,9 @@
           </div>
           <br>
           <%= f.radio_button(:blank_value, "default", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br>
+          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br/>
           <%= f.radio_button(:blank_value, "zero", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_zero, "Set to 0" ) %><br>
+          <%= f.label(:blank_value_zero, "Set to 0" ) %><br/>
           <div id="assay_blank_value_average_div">
           <%= f.radio_button(:blank_value, "average", {:class => "user_enter3 user_enter3_no"}) %>
           <%= f.label(:blank_value_average, "Average OD of blank wells at each time point" ) %>
@@ -180,7 +180,6 @@
         <div class="actions" style="">
           <%= f.submit %>
         </div>
-    </div>
   </div>
 </section>
 <% end %>
