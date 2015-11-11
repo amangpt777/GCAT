@@ -2,9 +2,9 @@
 #  Yury V Bukhman, 01 July 2015
 #  This script generates heat maps with pre-set limits.  Manually check output directory to see if they make sense.
 
-INPUT.DIR =  system.file("extdata/YPDAFEXglucoseTests_2-25-10",package="GCAT")
-OUTPUT.DIR.1 = paste(system.file("extdata/heatmap_tests",package="GCAT"),"temp1",sep="/")
-OUTPUT.DIR.2 = paste(system.file("extdata/heatmap_tests",package="GCAT"),"temp2",sep="/")
+INPUT.DIR =  system.file("extdata/tests/YPDAFEXglucoseTests_2-25-10",package="GCAT")
+OUTPUT.DIR.1 = paste(system.file("extdata/tests/heatmap_tests",package="GCAT"),"temp1",sep="/")
+OUTPUT.DIR.2 = paste(system.file("extdata/tests/heatmap_tests",package="GCAT"),"temp2",sep="/")
 INPUT.FILE = "YPDAFEXglucoseTests_2-25-10.csv"
 
 #  Run GCAT

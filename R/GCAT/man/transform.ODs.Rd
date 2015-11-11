@@ -5,7 +5,8 @@
 \title{Log-transform OD readings for a single well object}
 \usage{
 \method{transform}{ODs}(input.well, use.log = T, blank.value = NULL,
-  start.index = 2, negative.OD.cutoff = 10, constant.added = 1, ...)
+  start.index = 2, negative.OD.cutoff = 10, constant.added = 1,
+  normalize.method = normalize.method, ...)
 }
 \arguments{
 \item{input.well}{an object of class well}
@@ -20,6 +21,8 @@ or raw normalized data is returned using the function \code{data.from}.}
 \item{negative.OD.cutoff}{if any ODs below the specified blank value are detected before this index timepoint, the entire well is discarded.}
 
 \item{constant.added}{similar to added.constant.}
+
+\item{normalize.method}{To specify if we are using average.layout method to set our blank value at each timestamp as average of}
 
 \item{...}{Additional arguments for this function.}
 }
