@@ -53,7 +53,6 @@ class AssaysController < ApplicationController
       @result = @assay.r_calculation
       # parse the output text file into a hash in order to create a table in Assays#show
       @table = output_table(@result, !@result[:layout_file].nil?)
-      puts @table
       remove_old_files(relative_path(@result[:zipfile]))
       flash.now[:notice] = "Your assay processed!\nPlease click on any of plate diagrams to save your results to a zip archive."  
       render :action => 'show'
