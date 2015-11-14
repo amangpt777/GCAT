@@ -53,7 +53,7 @@
 #' @param single.plate Is the plate single type?
 #' 
 #' @return A list of well objects.
-gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL, single.plate.ID = NULL, 
+gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL, single.plate.ID = NULL, microplate.reader = "TECAN",
   plate.layout = NULL,plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
   multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
   layout.sheet.headers = c("Strain", "Media Definition"),

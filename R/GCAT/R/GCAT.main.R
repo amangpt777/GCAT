@@ -116,7 +116,7 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' @return Depending on return.fit setting, an array of fitted well objects or a list of output files
 #' 
 #' @export
-gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,   
+gcat.analysis.main = function(file.list, single.plate, layout.file = NULL, microplate.reader = "TECAN",  
   out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
   add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
   use.linear.param = F, use.loess = F, smooth.param=0.1,
@@ -146,7 +146,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
   
   #  With average.layout option a layout file should always be passed
   if ((normalize.method == "average.layout") && is.null(layout.file)) {
-    exception("", "If normalize.method is 'average.layout' then a layout file should be specified")
+    exception("", "If Average OD is selected in Media Background then a layout file should be provided")
   }
   
     # MB: Not the best solution.
@@ -188,7 +188,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     for(file.name in file.list){
       
       # Call <gcat.fit.main> on the file with single plate options
-    	fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",   
+    	fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",  microplate.reader = microplate.reader, 
           single.plate = single.plate, layout.file = layout.file, start.index = start.index, 
           time.input = time.input, normalize.method=normalize.method, add.constant = add.constant, blank.value = blank.value, 
           growth.cutoff = growth.cutoff, points.to.remove = points.to.remove, remove.jumps = remove.jumps,
@@ -282,7 +282,7 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
 #' @param verbose Display all messages when analyzing each well.
 #' 
 #' @return An array of well objects 
-gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout.file = NULL, 
+gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout.file = NULL, microplate.reader = microplate.reader,
   single.plate = F, blank.value = NULL, start.index = 2, time.input = NA,
   normalize.method = "default", add.constant = 1, use.log = T, points.to.remove = 0,
   use.linear.param=F, use.loess=F, smooth.param=0.1,
@@ -351,7 +351,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
     }
       
     # Load the data    
-		well.array = try(gcat.load.data(file.name = file.name, input.data = input.data, 
+		well.array = try(gcat.load.data(file.name = file.name, input.data = input.data, microplate.reader = microplate.reader,
                       plate.layout = plate.layout, plate.nrow = plate.nrow, plate.ncol = plate.ncol, 
                       input.skip.lines = input.skip.lines, multi.column.headers = multi.column.headers, 
                       single.column.headers = single.column.headers, layout.sheet.headers = layout.sheet.headers,
