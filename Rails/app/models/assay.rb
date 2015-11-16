@@ -77,6 +77,7 @@ class Assay
 
   # (1) Validation of input data file
   validates_presence_of :input_file, :message => '- No input file was specified.'
+ validates_presence_of :layout_file, :if=>'blank_value=="average"', :message => '- You must upload a layout file for this OD option.'
   # Either look for .csv as file extension, or in mime type (content_type). 
   # No need to validate if there is not filename
   # Change the regex to %r{\.(csv|xlsx)$}i to accept both csv and xlsx files
@@ -377,8 +378,8 @@ class Assay
     end
 
     ## Heatmap values
-    self.specg_max ||= ''
-    self.specg_min ||= ''
+    self.specg_max ||= 'NULL'
+    self.specg_min ||= 'NULL'
     if (self.specg_max != '' && self.specg_min != '')
       R.assign 'specMin', self.specg_min.to_f
       R.assign 'specMax', self.specg_max.to_f
@@ -483,7 +484,8 @@ class Assay
     
   def r_calculation 
     # This block evaluates the files (csv or xlsx, single.plate or multiple.plate)
-    R.eval 'R_file_return_value <- gcat.analysis.main(
+
+  R.eval 'R_file_return_value <- gcat.analysis.main(
                         file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
                         start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
                         lagRange = lagRange, totalRange = totalRange, totalODRange = totalODRange, specRange = specRange, 
@@ -493,7 +495,7 @@ class Assay
                         auc.start=auc.start, auc.end=auc.end
             )'
     # good file returns a list of file path(length is more than 1), bad file returns error message string(array length = 1)
-    print R.R_file_return_value
+    puts R.R_file_return_value
     
     R.eval ('R_array_return_length <- length(R_file_return_value)')
     

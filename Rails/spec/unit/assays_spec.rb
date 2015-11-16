@@ -12,10 +12,19 @@ context "Validation" do
 #begin of context Input File
   NO_INPUT_FILE = '- No input file was specified.'
   ONLY_CSV_FILES = '- You can only upload csv files.'
+  REQUIRE_LAYOUT_FILE = '- You must upload a layout file for this OD option.'
   context "Input File" do
     it "should warn if input_file is not provided" do
       expect(@assay.valid?).to be false
       expect(@assay.errors[:input_file]).to include NO_INPUT_FILE
+    end
+
+    it "requires layout file if user choose to use average OD of blank wells at each time point as OD" do
+      f = fixture_file_upload('spec/fixtures/files/samplefile.jpg','image/jpg')
+      @assay.input_file = f
+      @assay.blank_value = "average"
+      expect(@assay.valid?).to be false
+      expect(@assay.errors[:layout_file]).to include REQUIRE_LAYOUT_FILE
     end
   
     it "shoule not accept .jpg file" do
