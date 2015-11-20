@@ -378,47 +378,20 @@ class Assay
     end
 
     ## Heatmap values
-    self.specg_max ||= 'NULL'
-    self.specg_min ||= 'NULL'
-    if (self.specg_max != '' && self.specg_min != '')
-      R.assign 'specMin', self.specg_min.to_f
-      R.assign 'specMax', self.specg_max.to_f
-      R.eval "specRange <- c(specMin, specMax)"
-    else
-      R.eval 'specRange <- NA'
-    end
-
-    self.totg_max ||= ''
-    self.totg_min ||= ''
-    if (self.totg_min != '' && self.totg_max != '')
-      R.assign 'totMin', self.totg_min.to_f
-      R.assign 'totMax', self.totg_max.to_f
-      R.eval "totalRange <- c(totMin, totMax)"
-    else
-      R.eval 'totalRange <- NA'
-    end
+    symbols = [[:specRange, :specg_min, :specg_max], 
+      [:totalRange, :totg_min, :totg_max], 
+      [:totalODRange, :totg_OD_min, :totg_OD_max], 
+      [:lagRange, :lagT_min, :lagT_max]]
     
-    self.totg_OD_max ||= ''
-    self.totg_OD_min ||= ''
-    if (self.totg_OD_min != '' && self.totg_OD_max != '')
-      R.assign 'totODMin', self.totg_OD_min.to_f
-      R.assign 'totODMax', self.totg_OD_max.to_f
-      R.eval "totalODRange <- c(totODMin, totODMax)"
-    else
-      R.eval 'totalODRange <- NA'
+    for r_range_symbol, ruby_min_symbol, ruby_max_symbol in symbols
+      ruby_min = self.send("#{ruby_min_symbol}")
+      ruby_max = self.send("#{ruby_max_symbol}")
+      if !ruby_min.blank? or !ruby_max.blank?
+        R.eval "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})" 
+      else
+        R.eval "#{r_range_symbol} <- NA"
+      end
     end
-    
-    self.lagT_max ||= ''
-    self.lagT_min ||= ''
-    if (self.lagT_min != '' && self.lagT_max != '')
-      R.assign 'lagT_min', self.lagT_min.to_f
-      R.assign 'lagT_max', self.lagT_max.to_f
-      R.eval "lagRange <- c(lagT_min, lagT_max)"
-    else
-      R.eval 'lagRange <- NA'
-    end
-
-
     # Area under curve
     self.area_start_hour ||= ''
     self.area_end_hour ||= ''
