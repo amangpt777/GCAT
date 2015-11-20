@@ -364,16 +364,12 @@ class Assay
       else
         R.assign 'smooth.param', 0.1
       end
-      R.assign 'use.linear.param', 'F'
     elsif (self.model == 'sigmoid-linear')
       # Currently not in use. May return someday... NWD 9/1
-      #R.assign 'use.linear.param', 'T'
-      R.assign 'use.linear.param', 'F' #must be false
       R.assign 'use.loess', 'F'
     elsif (self.model == 'sigmoid')
       # Initialize values for growth curve models.
       R.assign 'use.loess', 'F'
-      R.assign 'use.linear.param', 'F'
       R.assign 'smooth.param', 0.1 # default value
     end
 
@@ -468,9 +464,9 @@ class Assay
 
   R.eval 'R_file_return_value <- gcat.analysis.main(
                         file, single.plate, layout.file, out.dir=out.dir, graphic.dir = out.dir, add.constant, blank.value, 
-                        start.index, growth.cutoff, use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param, 
+                        start.index, growth.cutoff, use.loess=use.loess, smooth.param=smooth.param, 
                         lagRange = lagRange, totalRange = totalRange, totalODRange = totalODRange, specRange = specRange, 
-                        points.to.remove = points.to.remove, remove.jumps, time.input, plate.nrow = 8, 
+                        points.to.remove = points.to.remove,remove.jumps,use.linear.param=F, time.input, plate.nrow = 8, 
                         plate.ncol = 12, input.skip.lines = 0, multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
                         layout.sheet.headers = c("Strain", "Media Definition"), silent = T, verbose = F, return.fit = F, overview.jpgs = T,
                         auc.start=auc.start, auc.end=auc.end

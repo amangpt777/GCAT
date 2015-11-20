@@ -890,15 +890,9 @@ EOF
         }else{
           use.loess <- 0
         }
-        if (use.linear.param){
-          use.linear.param <- 1
-        }else{
-          use.linear.param <- 0
-        }
 EOF
       expect(R.pull('use.loess')).to eq 1
       expect(R.pull('smooth.param')).to eq 0.1
-      expect(R.pull('use.linear.param')).to eq 0
     end
     
     it "binds models correctly - loess default" do
@@ -912,15 +906,9 @@ EOF
         }else{
           use.loess <- 0
         }
-        if (use.linear.param){
-          use.linear.param <- 1
-        }else{
-          use.linear.param <- 0
-        }
 EOF
       expect(R.pull('use.loess')).to eq 1
       expect(R.pull('smooth.param')).to eq 0.2
-      expect(R.pull('use.linear.param')).to eq 0
     end
 
 #currently unused
@@ -934,14 +922,8 @@ EOF
         }else{
           use.loess <- 0
         }
-        if (use.linear.param){
-          use.linear.param <- 1
-        }else{
-          use.linear.param <- 0
-        }
 EOF
       expect(R.pull('use.loess')).to eq 0
-      expect(R.pull('use.linear.param')).to eq 0
     end
     
     it "binds models correctly - sigmoid" do
@@ -954,14 +936,8 @@ EOF
         }else{
           use.loess <- 0
         }
-        if (use.linear.param){
-          use.linear.param <- 1
-        }else{
-          use.linear.param <- 0
-        }
 EOF
       expect(R.pull('use.loess')).to eq 0
-      expect(R.pull('use.linear.param')).to eq 0
       expect(R.pull('smooth.param')).to eq 0.1
     end
   
