@@ -956,7 +956,7 @@ EOF
       expect(R.pull('smooth.param')).to eq 0.1
     end
   
-    it "binds heatmap ranges correctly - 1" do
+    it "binds heatmap ranges correctly - both values valid" do
       symbols = [[:specRange, :specg_min, :specg_max], 
         [:totalRange, :totg_min, :totg_max], 
         [:totalODRange, :totg_OD_min, :totg_OD_max], 
@@ -975,15 +975,69 @@ EOF
       end
     end
 
-    it "binds heatmap ranges correctly - 2" do
+    it "binds heatmap ranges correctly - min value specified, max value blank" do
       symbols = [[:specRange, :specg_min, :specg_max], 
         [:totalRange, :totg_min, :totg_max], 
         [:totalODRange, :totg_OD_min, :totg_OD_max], 
         [:lagRange, :lagT_min, :lagT_max]]
       
       for r_range, ruby_min, ruby_max in symbols
-        @assay.send("#{ruby_min}=",0)
+        @assay.send("#{ruby_min}=",3)
         @assay.send("#{ruby_max}=","")
+      end 
+     
+      @assay.bind_arguments_to_r
+      
+      for r_range, ruby_min, ruby_max in symbols
+        #workaround
+        R.eval <<EOF
+          if (is.na(#{r_range}[2])){
+            #{r_range}[2] <- 0
+          }else{
+            #{r_range}[2] <- 1
+          }
+EOF
+        expect(R.pull("#{r_range}")).to eq [3,0]
+      end
+    end
+
+
+    it "binds heatmap ranges correctly - min value blank, max value specified" do
+      symbols = [[:specRange, :specg_min, :specg_max], 
+        [:totalRange, :totg_min, :totg_max], 
+        [:totalODRange, :totg_OD_min, :totg_OD_max], 
+        [:lagRange, :lagT_min, :lagT_max]]
+      
+      for r_range, ruby_min, ruby_max in symbols
+        @assay.send("#{ruby_min}="," ")
+        @assay.send("#{ruby_max}=","3")
+      end 
+     
+      @assay.bind_arguments_to_r
+      
+      for r_range, ruby_min, ruby_max in symbols
+        #workaround
+        R.eval <<EOF
+          if (is.na(#{r_range}[1])){
+            #{r_range}[1] <- 0
+          }else{
+            #{r_range}[1] <- 1
+          }
+EOF
+        expect(R.pull("#{r_range}[1]")).to eq 0
+        expect(R.pull("#{r_range}[2]")).to eq 3
+      end
+    end
+
+    it "binds heatmap ranges correctly - both blank" do
+      symbols = [[:specRange, :specg_min, :specg_max], 
+        [:totalRange, :totg_min, :totg_max], 
+        [:totalODRange, :totg_OD_min, :totg_OD_max], 
+        [:lagRange, :lagT_min, :lagT_max]]
+      
+      for r_range, ruby_min, ruby_max in symbols
+        @assay.send("#{ruby_min}=","  ")
+        @assay.send("#{ruby_max}=","  ")
       end 
      
       @assay.bind_arguments_to_r

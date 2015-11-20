@@ -44,7 +44,7 @@ class AssaysController < ApplicationController
     
     @assay.generate_directory_and_move_files
     
-    $stdout = File.new(@assay.generated_files_directory.join('console_out.txt'), 'w')
+    #$stdout = File.new(@assay.generated_files_directory.join('console_out.txt'), 'w')
     $stdout.sync = true 
     
     begin
@@ -69,7 +69,7 @@ class AssaysController < ApplicationController
       end
       render :action => 'inputfile_error_message'
     end
-    $stdout.close
+    #$stdout.close
     $stdout = original_stdout
   end  
 end

@@ -377,6 +377,22 @@ class Assay
     end
 
     ## Heatmap values
+    symbols = [[:specRange, :specg_min, :specg_max], 
+      [:totalRange, :totg_min, :totg_max], 
+      [:totalODRange, :totg_OD_min, :totg_OD_max], 
+      [:lagRange, :lagT_min, :lagT_max]]
+    
+    for r_range_symbol, ruby_min_symbol, ruby_max_symbol in symbols
+      ruby_min = self.send("#{ruby_min_symbol}")
+      ruby_max = self.send("#{ruby_max_symbol}")
+      if !ruby_min.blank? or !ruby_max.blank?
+        R.eval "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})" 
+      else
+        R.eval "#{r_range_symbol} <- NA"
+      end
+    end
+
+=begin
     self.specg_max ||= ''
     self.specg_min ||= ''
     if (self.specg_max != '' && self.specg_min != '')
@@ -416,7 +432,7 @@ class Assay
     else
       R.eval 'lagRange <- NA'
     end
-
+=end
 
     # Area under curve
     self.area_start_hour ||= ''
