@@ -326,6 +326,11 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
     num.dig = 3 #how many digits should be put on pdf?
     max = round(max(spec.growth, na.rm=T), digits=num.dig)
     min = round(min(spec.growth, na.rm=T), digits=num.dig)
+    if (length(MinMax) == 2){
+      #  Min and max values to plot to floor and ceiling values if MinMax parameter was specified by the caller
+      heat[is.finite(heat) & heat < MinMax[1]] = MinMax[1]
+      heat[is.finite(heat) & heat > MinMax[2]] = MinMax[2]
+    }
     avg = round(median(spec.growth, na.rm=T), digits=num.dig)
     heat.text = paste(toupper(sub("\\.", " ", attr.name)), ":\n", plate.ID, "\n",
                       paste("Min:", min, "Med:", avg, "Max:", max, sep=" "))
@@ -340,11 +345,7 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
     pdf(pdf.name)
     #heatmap(heat, Rowv=NA, Colv=NA, revC=T, scale="none", na.rm=T, main=plate.ID, col=rainbow(100), margins=c(6,6))
     #mtext(paste("Max:", round(max(spec.growth, na.rm=T), digits=4),"Min:", round(min(spec.growth, na.rm=T), digits=4), "Avg:", round(mean(spec.growth, na.rm=T), digits=4)), side=1, line=3)
-    if (length(MinMax) == 2){
-      #  Min and max values to plot to floor and ceiling values if MinMax parameter was specified by the caller
-      heat[is.finite(heat) & heat < MinMax[1]] = MinMax[1]
-      heat[is.finite(heat) & heat > MinMax[2]] = MinMax[2]
-    }
+    
     pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
              border_color="black", cell_width=2, cell_height=3,
              cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
