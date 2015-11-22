@@ -158,15 +158,24 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     }
   
   # Check heatmap ranges
+  # Heatmap ranges will be one of NA, (NA, NA), (val, NA), (NA, val), (val, val)
+  
   for (range1 in list(lagRange, totalRange, totalODRange, specRange)) {
+    
     if (!identical(range1,NA)) {
       range1.string = paste(range1,collapse="-")
       if (length(range1) != 2) return(paste("Heat map range must contain 2 values.  Bad range:", range1.string))
-      if (!all(is.finite(range1))) return(paste("Heat map range must be numeric and finite.  Bad range:", range1.string))
+      if (!(is.na(range1[1]) | is.finite(range1[1])) | !(is.na(range1[2]) | is.finite(range1[2]))) return(paste("Heat map range must contain either NA or a finite number.  Bad range:", range1.string))
+      
+      #  Removing NA values from range1 to check for the other value
+      range1 = range1[!is.na(range1)]
       if (!all(range1 >= 0)) return(paste("Heat map range must be positive.  Bad range:", range1.string))
-      if (range1[1] >= range1[2]) return(paste("Heat map range max must be > min.  Bad range:", range1.string))
+      if(length(range1) == 2) {
+        #  Checking for following condition only if range1 doesn't contain any NA value i.e. its length is 2
+        if (!(all(is.na(range1))) & (range1[1] >= range1[2])) return(paste("Heat map range max must be > min.  Bad range:", range1.string))
+        }
+      }
     }
-  }
   
     # MB: Now add.constant will always be 0.
     # No need to check.

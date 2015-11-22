@@ -20,8 +20,5 @@ expect_equal(gcat.analysis.main(file.list = INPUT.FILE, single.plate = T, layout
                                points.to.remove = integer(), remove.jumps = F, time.input=time.input,
                                silent = F, verbose = T, return.fit = T, overview.jpgs = T), "If inoculation time point is 1, the user must specify a blank value")
 
-#  Test for average.layout is the selected normalized method(blank.value) and layout file is not given
-#  Already done in BlankAverageLayout_Issue7 in test.avg.layout.issue7.exceptions.R
-
 #  Clean up
 unlink(OUTPUT.DIR, recursive=T)
