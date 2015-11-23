@@ -54,10 +54,10 @@ $(document).ready(function(){
 			console.error("Error: unknown selector in reset_optional_fields()");
 		}
 	}
-	reset_optional_fields($('#assay_plate_type_m'), $("#time"));
+	reset_optional_fields($('#assay_plate_type_multiple'), $("#time"));
 	reset_optional_fields($("input#assay_blank_value_user"), $("div.optional_input3"));
-	reset_optional_fields($("input#assay_transformation_-1"), $("div.optional_input2"));
-	reset_optional_fields($("input#assay_model_-1"), $("div.optional_input1"));
+	reset_optional_fields($("input#assay_transformation_user"), $("div.optional_input2"));
+	reset_optional_fields($("input#assay_model_loess"), $("div.optional_input1"));
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	$('#new_assay').submit(function() {
@@ -66,11 +66,24 @@ $(document).ready(function(){
 
 	$("input[name$='assay[plate_type]']").click(function(){
 	  var value = $(this).val();
-	  if(value=='s') {
+	  if(value=='single') {
 	    $("#time").hide();
+      $("#assay_blank_value_average_div").show();
 	  }
-	  else if(value=='m') {
+	  else if(value=='multiple') {
 	    $("#time").show();
+      $("#assay_blank_value_average_div").hide();
 	   }
-	});        
+	});
+
+  //automatically change inoculation point to 2 if user selects "take the first OD as blank option" and current inoculation point is 1
+  $("#assay_blank_value_default").click(function(){
+    if($(this).is(':checked')){
+      var start_index_field = $("#assay_start_index");
+      if(start_index_field.val() == "1"){
+        start_index_field.val("2");
+      }
+    }
+  });
+
 });

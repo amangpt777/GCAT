@@ -13,8 +13,9 @@ module TableBuilder
 			offsets[:pdf] = -7
 			offsets[:page] = -6
 		end
-		rel_path = result[:txtFile]
-		pdf_path = File.dirname @result[:txtFile] #Rails.root.join("public/"+result[:pdfFile])
+    puts result[:txtFile]
+		rel_path = result[:txtFile][0]
+		pdf_path = File.dirname @result[:txtFile][0] #Rails.root.join("public/"+result[:pdfFile])
 		path = Rails.root.join("public/"+rel_path)
 		raise "File not found" unless File.exists? path
 		file = File.open path
@@ -35,6 +36,7 @@ module TableBuilder
       	output << format_row(l_ar, pdf_path, offsets)
     	end
 		end
+    file.close
 		return output
 	end
 
@@ -51,6 +53,7 @@ module TableBuilder
 			if(entry.to_f.zero?)
 				entry.gsub "\"", ""
 			elsif(view_context.number_with_precision(entry.to_f, precision: 2, significant: true).size > 15)
+				#if it is too big, use scientific notation
 				"%E" % view_context.number_with_precision(entry.to_f, precision: 2, significant: true)
 			else
 				view_context.number_with_precision(entry.to_f, precision: 2, significant: true)

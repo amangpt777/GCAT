@@ -10,37 +10,37 @@
 </div>
 <% end %>
 <div class="actions" style="margin-top:30px;">
-    <%= link_to "GCAT Users Manual","/resources/GCAT_users_manual.pdf" %> </br>
+    <%= link_to "GCAT Users Manual","/resources/GCAT_users_manual.pdf" %> <br/>
     <%= link_to "GCAT Release Notes","/resources/Release_Notes.pdf" %>
 </div>
 <section>
   <div class="row">
     <div class="form-group col-md-4">
       <h3>Plate Type</h3>
-      <%= f.radio_button(:plate_type, 's', :checked => true) %>
+      <%= f.radio_button(:plate_type, 'single', :checked => true) %>
       <%= f.label(:plate_type_single, "Single-plate") %><br />
-      <%= f.radio_button(:plate_type, 'm', :checked => false) %>
+      <%= f.radio_button(:plate_type, 'multiple', :checked => false) %>
       <%= f.label(:plate_type_single, "Multiple-plate") %><br />
     </div>
     <div class="form-group col-md-4">
       <h3>Input Data File</h3>
-      Please specify a  plate results file to upload for analysis:<br>
+      Please specify a  plate results file to upload for analysis:<br/>
       <div class="field">
         <%= f.file_field :input_file, :class=>'control-label' %>  
       </div>
       <div class="actions" style="margin-top:30px;">
-        <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br>
-        <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br>
+        <%= link_to "Single-Plate Example File","/resources/YPDAFEXglucoseTests_2-25-10.csv" %><br/>
+        <%= link_to "Multi-Plate Example File","/resources/test_YYYY_MM_DD_HH_MM_SS.csv" %><br/>
       </div>
     </div>
     <div class="form-group col-md-4">
       <h3><span data-tooltip="Optionally upload a companion .csv file containing identifying information for all wells in the experiments(s) to be analyzed, including strain identifiers and growth media (or growth environment) definitions, which are used for graphic output.">Plate Layout File</span></h3>
-      Optionally upload a plate layout file:<br>
+      Optionally upload a plate layout file:<br/>
       <div class="field">
         <%= f.file_field :layout_file %>  
       </div>
       <div class="actions" style="margin-top:30px;">
-        <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br>
+        <%= link_to "Single-Plate Layout Example File","/resources/YPDAFEXglucoseTests_2-25-10_Layout.csv" %><br/>
         <%= link_to "Multi-Plate Layout Example File","/resources/MultiPlateLayout_plateID.csv" %>
       </div>
     </div>
@@ -51,33 +51,37 @@
           <%= f.radio_button(:blank_value, "user", {:checked => true, :class => "user_enter3 user_enter3_yes"}) %>
           <%= f.label(:blank_value_user, "User Input.") %>
           <div class="field optional_input3" style="display:none">
-            <%= f.text_field :blank_value_input, :placeholder => 'Enter your OD blank value here' %>
+            <%= f.number_field :blank_value_input, :min=>0, :step=>"any", :placeholder => 'Enter your OD blank value here' %>
           </div>
           <br>
           <%= f.radio_button(:blank_value, "default", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br>
+          <%= f.label(:blank_value_default, "Take the first OD reading of each well to be the blank") %><br/>
           <%= f.radio_button(:blank_value, "zero", {:class => "user_enter3 user_enter3_no"}) %>
-          <%= f.label(:blank_value_zero, "Set to 0" ) %>
+          <%= f.label(:blank_value_zero, "Set to 0" ) %><br/>
+          <div id="assay_blank_value_average_div">
+          <%= f.radio_button(:blank_value, "average", {:class => "user_enter3 user_enter3_no"}) %>
+          <%= f.label(:blank_value_average, "Average OD of blank wells at each time point" ) %>
+          </div>
       </div>
       <div class="form-group col-md-4">
           <h3><span data-tooltip="GCAT transforms optical density (OD) to log(x+δ). x = OD – Media background. Specify a value for n or choose from the defaults. Note: 0 is not recommended unless all wells contain many repeated measurements for initial density that can be used to accurately estimate the baseline density. See the user manual for more details.">OD Transform</span></h3>
-          <%= f.radio_button(:transformation, 0, {:checked => true, :class => "user_enter2 user_enter2_no"}) %>
+          <%= f.radio_button(:transformation, "0", {:checked => true, :class => "user_enter2 user_enter2_no"}) %>
           <%= f.label(:transformation_zero, "log(x)") %><br />
-          <%= f.radio_button(:transformation, 0.1, {:class => "user_enter2 user_enter2_no"}) %>
+          <%= f.radio_button(:transformation, "0.1", {:class => "user_enter2 user_enter2_no"}) %>
           <%= f.label(:transformation_one, "log(x + 0.1)") %><br />
-          <%= f.radio_button(:transformation, -1, {:class => "user_enter2 user_enter2_yes"}) %>
-          <%= f.label(:transformation_any, "log(x + δ)") %> 
+          <%= f.radio_button(:transformation, "user", {:class => "user_enter2 user_enter2_yes"}) %>
+          <%= f.label(:transformation_user, "log(x + δ)") %> 
           <div class="field optional_input2" style="display:none">
               <%= f.text_field :transformation_input, :placeholder => 'Enter your δ value here'%>
           </div>
       </div>
       <div class="form-group col-md-4">
           <h3><span data-tooltip="Choose the preferred growth curve model selection available below.">Growth curve model</span></h3>
-          <%= f.radio_button(:model, 1, {:checked => true, :class => "user_enter1 user_enter1_no"})%>
+          <%= f.radio_button(:model, "sigmoid", {:checked => true, :class => "user_enter1 user_enter1_no"})%>
           <%= f.label(:model_one, "Sigmoid curve") %><br />
           <%#= f.radio_button(:model, 0, {:class => "user_enter1 user_enter1_no"}) %>
           <%#= f.label(:model_zero, "Sigmoid + linear") %>
-          <%= f.radio_button(:model, -1, {:class => "user_enter1 user_enter1_yes"}) %>
+          <%= f.radio_button(:model, "loess", {:class => "user_enter1 user_enter1_yes"}) %>
           <%= f.label(:model_any, "LOESS. The default smoothing value is 0.1.") %>
           <div class="field optional_input1" style="display:none">
               <%= f.text_field :loess_input, :placeholder => 'Enter the smoothing value here.'%>
@@ -176,10 +180,6 @@
         <div class="actions" style="">
           <%= f.submit %>
         </div>
-    </div>
-  </div>
-  <div class="actions" style="margin-top:30px; clear:both;">
-    <%= mail_to "gcat.help@glbrc.wisc.edu","Please Send Any Questions To The GLBRC Help Desk And Be Sure To Include 'GCAT' In Your Subject Title", :subject => "GCAT" %>
   </div>
 </section>
 <% end %>

@@ -9,7 +9,7 @@ feature 'User fills out od transform' do
     choose('assay_transformation_01')
     expect(page).not_to have_selector '#assay_transformation_input'
     
-    choose('assay_transformation_-1')
+    choose('assay_transformation_user')
     expect(page).to have_selector '#assay_transformation_input'
     
     choose('assay_transformation_0')

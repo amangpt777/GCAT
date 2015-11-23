@@ -1,4 +1,4 @@
-<div id="form-container">
+<div class="container" id="form-container">
     <h1>Error</h1>
     <%= @error_msg %>
 	</br></br>
@@ -16,6 +16,10 @@
     </script>
 	</br>
 	<h5>Please resubmit your file.</h5>
-    <%= link_to 'New Assay', new_assay_path%>
+  <div class="actions" style="margin-top:30px; clear:both;">
+    <h5>If you suspect (or found out) that the error was our fault, please let us know! Be sure to include 'GCAT' in your subject title.</h5>
+    <%= mail_to "gcat.help@glbrc.wisc.edu","Click here to mail", :subject => "GCAT" %>
+  </div>
+  <%= link_to 'New Assay', new_assay_path%>
   <br><br><br>
 </div>
