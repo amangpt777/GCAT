@@ -13,12 +13,12 @@ setwd(INPUT.DIR)
 time.input=1/3600
 
 
-expect_that(gcat.analysis.main(file.list = INPUT.FILE, single.plate = T, layout.file = NULL,   
+expect_equal(gcat.analysis.main(file.list = INPUT.FILE, single.plate = T, layout.file = NULL,   
                          out.dir = OUTPUT.DIR, graphic.dir = OUTPUT.DIR, 
                          add.constant = 1, blank.value = "average.layout", start.index = 2, growth.cutoff = 0.05,
                          use.linear.param=F, use.loess=F, smooth.param=0.1,
                          points.to.remove = integer(), remove.jumps = F, time.input=time.input,
-                         silent = F, verbose = T, return.fit = T, overview.jpgs = T), throws_error())
+                         silent = F, verbose = T, return.fit = T, overview.jpgs = T), "If normalize.method is 'average.layout' then a layout file should be specified")
 
 #  Clean up
 unlink(OUTPUT.DIR, recursive=T)
