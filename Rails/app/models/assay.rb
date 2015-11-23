@@ -382,19 +382,12 @@ class Assay
     for r_range_symbol, ruby_min_symbol, ruby_max_symbol in symbols
       ruby_min = self.send("#{ruby_min_symbol}")
       ruby_max = self.send("#{ruby_max_symbol}")
-      if !ruby_min.blank? and !ruby_max.blank?
-        R.eval "#{r_range_symbol} <- c(#{ruby_min.to_f}, #{ruby_max.to_f})" 
-      else
-        R.eval "#{r_range_symbol} <- NA"
-      end
-#wait for R to finish implement this feature
-=begin  
       if !ruby_min.blank? or !ruby_max.blank?
+        puts "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})"
         R.eval "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})" 
       else
         R.eval "#{r_range_symbol} <- NA"
       end
-=end    
     end
     # Area under curve
     self.area_start_hour ||= ''
