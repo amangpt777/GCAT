@@ -67,7 +67,7 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 # growth.cutoff - minimum threshold for curve growth. 
 # points.to.remove - a list of numbers referring to troublesome points that should be removed across all wells.
 # remove.jumps - should the slope checking function be on the lookout for large jumps in OD?
-  
+
 # silent - should messages be returned to the console?
 # verbose - should sub-functions return messages to console? (when I say verbose, I mean it!)
 
@@ -117,16 +117,16 @@ global.version.number = packageDescription(pkg="GCAT")$Version
 #' 
 #' @export
 gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,   
-  out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
-  add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
-  use.linear.param = F, use.loess = F, smooth.param=0.1,
-  lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
-  points.to.remove = 0, remove.jumps = F, time.input = NA,
-  plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
-  multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
-  layout.sheet.headers = c("Strain", "Media Definition"),
-  silent = T, verbose = F, return.fit = F, overview.jpgs = T,
-  auc.start = NULL, auc.end = NULL){
+                              out.dir = getwd(), graphic.dir = paste(out.dir, "/pics", sep = ""), 
+                              add.constant = 0, blank.value, start.index, growth.cutoff = 0.05,
+                              use.linear.param = F, use.loess = F, smooth.param=0.1,
+                              lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
+                              points.to.remove = 0, remove.jumps = F, time.input = NA,
+                              plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
+                              multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
+                              layout.sheet.headers = c("Strain", "Media Definition"),
+                              silent = T, verbose = F, return.fit = F, overview.jpgs = T,
+                              auc.start = NULL, auc.end = NULL){
   
   #  Capture the starting environment for debugging
   main.envir = c(as.list(environment()))
@@ -149,13 +149,13 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     return("If normalize.method is 'average.layout' then a layout file should be specified")
   }
   
-    # MB: Not the best solution.
-    if (is.na(time.input)) {
-      if (single.plate)
-        time.input = 1/3600
-      else
-        return("time.input is NA.")
-    }
+  # MB: Not the best solution.
+  if (is.na(time.input)) {
+    if (single.plate)
+      time.input = 1/3600
+    else
+      return("time.input is NA.")
+  }
   
   # Check heatmap ranges
   # Heatmap ranges will be one of NA, (NA, NA), (val, NA), (NA, val), (val, val)
@@ -173,67 +173,67 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
       if(length(range1) == 2) {
         #  Checking for following condition only if range1 doesn't contain any NA value i.e. its length is 2
         if (!(all(is.na(range1))) & (range1[1] >= range1[2])) return(paste("Heat map range max must be > min.  Bad range:", range1.string))
-        }
       }
     }
+  }
   
-    # MB: Now add.constant will always be 0.
-    # No need to check.
-    #if (add.constant < 0)
-    #  exception("", "The constant r should not be negative.")
-    # End prototyping temporary solution.
-    
-    #  YB: seem to need this to avoid spurious discarding of some wells in example multiplate dataset: 
-    #  Trac ticket 1780. 
-    if(length(points.to.remove)==0) points.to.remove = 0
-    
-    upload.timestamp = strftime(Sys.time(), format="%Y-%m-%d %H:%M:%S") # Get a timestamp for the time of upload.  
-    fitted.well.array.master = list()
-    source.file.list = c()
+  # MB: Now add.constant will always be 0.
+  # No need to check.
+  #if (add.constant < 0)
+  #  exception("", "The constant r should not be negative.")
+  # End prototyping temporary solution.
   
-    dim(fitted.well.array.master) = c(plate.nrow,plate.ncol,0)
-    dimnames(fitted.well.array.master) = list(PLATE.LETTERS[1:plate.nrow], 1:plate.ncol, c())
+  #  YB: seem to need this to avoid spurious discarding of some wells in example multiplate dataset: 
+  #  Trac ticket 1780. 
+  if(length(points.to.remove)==0) points.to.remove = 0
+  
+  upload.timestamp = strftime(Sys.time(), format="%Y-%m-%d %H:%M:%S") # Get a timestamp for the time of upload.  
+  fitted.well.array.master = list()
+  source.file.list = c()
+  
+  dim(fitted.well.array.master) = c(plate.nrow,plate.ncol,0)
+  dimnames(fitted.well.array.master) = list(PLATE.LETTERS[1:plate.nrow], 1:plate.ncol, c())
+  
+  for(file.name in file.list){
     
-    for(file.name in file.list){
-      
-      # Call <gcat.fit.main> on the file with single plate options
-    	fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",   
-          single.plate = single.plate, layout.file = layout.file, start.index = start.index, 
-          time.input = time.input, normalize.method=normalize.method, add.constant = add.constant, blank.value = blank.value, 
-          growth.cutoff = growth.cutoff, points.to.remove = points.to.remove, remove.jumps = remove.jumps,
-    	    use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param,
-          plate.nrow = plate.nrow, plate.ncol = plate.ncol, multi.column.headers = multi.column.headers, 
-          single.column.headers = single.column.headers, layout.sheet.headers = layout.sheet.headers,
-          input.skip.lines = input.skip.lines, silent = silent, verbose = verbose), silent = T)
-      
-      # Return error message if the function fails.
-      if(class(fitted.well.array) == "try-error")
-        return(as.character(fitted.well.array))  
-    }
-      
-    # Add fitted well array onto existing fitted wells
-    fitted.well.array.master = gcat.append.arrays(fitted.well.array.master, fitted.well.array, plate.ncol, plate.nrow)
+    # Call <gcat.fit.main> on the file with single plate options
+    fitted.well.array = try(gcat.fit.main(file.name = file.name, load.type = "csv",   
+                                          single.plate = single.plate, layout.file = layout.file, start.index = start.index, 
+                                          time.input = time.input, normalize.method=normalize.method, add.constant = add.constant, blank.value = blank.value, 
+                                          growth.cutoff = growth.cutoff, points.to.remove = points.to.remove, remove.jumps = remove.jumps,
+                                          use.linear.param=use.linear.param, use.loess=use.loess, smooth.param=smooth.param,
+                                          plate.nrow = plate.nrow, plate.ncol = plate.ncol, multi.column.headers = multi.column.headers, 
+                                          single.column.headers = single.column.headers, layout.sheet.headers = layout.sheet.headers,
+                                          input.skip.lines = input.skip.lines, silent = silent, verbose = verbose), silent = T)
     
-    # Remove the "processed_" tag from file names and add to the list of source files.
-    source.file.list = c(source.file.list, basename(paste(strsplit(file.name, "processed_")[[1]],collapse="/")))        
-
-    out.files = try(gcat.output.main(fitted.well.array.master, out.prefix = "output", 
-          source.file.list = source.file.list, upload.timestamp = upload.timestamp,   
-          growth.cutoff = growth.cutoff, add.constant = add.constant, blank.value = blank.value, start.index = start.index, 
-          points.to.remove = points.to.remove, remove.jumps = remove.jumps, 
-          lagRange = lagRange, specRange = specRange, totalRange = totalRange, totalODRange = totalODRange,
-          out.dir = out.dir, graphic.dir = graphic.dir, overview.jpgs=overview.jpgs,
-          use.linear.param=use.linear.param, use.loess=use.loess, plate.ncol = plate.ncol, plate.nrow = plate.nrow,
-          silent = silent, main.envir = main.envir, auc.start = auc.start, auc.end = auc.end), 
-          silent = T)
-    
-    # Return file list or error message otherwise return "successful analysis" message (?)
-
-    # file.list = c("Data was successfully analyzed.", file.list) # <--- yet to be implemented. causes errors downstream right now   
-    if(class(out.files) == "try-error") return(as.character(out.files)) 
-    
-    if(return.fit) return(fitted.well.array.master)
-      else return(out.files)  
+    # Return error message if the function fails.
+    if(class(fitted.well.array) == "try-error")
+      return(as.character(fitted.well.array))  
+  }
+  
+  # Add fitted well array onto existing fitted wells
+  fitted.well.array.master = gcat.append.arrays(fitted.well.array.master, fitted.well.array, plate.ncol, plate.nrow)
+  
+  # Remove the "processed_" tag from file names and add to the list of source files.
+  source.file.list = c(source.file.list, basename(paste(strsplit(file.name, "processed_")[[1]],collapse="/")))        
+  
+  out.files = try(gcat.output.main(fitted.well.array.master, out.prefix = "output", 
+                                   source.file.list = source.file.list, upload.timestamp = upload.timestamp,   
+                                   growth.cutoff = growth.cutoff, add.constant = add.constant, blank.value = blank.value, start.index = start.index, 
+                                   points.to.remove = points.to.remove, remove.jumps = remove.jumps, 
+                                   lagRange = lagRange, specRange = specRange, totalRange = totalRange, totalODRange = totalODRange,
+                                   out.dir = out.dir, graphic.dir = graphic.dir, overview.jpgs=overview.jpgs,
+                                   use.linear.param=use.linear.param, use.loess=use.loess, plate.ncol = plate.ncol, plate.nrow = plate.nrow,
+                                   silent = silent, main.envir = main.envir, auc.start = auc.start, auc.end = auc.end), 
+                  silent = T)
+  
+  # Return file list or error message otherwise return "successful analysis" message (?)
+  
+  # file.list = c("Data was successfully analyzed.", file.list) # <--- yet to be implemented. causes errors downstream right now   
+  if(class(out.files) == "try-error") return(as.character(out.files)) 
+  
+  if(return.fit) return(fitted.well.array.master)
+  else return(out.files)  
 }
 
 ########################################################################
@@ -292,15 +292,15 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
 #' 
 #' @return An array of well objects 
 gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout.file = NULL, 
-  single.plate = F, blank.value = NULL, start.index = 2, time.input = NA,
-  normalize.method = "default", add.constant = 1, use.log = T, points.to.remove = 0,
-  use.linear.param=F, use.loess=F, smooth.param=0.1,
-  fall.cutoff = -0.0025, growth.cutoff = 0.05, remove.jumps = F,  
-  plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
-  multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
-  layout.sheet.headers = c("Strain", "Media Definition"),
-  growth.model = NA, backup.growth.model = NA, 
-  silent = F, verbose = F){
+                         single.plate = F, blank.value = NULL, start.index = 2, time.input = NA,
+                         normalize.method = "default", add.constant = 1, use.log = T, points.to.remove = 0,
+                         use.linear.param=F, use.loess=F, smooth.param=0.1,
+                         fall.cutoff = -0.0025, growth.cutoff = 0.05, remove.jumps = F,  
+                         plate.nrow = 8, plate.ncol = 12, input.skip.lines = 0,
+                         multi.column.headers = c("Plate.ID", "Well", "OD", "Time"), single.column.headers = c("","A1"), 
+                         layout.sheet.headers = c("Strain", "Media Definition"),
+                         growth.model = NA, backup.growth.model = NA, 
+                         silent = F, verbose = F){
   
   # Explanation of arguments:
   
@@ -309,11 +309,11 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   #   input.data - use pre-loaded data set (output from <gcat.load.data> function only). will override <file.name> if not NULL 
   #   load.type - supports "csv." 
   #   layout.file - full path to a file containing the plate layout in the same format as <file.name>. will not be used if <load.type> is "xlsx"
-
+  
   # ---Input file format---
   #   single.plate - true denotes data in single-plate format, i.e. simple OD output. false denotes multiple-plate robotic screening output.  
   #      note: reading directly from excel to R results in timestamps being converted to days.
-
+  
   # ---Normalization and Transforms---
   #  blank.value - user can enter a blank OD measurement for uninoculated wells. if NULL, defaults to the value of the first OD measurement of each well. 
   #  start.index - which timepoint should be used as the first one after inoculation (defaults to the 2th one)
@@ -340,7 +340,7 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   #  unlog - should exported graphics be transformed back to the OD scale? 
   #  return.fit - should the function return an array of wells? if not, it will return a list of generated files.  
   
-  	
+  
   ########################################################################
   #    Read from .csv file                                               #
   ########################################################################
@@ -348,39 +348,39 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   # The functions used here are found in table2well.R
   
   if(!silent) cat("\nReading input files...")
-    # Read from .csv or tab-delimited text file using <gcat.load.data> (in load.R)
-    #   if <layout.file> is provided, it will be used here.  
-    
-    plate.layout = NULL          
-    # Read layout file if it is specified. 
-    if(!is.null(layout.file)){
-      if(load.type=="csv") plate.layout = read.csv(layout.file,header=T,stringsAsFactors=F)
-      else plate.layout = read.table(layout.file,header=T,sep="\t",stringsAsFactors=F)                                      
-      if(!silent) cat("\n\tAdded plate layout information from", layout.file, "\n")
-    }
-      
-    # Load the data    
-		well.array = try(gcat.load.data(file.name = file.name, input.data = input.data, 
-                      plate.layout = plate.layout, plate.nrow = plate.nrow, plate.ncol = plate.ncol, 
-                      input.skip.lines = input.skip.lines, multi.column.headers = multi.column.headers, 
-                      single.column.headers = single.column.headers, layout.sheet.headers = layout.sheet.headers,
-                      blank.value = blank.value, start.index = start.index, single.plate = single.plate, 
-                      load.type = load.type, silent=silent),silent=silent)
-
-   # Return an error if there is a problem with file loading. 
-    if (class(well.array) == "try-error")
-    	stop("Error in <gcat.load.data>: ", well.array)
-		
-
+  # Read from .csv or tab-delimited text file using <gcat.load.data> (in load.R)
+  #   if <layout.file> is provided, it will be used here.  
+  
+  plate.layout = NULL          
+  # Read layout file if it is specified. 
+  if(!is.null(layout.file)){
+    if(load.type=="csv") plate.layout = read.csv(layout.file,header=T,stringsAsFactors=F)
+    else plate.layout = read.table(layout.file,header=T,sep="\t",stringsAsFactors=F)                                      
+    if(!silent) cat("\n\tAdded plate layout information from", layout.file, "\n")
+  }
+  
+  # Load the data    
+  well.array = try(gcat.load.data(file.name = file.name, input.data = input.data, 
+                                  plate.layout = plate.layout, plate.nrow = plate.nrow, plate.ncol = plate.ncol, 
+                                  input.skip.lines = input.skip.lines, multi.column.headers = multi.column.headers, 
+                                  single.column.headers = single.column.headers, layout.sheet.headers = layout.sheet.headers,
+                                  blank.value = blank.value, start.index = start.index, single.plate = single.plate, 
+                                  load.type = load.type, silent=silent),silent=silent)
+  
+  # Return an error if there is a problem with file loading. 
+  if (class(well.array) == "try-error")
+    stop("Error in <gcat.load.data>: ", well.array)
+  
+  
   # !---At this point, <well.array> is an array of well objects, each containing raw data and media/strain information if provided--- 
   
   # Attempt to apply time formatting to all wells in array 
   well.array = try(aapply(well.array, gcat.start.times, start.index = start.index, time.input = time.input),silent=silent)
   
-      # Return an error if there is a problem with time formatting
-      if (class(well.array) == "try-error")
-      	stop("Error in <gcat.start.times>: ", well.array)
-  	
+  # Return an error if there is a problem with time formatting
+  if (class(well.array) == "try-error")
+    stop("Error in <gcat.start.times>: ", well.array)
+  
   ########################################################################
   #    Perform  normalization and transformation of raw data             #
   ########################################################################                                           
@@ -396,11 +396,11 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   # Normalize ODs using specified method and adding a constant if desired.  
   #   sets the "norm" slot of each well to a value to be subtracted from OD values whenever data is retrieved from the well
   well.array = try(normalize.ODs(well.array, normalize.method = normalize.method, 
-    start.index = start.index, blank.value = blank.value, add.constant = add.constant),silent=silent)
+                                 start.index = start.index, blank.value = blank.value, add.constant = add.constant),silent=silent)
   
-      # Return an error if there is a problem with normalization
-      if (class(well.array) == "try-error")
-      	stop("Error in <normalize.ODs>: ", well.array)
+  # Return an error if there is a problem with normalization
+  if (class(well.array) == "try-error")
+    stop("Error in <normalize.ODs>: ", well.array)
   #well.array = try(subtract.blank(well.array, blank.value), silent = silent)
   
   # Transform ODs on the logarithmic scale, regardless of whether <use.log> is true 
@@ -408,9 +408,9 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   #   the "use.log" slot of each well is set instead to determine whether the transformed values will be returned when data is retrieved from the well.
   well.array = try(aapply(well.array, transform.ODs, start.index = start.index, blank.value = blank.value, use.log = use.log, constant.added = add.constant, normalize.method = normalize.method),silent=silent)
   
-      # Return an error if there is a problem with transformation
-      if (class(well.array) == "try-error")
-      	stop("Error in <transform.ODs>: ", well.array)
+  # Return an error if there is a problem with transformation
+  if (class(well.array) == "try-error")
+    stop("Error in <transform.ODs>: ", well.array)
   
   # Remove specified timepoints across wells (use "points.to.remove=NULL" if no points to remove) 
   well.array = try(aapply(well.array, remove.points, points = points.to.remove),silent=silent)
@@ -420,49 +420,49 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
     stop("Error in <remove.points>: ", well.array)   
   
   
-    
+  
   ########################################################################
   #    Pre-fitting data processing (analysis of curve shapes)            #
   ########################################################################                                           
   #
   # The functions used here are found in slope.analysis.R
-                               
+  
   # Estimate slope at each timepoint 
   #  add a column to the "well.array" slot of each well with the local slope at each timepoint 
   
   well.array = try(aapply(well.array, calculate.slopes, silent=!verbose),silent=silent)
   
-      # Return an error if there is a problem with slope calculation
-      if (class(well.array) == "try-error")
-      	stop("Error in <calculate.slopes>: ", well.array)
+  # Return an error if there is a problem with slope calculation
+  if (class(well.array) == "try-error")
+    stop("Error in <calculate.slopes>: ", well.array)
   
   # Check slopes for tanking and/or jumping behavior
   #  fills the "curve.par" slot of each well with <tanking.start>, denoting the timepoint at which tanking starts (if none, value is NA) 
   #  uses <remove.points> to remove all points after <tanking.start>
   #  It will also fill the "jump.error" slot with a status message, and try to use an automated process to remove the 
   #     erroneous points if <remove.jumps> is true (default false). 
-    
+  
   well.array = try(aapply(well.array, check.slopes, fall.cutoff = fall.cutoff, remove.jumps = remove.jumps, silent=!verbose, draw = F),silent=silent)
- 
-      # Return an error if there is a problem with slope analysis
-      if (class(well.array) == "try-error")
-      	stop("Error in <check.slopes>: ", well.array)
-      	
-      	
+  
+  # Return an error if there is a problem with slope analysis
+  if (class(well.array) == "try-error")
+    stop("Error in <check.slopes>: ", well.array)
+  
+  
   # Check curves for growth above cutoff
   #   fills the "curve.par" slot of each well with <no.growth>, denoting whether the well has no detectable growth. 
   well.array = try(aapply(well.array, check.growth, growth.cutoff = growth.cutoff, start.index = start.index),silent=silent)
   
-      # Return an error if there is a problem with growth.check
-      if (class(well.array) == "try-error")
-      	stop("Error in <check.growth>: ", well.array)
-      	
+  # Return an error if there is a problem with growth.check
+  if (class(well.array) == "try-error")
+    stop("Error in <check.growth>: ", well.array)
+  
   ########################################################################
   #           Fit parameterized models to data                           #
   ########################################################################                                           
   #
   # The functions used here are found in fit.model.R    
-                                 
+  
   # Fit each well with the selected model and attempt to catch failed fittings with the backup model 
   #   skips wells designated as <no.growth> above
   #   fills the "fit.info" slot of each well with "success," "failed," or "skipped"
@@ -475,15 +475,15 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
                       backup.growth.model = backup.growth.model, use.linear.param=use.linear.param,
                       use.loess=use.loess, smooth.param=smooth.param, silent=!verbose)
   
-      # Return an error if there is a problem with model fitting
-      if (class(well.array) == "try-error")
-      	stop("Error in <fit.model>: ", well.array)
-        
+  # Return an error if there is a problem with model fitting
+  if (class(well.array) == "try-error")
+    stop("Error in <fit.model>: ", well.array)
+  
   if(!silent) cat("\ndone!\n")     
   return(well.array)     
-  }    
-  
-  
+}    
+
+
 ########################################################################
 #                                                                      #
 #   Output function for generating files from fitted data.             #
@@ -526,42 +526,42 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
 #' 
 #' @return A list of output files if success.
 gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list, upload.timestamp = NULL,   
-  add.constant, blank.value, start.index, growth.cutoff, points.to.remove, remove.jumps, 
-  out.dir = getwd(), graphic.dir = paste(out.dir,"/pics",sep = ""), overview.jpgs = T,
-  use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
-  plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir, auc.start = NULL, auc.end = NULL){     
-
+                            add.constant, blank.value, start.index, growth.cutoff, points.to.remove, remove.jumps, 
+                            out.dir = getwd(), graphic.dir = paste(out.dir,"/pics",sep = ""), overview.jpgs = T,
+                            use.linear.param=F, use.loess=F, lagRange = NA, totalRange = NA, totalODRange = NA, specRange = NA,
+                            plate.nrow = 8, plate.ncol = 12, unlog = F, silent = T, main.envir, auc.start = NULL, auc.end = NULL){     
+  
   # Prepare timestamp for addition to output file names. 
   filename.timestamp = strftime(upload.timestamp, format="_%Y-%m-%d_%H.%M.%S")
-    	
+  
   ########################################################################
   #           Prepare to write to output files                           #
   ########################################################################                                            	
-	 if(is.null(blank.value)) blank.value = "First timepoint in well"
-	 
+  if(is.null(blank.value)) blank.value = "First timepoint in well"
+  
   if(!silent) cat("\nFinding/creating new output directories...")
-   
+  
   old.wd = getwd()  
   # Create output directory if it doesn't exist
   if(class(try(setwd(out.dir), silent = T)) == "try-error"){
-  	if(!silent) cat("\ncreating new output directory")
-  	if (class(try(dir.create(out.dir))) == "try-error")
-  		stop("Error creating new output directory!")
-  	}
+    if(!silent) cat("\ncreating new output directory")
+    if (class(try(dir.create(out.dir))) == "try-error")
+      stop("Error creating new output directory!")
+  }
   
   # Create graphics directory if it doesn't exist
   if(class(try(setwd(graphic.dir), silent = T)) == "try-error"){
-  	if(!silent) cat("\ncreating new graphics directory")
-  	if (class(try(dir.create(graphic.dir))) == "try-error")
-  		stop("Error creating new graphics directory!")
-  	}
-  	
+    if(!silent) cat("\ncreating new graphics directory")
+    if (class(try(dir.create(graphic.dir))) == "try-error")
+      stop("Error creating new graphics directory!")
+  }
+  
   ########################################################################
   #    Populate a data table with fit results and write to file          #
   ######################################################################## 
   #                                         
   # The functions used here are found in table.output.R 
-                                 
+  
   # Creates a table with a row for each well and a column for each of various identifiers and fitted and calculated parameters. 
   
   if(!silent) cat("\nPopulating data table...")
@@ -569,23 +569,23 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
                             use.linear.param=use.linear.param, use.loess=use.loess, 
                             constant.added=add.constant, auc.start = auc.start, auc.end = auc.end))
   
-      # Return an error if there is a problem with returning the table
-      if (class(fitted.well.array) == "try-error")
-      	stop("Error in <table.out>: ", fitted.well.array)
-      	
- 	
+  # Return an error if there is a problem with returning the table
+  if (class(fitted.well.array) == "try-error")
+    stop("Error in <table.out>: ", fitted.well.array)
+  
+  
   # Set working directory to <out.dir>
-	if (class(try(setwd(out.dir))) == "try-error")
-		stop("Error setting directory for table output")
-		
-	# Write output table to file in <out.dir> 
+  if (class(try(setwd(out.dir))) == "try-error")
+    stop("Error setting directory for table output")
+  
+  # Write output table to file in <out.dir> 
   table.filename = paste(out.dir, "/", out.prefix, "_gcat.fit", filename.timestamp, ".txt", sep = "")
   if (class(try(write.table(table.fit, table.filename, sep = "\t", row.names = F))) == "try-error")
-		stop("Error writing tabular output")
-		
- 	# ---If successfully written, add postscript and start a list of generated files.	
+    stop("Error writing tabular output")
+  
+  # ---If successfully written, add postscript and start a list of generated files.	
   generated.files = table.filename
-
+  
   ########################################################################
   #    Write individual fit and overview graphics to file                #
   ######################################################################## 
@@ -595,18 +595,23 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
   if(!silent) cat("\nDrawing graphics...")
   
   # Set working directory to <graphic.dir>
-	if (class(try(setwd(graphic.dir))) == "try-error")
-		stop("Error setting directory for graphic output")
-	# Use function <pdf.by.plate> to write fit graphics to file. 
+  if (class(try(setwd(graphic.dir))) == "try-error")
+    stop("Error setting directory for graphic output")
+  # Use function <pdf.by.plate> to write fit graphics to file. 
   
-	graphic.files = try(pdf.by.plate(fitted.well.array, out.prefix=out.prefix, upload.timestamp = upload.timestamp, 
-    unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, lagRange = lagRange, specRange = specRange, totalRange = totalRange,
-    totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow, auc.start = auc.start, 
-    auc.end = auc.end),silent=silent)
+  graphic.files = try(pdf.by.plate(fitted.well.array, out.prefix=out.prefix, upload.timestamp = upload.timestamp, 
+                                   unlog=unlog,constant.added=add.constant,overview.jpgs=overview.jpgs, lagRange = lagRange, specRange = specRange, totalRange = totalRange,
+                                   totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow, auc.start = auc.start, 
+                                   auc.end = auc.end),silent=silent)
   
-  if (class(graphic.files) == "try-error")
-		stop("Error in <pdf.by.plate>: ", graphic.files)
- 
+  if (class(graphic.files) == "try-error") {
+    if(!silent)
+      exception("", paste("Error in <pdf.by.plate>: ", graphic.files))
+    else
+      exception("", graphic.files)
+  }
+    
+  
   # If successfully written, add to the list of generated files.	
   generated.files = c(generated.files, graphic.files)
   
@@ -647,11 +652,11 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
       "\n#    - tank: (Tanking indicator) If a number is present then the growth trend was determined to tank at that timepoint index.", 
       "\n#    - other: Additional flag column.  Displays information about whether jumps in OD were detected and what was done about them.",
       "\n#    - pdf.file and page.no: location of the figure for this well in the output .pdf files."
-      )
+  )
   
-	 # Analysis information 
-   
-   cat("\n#\n# -- Source file information--",
+  # Analysis information 
+  
+  cat("\n#\n# -- Source file information--",
       "\n# ",  paste(source.file.list, collapse = "\n# "), 
       "\n#  analyzed using GCAT v", global.version.number,  
       "\n#  request sent: ", upload.timestamp, 
@@ -663,7 +668,7 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
       "\n#    - Minimum growth threshold:", growth.cutoff, 
       "\n#    - Removed points:", paste(points.to.remove, collapse = " "),
       "\n#    - Jump detection:", remove.jumps
-   )
+  )
   
   # gcat.analysis.main() starting environment
   cat("\n#\n# -- gcat.analysis.main() starting environment --\n#")
@@ -676,10 +681,9 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
   #                 Return values to R                                   #
   ######################################################################## 
   #  
-
+  
   if(!silent) cat("\ndone!")                    
   setwd(old.wd)
   # Return list of generated files
-	return(generated.files)
-  }
-  
+  return(generated.files)
+}
