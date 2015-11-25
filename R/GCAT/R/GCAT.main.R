@@ -604,8 +604,13 @@ gcat.output.main = function(fitted.well.array, out.prefix = "", source.file.list
                                    totalODRange = totalODRange, plate.ncol = plate.ncol, plate.nrow = plate.nrow, auc.start = auc.start, 
                                    auc.end = auc.end),silent=silent)
   
-  if (class(graphic.files) == "try-error")
-    exception("",paste("Error in <pdf.by.plate>: ", graphic.files))
+  if (class(graphic.files) == "try-error") {
+    if(!silent)
+      exception("", paste("Error in <pdf.by.plate>: ", graphic.files))
+    else
+      exception("", graphic.files)
+  }
+    
   
   # If successfully written, add to the list of generated files.	
   generated.files = c(generated.files, graphic.files)

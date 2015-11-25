@@ -675,17 +675,34 @@ pdf.by.plate = function(fitted.data, out.prefix = "", upload.timestamp = NULL,
         #Heatmap block##########################################################
         #alongside the jpgs file create 3 heatmaps for each plate. NWD
         spec.heat.file = try(create.heatmap(fitted.data[,,i], max.spec.growth.rate, MinMax = specRange, constant.added))
-        if(class(spec.heat.file) == "try-error")
-          exception("", paste("Error in <create.heatmap> for specific growth ", paste(trimws(spec.heat.file), "for specRange")))
+        if(class(spec.heat.file) == "try-error") {
+          if(!silent)
+            exception("", paste("Error in <create.heatmap> for specific growth ", paste(trimws(spec.heat.file), "for specRange parameter")))  
+          else
+            exception("", paste(trimws(spec.heat.file), "for specRange"))
+        }
         lag.heat.file = try(create.heatmap(fitted.data[,,i], lag.time, MinMax = lagRange, constant.added))
-        if(class(lag.heat.file) == "try-error")
-          exception("", paste("Error in <create.heatmap> for lag time ", paste(trimws(lag.heat.file), "for lagRange")))
+        if(class(lag.heat.file) == "try-error") {
+          if(!silent)
+            exception("", paste("Error in <create.heatmap> for lag time ", paste(trimws(lag.heat.file), "for lagRange parameter")))
+          else
+            exception("", paste(trimws(lag.heat.file), "for lagRange"))
+        }
         total.heat.file = try(create.heatmap(fitted.data[,,i], achieved.growth, MinMax = totalRange, constant.added))
-        if(class(total.heat.file) == "try-error")
-          exception("", paste("Error in <create.heatmap> for total growth ", paste(trimws(total.heat.file), "for totalRange")))
+        if(class(total.heat.file) == "try-error") {
+          if(!silent)
+            exception("", paste("Error in <create.heatmap> for total growth ", paste(trimws(total.heat.file), "for totalRange paramter")))
+          else
+            exception("", paste(trimws(total.heat.file), "for totalRange"))
+        }
         total.OD.heat.file = try(create.heatmap(fitted.data[,,i], achieved.growth.OD, MinMax = totalODRange, constant.added))
-        if(class(total.OD.heat.file) == "try-error")
-          exception("", paste("Error in <create.heatmap> for total OD growth ", paste(trimws(total.OD.heat.file), "for totalODRange")))
+        if(class(total.OD.heat.file) == "try-error") {
+          if(!silent)
+            exception("", paste("Error in <create.heatmap> for total OD growth ", paste(trimws(total.OD.heat.file), "for totalODRange parameter")))
+          else
+            exception("", paste(trimws(total.OD.heat.file), "for totalODRange"))
+        }
+          
         #  Add name of file if successfully written to file list output. Including heatmap files NWD
         file.list.out = c(file.list.out, spec.heat.file, lag.heat.file, total.heat.file, total.OD.heat.file)
         ########################################################################
