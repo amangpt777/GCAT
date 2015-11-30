@@ -185,8 +185,8 @@ class Assay
     # uniqueID = Process.pid.to_s + "-" + Time.now.to_i.to_s
     #wanted the date to be easier to extract NWD 2/26/14
     today = Time.now
-    uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
-	# + rand(36**8).to_s(36) if we want it more randominzed
+    uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s + "-" + rand(36**8).to_s(36)
+    #if we want it more randominzed
   end
 
  
