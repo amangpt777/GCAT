@@ -71,7 +71,7 @@ class Assay
     :specg_min, :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,
     :transformation, :transformation_input, 
     :area_start_hour, :area_end_hour,
-    :uploaded_files_directory, :generated_files_directory, 
+    :uploaded_files_directory, :generated_files_directory, :uniqueID, 
     :input_file_path, :layout_file_path, #pathname object, not string
     :overviewFiles, :pdfFiles, :txtFiles, :consoleOut
 
@@ -193,6 +193,7 @@ class Assay
   def generate_directory_names
     uniqueID = getUniqueID
     # set working directories for uploaded and generated files
+    @uniqueID = uniqueID
     @uploaded_files_directory = Rails.root.join("public", "uploadedFiles", uniqueID)
     @generated_files_directory = Rails.root.join("public", "generatedFiles", uniqueID)
   end

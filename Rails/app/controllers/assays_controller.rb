@@ -58,8 +58,9 @@ class AssaysController < ApplicationController
       render :action => 'show'
     rescue GCATError=>e
       #remove files if calculation is not successful
-      FileUtils.rm_rf @assay.uploaded_files_directory
-      FileUtils.rm_rf @assay.generated_files_directory
+      #currently we don't clean it right away because user might need to report error
+      #FileUtils.rm_rf @assay.uploaded_files_directory
+      #FileUtils.rm_rf @assay.generated_files_directory
       if not e.data.nil?
         flash.now[:error] = e.data[:error_message]
         @error_msg = e.data[:error_message]
@@ -71,5 +72,41 @@ class AssaysController < ApplicationController
     end
     $stdout.close
     $stdout = original_stdout
-  end  
+  end 
+
+  def notify_admin
+    #pack files if they exist
+    email = params[:email]
+    name = params[:name]
+    uniqueID = params[:assay_id]
+    uploaded_files_directory = Rails.root.join("public", "uploadedFiles", uniqueID)
+    generated_files_directory = Rails.root.join("public", "generatedFiles", uniqueID)
+    zip_path = Rails.root.join("tmp","debug-info-"+uniqueID+".zip")
+    #if we try to add two files with the same name, it will throw error, we can ignore it
+    begin
+      Zip::File.open(zip_path, Zip::File::CREATE) { |zf| 
+      
+        if File.exists?(uploaded_files_directory)
+          files = Dir.glob(uploaded_files_directory.to_s + "/*")
+          for file in files
+            puts file, File.basename(file)
+            zf.add(File.basename(file), file)
+          end
+        end
+        
+        if File.exists?(generated_files_directory)
+          files = Dir.glob(generated_files_directory.to_s + "/*")
+          for file in files
+            puts file, File.basename(file)
+            zf.add(File.basename(file), file)
+          end
+        end    
+      }
+    rescue
+    end
+    HelpdeskMailer.reportError({:email=>email, :name=>name, :zip_path=>zip_path}).deliver
+    @admin_notified = true
+    render :action => 'inputfile_error_message'
+    @admin_notified = false
+  end
 end

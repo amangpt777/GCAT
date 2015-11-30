@@ -21,8 +21,9 @@
 Gcat::Application.routes.draw do
   resources :assays
   
+  post 'notify_admin', to: 'assays#notify_admin'
   root :to => 'assays#new'
-  
+    
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
