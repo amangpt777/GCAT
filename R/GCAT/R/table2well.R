@@ -81,7 +81,8 @@ gcat.load.data = function(file.name = NULL, load.type = "csv", input.data = NULL
     
 		# input.data = read.csv(file.name, colClasses = colclasses, stringsAsFactors=F, skip = input.skip.lines, fileEncoding='UTF-8')
 		input.data = read.csv(file.name, stringsAsFactors=F, skip = input.skip.lines, fileEncoding='UTF-8')
-    
+		# To remove lines with all the columns as empty or NA
+		input.data = input.data[!apply(is.na(input.data) | input.data == "", 1, all), ]
     # Checking for temperature column.
     # Reread the file if temp column is there.
     # MB: Not the best solution.

@@ -354,7 +354,10 @@ gcat.fit.main = function(file.name, input.data = NULL, load.type = "csv", layout
   plate.layout = NULL          
   # Read layout file if it is specified. 
   if(!is.null(layout.file)){
-    if(load.type=="csv") plate.layout = read.csv(layout.file,header=T,stringsAsFactors=F)
+    if(load.type=="csv") {
+      plate.layout = read.csv(layout.file,header=T,stringsAsFactors=F)
+      plate.layout = plate.layout[!apply(is.na(plate.layout) | plate.layout == "", 1, all), ]
+    }
     else plate.layout = read.table(layout.file,header=T,sep="\t",stringsAsFactors=F)                                      
     if(!silent) cat("\n\tAdded plate layout information from", layout.file, "\n")
   }
