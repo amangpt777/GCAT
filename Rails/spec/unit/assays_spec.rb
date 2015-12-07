@@ -959,7 +959,7 @@ EOF
         expect(R.pull("#{r_range}[2]")).to eq 1
       end
     end
-=begin
+    
     it "binds heatmap ranges correctly - min value specified, max value blank" do
       symbols = [[:specRange, :specg_min, :specg_max], 
         [:totalRange, :totg_min, :totg_max], 
@@ -1013,7 +1013,7 @@ EOF
         expect(R.pull("#{r_range}[2]")).to eq 3
       end
     end
-=end
+    
     it "binds heatmap ranges correctly - both blank" do
       symbols = [[:specRange, :specg_min, :specg_max], 
         [:totalRange, :totg_min, :totg_max], 

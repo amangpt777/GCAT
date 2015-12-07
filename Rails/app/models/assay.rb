@@ -71,7 +71,7 @@ class Assay
     :specg_min, :specg_max, :totg_min, :totg_max, :totg_OD_min, :totg_OD_max, :lagT_min, :lagT_max,
     :transformation, :transformation_input, 
     :area_start_hour, :area_end_hour,
-    :uploaded_files_directory, :generated_files_directory, 
+    :uploaded_files_directory, :generated_files_directory, :uniqueID, 
     :input_file_path, :layout_file_path, #pathname object, not string
     :overviewFiles, :pdfFiles, :txtFiles, :consoleOut
 
@@ -185,14 +185,15 @@ class Assay
     # uniqueID = Process.pid.to_s + "-" + Time.now.to_i.to_s
     #wanted the date to be easier to extract NWD 2/26/14
     today = Time.now
-    uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s
-	# + rand(36**8).to_s(36) if we want it more randominzed
+    uniqueID = today.year.to_s + pad_date(today.month) + pad_date(today.day) + "-" + today.to_i.to_s + "-" + rand(36**8).to_s(36)
+    #if we want it more randominzed
   end
 
  
   def generate_directory_names
     uniqueID = getUniqueID
     # set working directories for uploaded and generated files
+    @uniqueID = uniqueID
     @uploaded_files_directory = Rails.root.join("public", "uploadedFiles", uniqueID)
     @generated_files_directory = Rails.root.join("public", "generatedFiles", uniqueID)
   end
@@ -382,19 +383,12 @@ class Assay
     for r_range_symbol, ruby_min_symbol, ruby_max_symbol in symbols
       ruby_min = self.send("#{ruby_min_symbol}")
       ruby_max = self.send("#{ruby_max_symbol}")
-      if !ruby_min.blank? and !ruby_max.blank?
-        R.eval "#{r_range_symbol} <- c(#{ruby_min.to_f}, #{ruby_max.to_f})" 
-      else
-        R.eval "#{r_range_symbol} <- NA"
-      end
-#wait for R to finish implement this feature
-=begin  
       if !ruby_min.blank? or !ruby_max.blank?
+        puts "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})"
         R.eval "#{r_range_symbol} <- c(#{ruby_min.blank? ? "NA" : ruby_min.to_f}, #{ruby_max.blank? ? "NA" : ruby_max.to_f})" 
       else
         R.eval "#{r_range_symbol} <- NA"
       end
-=end    
     end
     # Area under curve
     self.area_start_hour ||= ''
