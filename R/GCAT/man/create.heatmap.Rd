@@ -4,7 +4,8 @@
 \alias{create.heatmap}
 \title{Create a heat map of a plate}
 \usage{
-create.heatmap(fitted.well.array, attribute, MinMax = NA, constant.added)
+create.heatmap(fitted.well.array, attribute, MinMax = NA, constant.added,
+  range.name)
 }
 \arguments{
 \item{fitted.well.array}{matrix containing well array object data}
