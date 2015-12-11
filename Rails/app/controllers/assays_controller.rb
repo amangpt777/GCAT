@@ -74,6 +74,8 @@ class AssaysController < ApplicationController
     $stdout = original_stdout
   end 
 
+#notify admin about this error
+#and send thank you letter to user (if the user provided a valid email address)
   def notify_admin
     #pack files if they exist
     email = params[:email]
@@ -104,7 +106,9 @@ class AssaysController < ApplicationController
       }
     rescue
     end
-    HelpdeskMailer.reportError({:email=>email, :name=>name, :zip_path=>zip_path}).deliver
+    info = {:email=>email, :name=>name, :zip_path=>zip_path} 
+    HelpdeskMailer.reportError(info).deliver
+    HelpdeskMailer.sendThankyouLetter(info).deliver
     @admin_notified = true
     render :action => 'inputfile_error_message'
     @admin_notified = false
