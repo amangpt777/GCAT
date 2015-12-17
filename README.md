@@ -6,12 +6,13 @@
 
 # Getting started
 
-First you will need to install Ruby and Ruby on Rails. I suggest using RVM to
-install them. Documentation for RVM can be found at: http://rvm.io.
+If all you want is the R package, you can install it from file R/GCAT_N.N.N.tar.gz using R CMD INSTALL.  You can also install it in RStudio, using menu Tools --> Install Packages --> Package Archive File.
+
+To get GCAT web server, you will need to install Ruby and Ruby on Rails. I suggest using RVM. Documentation for RVM can be found at: http://rvm.io.
 
 ## You will need: 
 - Ruby version 1.9.3p194 and Rails 3.2.15
-- R version between 3.0.2 and 3.2.0.
+- R version 3.2.2 or later
 
 The R package is in subfolder R. To install, do the following:
 Open a terminal in the R folder
