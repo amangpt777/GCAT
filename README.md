@@ -6,7 +6,7 @@
 
 # Getting started
 
-If all you want is the R package, you can install it from file R/GCAT_N.N.N.tar.gz using R CMD INSTALL.  You can also install it in RStudio, using menu Tools --> Install Packages --> Package Archive File.
+If all you want is the R package, you can install it from file R/GCAT_N.N.N.tar.gz using R CMD INSTALL.  You can also install it in RStudio, using menu Tools ==> Install Packages ==> Package Archive File.
 
 To get GCAT web server, you will need to install Ruby and Ruby on Rails. I suggest using RVM. Documentation for RVM can be found at: http://rvm.io.
 
