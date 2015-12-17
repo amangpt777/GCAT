@@ -392,12 +392,22 @@ auc = function(fitted.well, start=NULL, end=NULL, digits=3, unlog=FALSE, constan
     if (unlog) {
       # compute on OD scale
       int1 = integrate(function(x) {
-          unlog(well.eval(fitted.well,x),constant.added) - unlog(inoc.log.OD(fitted.well),constant.added)
-        },  
-                       start, end) 
+        # If at some x well.eval returns NA then we set it to inoc.log.OD(fitted.well)
+        # The contribution in auc at this timepoint thus will be zero as required
+        val = well.eval(fitted.well, x)
+        val <- replace(val, is.na(val), inoc.log.OD(fitted.well))
+        unlog(val,constant.added) - unlog(inoc.log.OD(fitted.well),constant.added)
+      },  
+      start, end) 
     } else {
       # compute on log scale
-      int1 = integrate(function(x) {well.eval(fitted.well,x) - inoc.log.OD(fitted.well)}, start, end)
+      int1 = integrate(function(x) {
+        # If at some x well.eval returns NA then we set it to inoc.log.OD(fitted.well)
+        # The contribution in auc at this timepoint thus will be zero as required
+        val = well.eval(fitted.well, x)
+        val <- replace(val, is.na(val), inoc.log.OD(fitted.well))
+        val - inoc.log.OD(fitted.well)
+      }, start, end)
     } 
     result = signif(int1$value,digits)
   } else {
