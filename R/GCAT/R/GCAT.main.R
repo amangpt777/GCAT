@@ -149,6 +149,15 @@ gcat.analysis.main = function(file.list, single.plate, layout.file = NULL,
     return("If normalize.method is 'average.layout' then a layout file should be specified")
   }
   
+  # Fixes Issue 15
+  # If blank value is Null then do not put OD at index 1 in points.to.remove
+  if(!is.null(blank.value) && start.index > 1) {
+    points.to.remove = c(1:(start.index - 1))
+  }
+  else if (is.null(blank.value) && start.index > 2) {
+    points.to.remove = c(2:(start.index - 1))
+  }
+  
   # MB: Not the best solution.
   if (is.na(time.input)) {
     if (single.plate)

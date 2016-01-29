@@ -305,7 +305,8 @@ setMethod("show", "well",
 #' @param  draw.guess initial guess model.  Drawn if specified
 #' @param  well.number the number of the well in an array of wells
 #' @param  ... additional arguments passed to the generic plot function
-#' 
+#' @param auc.start Start time for AUC computation
+#' @param auc.end End time for AUC computation
 #' @export
 setMethod("plot",
           signature(x = "well", y="missing"),

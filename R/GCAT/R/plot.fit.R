@@ -306,7 +306,7 @@ plot_residuals = function(input.well, xlim = NULL, lowess = T, ...){
 #'
 #' @return path of heatmap pdf file
 #' 
-create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.added, range.name){
+create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.added){
   # debug
   #browser()
   
