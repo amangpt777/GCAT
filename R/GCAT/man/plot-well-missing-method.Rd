@@ -35,6 +35,10 @@
 
 \item{draw.guess}{initial guess model.  Drawn if specified}
 
+\item{auc.start}{Start time for AUC computation}
+
+\item{auc.end}{End time for AUC computation}
+
 \item{...}{additional arguments passed to the generic plot function}
 }
 \description{
