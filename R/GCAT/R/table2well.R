@@ -286,13 +286,21 @@ gcat.reorganize.single.plate.data = function(input.data, blank.value = NULL, sin
   # Use header row to rename the columns, then cut off extra rows (including the ones above header)
 	names(input.data) = as.character(unlist(input.data[header.row,]))
   input.data = input.data[(header.row+1):(header.row+extra.rows.start-1),]
-                    
+  
+  # Select columns which contain OD values for wells
+  OD.columns = which(names(input.data) %in% gsub(" ", "", paste(rep(PLATE.LETTERS[1:plate.nrow], each = plate.ncol), rep(formatC(1:plate.ncol, digits = log(plate.ncol, 10)), plate.nrow), sep = ""), fixed = TRUE))
+  
   # Time column: allow for multiple matches to the name (since it's usually blank) but assume it's the first one
 	Time.column = which(names(input.data) == single.column.headers[1])
 	if (length(Time.column) != 1){
     if(!silent) cat("No unique time column in input.data file! Using the first one encountered.")
 		Time.column = min(Time.column)
-		}
+	}
+	
+	# Reformat input.data and select columns that are supported by GCAT i.e. Time column and OD columns 
+	Supported.columns = c(Time.column, OD.columns)
+	input.data = input.data[,Supported.columns]
+	
   # First well column (default A1): only allow for one match.	
 	Well.column.start = which(names(input.data) == single.column.headers[2])
 	if (length(Well.column.start) != 1)
