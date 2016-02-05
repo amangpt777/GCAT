@@ -338,7 +338,7 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
     for(i in 1:length(nums)) nums[i] = paste(" ", nums[i], " ")
     heat <- matrix(spec.growth, nrow=dim(fitted.well.array)[1], ncol=dim(fitted.well.array)[2], dimnames=list(letters,nums))
     pdf.name <- paste(getwd(), "/", plate.ID, "_", attr.name, ".pdf", sep="")
-    pdf(pdf.name)
+    
     #heatmap(heat, Rowv=NA, Colv=NA, revC=T, scale="none", na.rm=T, main=plate.ID, col=rainbow(100), margins=c(6,6))
     #mtext(paste("Max:", round(max(spec.growth, na.rm=T), digits=4),"Min:", round(min(spec.growth, na.rm=T), digits=4), "Avg:", round(mean(spec.growth, na.rm=T), digits=4)), side=1, line=3)
     if (length(MinMax) == 2){
@@ -368,10 +368,25 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
     heat.text = paste(toupper(sub("\\.", " ", attr.name)), ":\n", plate.ID, "\n",
                       paste("Min:", min, "Med:", avg, "Max:", max, sep=" "))
     
-    pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
+    # Fix to Issue5. Before calling pdf(pdf.name) check if pheatmap is possible to plot for the data. If not 
+    #       then print the error message in the output pdf file
+    
+    if (class(try(pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
              border_color="black", cell_width=2, cell_height=3,
-             cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
-    dev.off()
+             cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16))) == "try-error") {
+      pdf(pdf.name)
+      plot(1, type="n", axes=F, xlab="", ylab="", main = paste(heat.text, "\n", paste("Not Enough Values to plot a heatmap")))
+      dev.off()
+    }
+    
+    else {
+      pdf(pdf.name)
+      pheatmap(heat, color=colorpanel(100, "red", "orange", "yellow"),
+               border_color="black", cell_width=2, cell_height=3,
+               cluster_rows=F, cluster_cols=F, scale='none', main=heat.text, fontsize=16)
+      dev.off()
+    }
+    
   }
   else {
     return("Error") 
