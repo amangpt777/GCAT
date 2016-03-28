@@ -345,7 +345,7 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
       #  Min and max values to plot to floor and ceiling values if MinMax parameter was specified by the caller
       if(!(is.na(MinMax[1]))) {
         if(MinMax[1] > max_spec.growth) {
-          exception("", "The minimum value of range should not be greater than maximum spec.growth")
+          exception("", paste("Heat map range specified by user does not overlap with the actual range of ", attr.name, ". The actual range is from ", max_spec.growth, " to ", min_spec.growth))
         }
         else {
           heat[is.finite(heat) & heat < MinMax[1]] = MinMax[1]
@@ -355,7 +355,7 @@ create.heatmap = function(fitted.well.array, attribute, MinMax = NA, constant.ad
       }
       if(!(is.na(MinMax[2]))) {
         if(MinMax[2] < min_spec.growth) {
-          exception("", "The maximum value of range should not be less than minimum spec.growth")
+          exception("", paste("Heat map range specified by user does not overlap with the actual range of ", attr.name, ". The actual range is from ", max_spec.growth, " to ", min_spec.growth))
         }
         else {
           heat[is.finite(heat) & heat > MinMax[2]] = MinMax[2]
